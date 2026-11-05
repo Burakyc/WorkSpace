@@ -50,6 +50,9 @@ export function installFakeGoalsApi(
     /** The notes tree; mutated by the notes routes. */
     notes?: NoteNode[];
     failNotes?: boolean;
+    /** Page blocks by note id; pages not listed are empty. */
+    contents?: Record<string, unknown[]>;
+    failContentSave?: boolean;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -253,6 +256,7 @@ export function installFakeGoalsApi(
   }
 
   const notes = (options.notes ?? []).map((n) => ({ ...n }));
+  const contents: Record<string, unknown[]> = { ...options.contents };
 
   const lastOrder = (parentId: string | null) =>
     Math.max(-1, ...notes.filter((n) => n.parentId === parentId).map((n) => n.order)) + 1;
@@ -264,7 +268,7 @@ export function installFakeGoalsApi(
     body: unknown,
   ) {
     if (options.failNotes) return json({ title: 'Server error' }, 500);
-    if (method === 'GET') {
+    if (method === 'GET' && id === undefined) {
       return json([...notes].sort((a, b) => a.order - b.order));
     }
     if (method === 'POST' && id === undefined) {
@@ -290,6 +294,12 @@ export function installFakeGoalsApi(
       const doomed = descendantIds(notes, id).add(id);
       notes.splice(0, notes.length, ...notes.filter((n) => !doomed.has(n.id)));
       return new Response(null, { status: 204 });
+    }
+    if (action === 'content') {
+      if (method === 'GET') return json({ blocks: contents[id] ?? [] });
+      if (options.failContentSave) return json({ title: 'Server error' }, 500);
+      contents[id] = (body as { blocks: unknown[] }).blocks;
+      return json(node);
     }
     if (method === 'PUT') {
       const { title } = body as { title: string };
@@ -362,6 +372,7 @@ export function installFakeGoalsApi(
     sessions,
     logs,
     notes,
+    contents,
     fetchFn,
     openExternal,
     settings: () => settings,

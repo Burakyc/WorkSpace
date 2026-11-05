@@ -23,6 +23,9 @@ Opening a page in Notlar shows a BlockNote editor with the `/` command menu, hea
 | Version | **0.56.0** (14 October 2026) for every `@blocknote/*` package, pinned exactly like the other dependencies. 0.57.0 was one week old. |
 | Code blocks | **`@blocknote/code-block`** with a short language list: C#, TypeScript, JavaScript, JSON, SQL, Bash, HTML, CSS, Markdown (plus plain text). Shiki's JavaScript engine (no WebAssembly, works with the CSP). |
 | Title | **Editable above the editor** (Notion-like): Enter or leaving the field saves through `PUT /api/notes/{id}`; the tree updates. Escape restores the saved title. |
+| Lazy editor (implementation) | `NoteEditor` is loaded with `React.lazy` on the first page open, so BlockNote (about 2 MB) stays out of the start-up bundle; the language grammars load only when a code block uses them. |
+| Slash menu filter (implementation) | BlockNote's default menu items have no `key` in their type, so the offered items are matched by their translated title. |
+| Fake API (implementation) | The content routes of the test fake landed with task 5 instead of task 4 (a script edit missed them in task 4). |
 | Language of the editor UI | BlockNote 0.56.0 has no Turkish dictionary. The English dictionary is the base; the placeholders and the slash menu items used here are translated to Turkish in `editorDictionary.ts`. Untranslated tooltips stay English. |
 
 ## User stories

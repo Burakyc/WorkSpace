@@ -129,7 +129,11 @@ export function NotesPage() {
       <NoteTree nodes={nodes} openId={id ?? null} renamingId={renamingId} actions={actions} />
       <section className={styles.content}>
         {error}
-        <NoteView nodes={nodes} id={id ?? null} />
+        <NoteView
+          nodes={nodes}
+          id={id ?? null}
+          rename={(nodeId, title) => change((client) => client.renameNote(nodeId, title))}
+        />
       </section>
     </div>
   );

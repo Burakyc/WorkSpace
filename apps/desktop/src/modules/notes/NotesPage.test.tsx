@@ -6,6 +6,23 @@ import { installFakeGoalsApi } from '../goals/testing/fakeGoalsApi';
 import { NotesPage } from './NotesPage';
 import { noteNode } from './testing/noteNode';
 
+// BlockNote needs a real browser; a textarea stands in for it. Typing sends one paragraph block.
+vi.mock('./NoteEditor', () => ({
+  NoteEditor: ({
+    initialBlocks,
+    onChange,
+  }: {
+    initialBlocks: unknown[];
+    onChange(blocks: unknown[]): void;
+  }) => (
+    <textarea
+      aria-label="Editör"
+      defaultValue={JSON.stringify(initialBlocks)}
+      onChange={(event) => onChange([{ type: 'paragraph', text: event.target.value }])}
+    />
+  ),
+}));
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -14,8 +31,12 @@ function Location() {
   return <output aria-label="Adres">{useLocation().pathname}</output>;
 }
 
-function renderAt(path: string, notes: NoteNode[] = []) {
-  const api = installFakeGoalsApi([], { notes });
+function renderAt(
+  path: string,
+  notes: NoteNode[] = [],
+  options: Parameters<typeof installFakeGoalsApi>[1] = {},
+) {
+  const api = installFakeGoalsApi([], { ...options, notes });
   render(
     <MemoryRouter initialEntries={[path]}>
       <Routes>
@@ -71,8 +92,8 @@ describe('NotesPage', () => {
         { name: 'DI' },
       ),
     );
-    expect(await screen.findByRole('heading', { name: 'DI', level: 2 })).toBeInTheDocument();
-    expect(screen.getByText('Sayfa düzenleyici yakında geliyor.')).toBeInTheDocument();
+    expect(await screen.findByRole('textbox', { name: 'Sayfa başlığı' })).toHaveValue('DI');
+    expect(await screen.findByRole('textbox', { name: 'Editör' })).toHaveValue('[]');
     expect(screen.getByRole('status', { name: 'Adres' })).toHaveTextContent('/notes/p');
 
     await openMenu('DI');
@@ -201,5 +222,77 @@ describe('NotesPage', () => {
       </MemoryRouter>,
     );
     expect(await screen.findByRole('alert')).toHaveTextContent('Notlar yüklenemedi.');
+  });
+});
+
+describe('page editor', () => {
+  const pages = [
+    noteNode({ id: 'a', title: 'DI', order: 0 }),
+    noteNode({ id: 'b', title: 'Middleware', order: 1 }),
+    noteNode({ id: 'f', title: 'Folder', kind: 'folder', order: 2 }),
+  ];
+  const stored = [{ type: 'heading', content: 'Hello' }];
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('opens a page in the editor with its blocks; a folder has no editor', async () => {
+    renderAt('/notes/a', pages, { contents: { a: stored } });
+    expect(await screen.findByRole('textbox', { name: 'Editör' })).toHaveValue(
+      JSON.stringify(stored),
+    );
+
+    fireEvent.click(within(tree()).getByRole('link', { name: 'Folder' }));
+    expect(await screen.findByRole('heading', { name: 'Folder', level: 2 })).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: 'Editör' })).not.toBeInTheDocument();
+  });
+
+  it('saves one second after a change, and at once when another page opens', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const api = renderAt('/notes/a', pages);
+
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Editör' }), {
+      target: { value: 'first' },
+    });
+    expect(api.contents.a).toBeUndefined();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(api.contents.a).toEqual([{ type: 'paragraph', text: 'first' }]);
+    expect(await screen.findByText('Kaydedildi.')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Editör' }), {
+      target: { value: 'second' },
+    });
+    fireEvent.click(within(tree()).getByRole('link', { name: 'Middleware' }));
+    await waitFor(() => expect(api.contents.a).toEqual([{ type: 'paragraph', text: 'second' }]));
+  });
+
+  it('shows a failed save', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    renderAt('/notes/a', pages, { failContentSave: true });
+
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Editör' }), {
+      target: { value: 'x' },
+    });
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(
+      await screen.findByText('Kaydedilemedi. Yazmaya devam edince tekrar denenecek.'),
+    ).toBeInTheDocument();
+  });
+
+  it('renames the page from its title; Escape restores it', async () => {
+    const api = renderAt('/notes/a', pages);
+    const title = await screen.findByRole('textbox', { name: 'Sayfa başlığı' });
+
+    fireEvent.change(title, { target: { value: 'Old' } });
+    fireEvent.keyDown(title, { key: 'Escape' });
+    expect(title).toHaveValue('DI');
+
+    fireEvent.change(title, { target: { value: 'Dependency injection' } });
+    fireEvent.blur(title);
+    expect(
+      await within(tree()).findByRole('link', { name: 'Dependency injection' }),
+    ).toBeInTheDocument();
+    expect(api.notes.find((n) => n.id === 'a')?.title).toBe('Dependency injection');
   });
 });

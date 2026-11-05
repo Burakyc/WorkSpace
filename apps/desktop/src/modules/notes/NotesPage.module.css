@@ -193,3 +193,47 @@
   margin: 0 0 var(--space-3);
   color: var(--color-danger);
 }
+
+.page {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.titleField {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.titleInput {
+  width: 100%;
+  padding: var(--space-1) 0;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.titleInput:hover,
+.titleInput:focus {
+  border-bottom-color: var(--color-border);
+}
+
+.titleInput[aria-invalid='true'] {
+  border-bottom-color: var(--color-danger);
+}
+
+.status {
+  min-height: 1.25em;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* BlockNote pads its editor; the page already has the content padding. */
+.page :global(.bn-editor) {
+  padding-inline: 0;
+}
