@@ -2,6 +2,7 @@ using DevPath.Api.Infrastructure.Hosting;
 using DevPath.Api.Infrastructure.Security;
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
+using DevPath.Api.Modules.Calendar;
 using DevPath.Api.Modules.Goals;
 using DevPath.Api.Modules.Pomodoro;
 using DevPath.Api.Modules.Projects;
@@ -26,6 +27,7 @@ builder.Services.AddPomodoro();
 builder.Services.AddGoals();
 builder.Services.AddProjects();
 builder.Services.AddSingleton<SettingsService>();
+builder.Services.AddSingleton<CalendarService>();
 
 var app = builder.Build();
 
