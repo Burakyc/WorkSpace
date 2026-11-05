@@ -1,0 +1,24 @@
+# Personal data (never commit)
+data/
+backups/
+
+# Secrets
+.env
+.env.*
+secrets.bin
+
+# .NET
+bin/
+obj/
+TestResults/
+*.user
+.vs/
+
+# Node / Electron
+node_modules/
+dist/
+out/
+release/
+
+# Local tool settings
+.claude/settings.local.json
