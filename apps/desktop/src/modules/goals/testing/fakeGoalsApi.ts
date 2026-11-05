@@ -10,6 +10,7 @@ import type {
   SessionInput,
 } from '../../../shared/api/types';
 import { DEFAULT_POMODORO_SETTINGS } from '../../../shared/api/types';
+import { buildMonthGrid } from '../../calendar/monthGrid';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -31,6 +32,9 @@ export function installFakeGoalsApi(
     failSessions?: boolean;
     settings?: PomodoroSettings;
     tags?: string[];
+    /** Completed pomodoros per local date (YYYY-MM-DD) for GET /api/calendar; 25 minutes each. */
+    calendar?: Record<string, number>;
+    failCalendar?: boolean;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -200,6 +204,17 @@ export function installFakeGoalsApi(
     return json(session, 201);
   }
 
+  function calendarRoute(month: string, timeZone: string) {
+    if (options.failCalendar) return json({ title: 'Server error' }, 500);
+    const days = buildMonthGrid(month)
+      .flat()
+      .map(({ date }) => {
+        const count = options.calendar?.[date] ?? 0;
+        return { date, completedSessions: count, totalMinutes: count * 25 };
+      });
+    return json({ month, timeZone, days });
+  }
+
   const fetchFn = vi.fn<typeof fetch>((url, init) => {
     const { pathname, searchParams } = new URL(String(url));
     const method = init?.method ?? 'GET';
@@ -209,6 +224,11 @@ export function installFakeGoalsApi(
     const includeArchived = searchParams.get('includeArchived') === 'true';
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
     if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
+    if (resource === 'calendar') {
+      return Promise.resolve(
+        calendarRoute(searchParams.get('month') ?? '', searchParams.get('timeZone') ?? ''),
+      );
+    }
     const route = resource === 'projects' ? projectsRoute : goalsRoute;
     return Promise.resolve(route(method, id, action, body, includeArchived));
   });

@@ -1,6 +1,7 @@
 import type {
   ApiConfig,
   AppSettings,
+  CalendarMonth,
   Goal,
   GoalInput,
   GoalProgress,
@@ -44,6 +45,8 @@ export interface ApiClient {
   listTags(): Promise<string[]>;
   getSettings(): Promise<AppSettings>;
   savePomodoroSettings(settings: PomodoroSettings): Promise<PomodoroSettings>;
+  /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
+  getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT';
@@ -91,6 +94,11 @@ export function createApiClient(
     getSettings: () => request<AppSettings>('GET', '/api/settings'),
     savePomodoroSettings: (settings) =>
       request<PomodoroSettings>('PUT', '/api/settings/pomodoro', settings),
+    getCalendar: (month, timeZone) =>
+      request<CalendarMonth>(
+        'GET',
+        `/api/calendar?month=${encodeURIComponent(month)}&timeZone=${encodeURIComponent(timeZone)}`,
+      ),
   };
 }
 

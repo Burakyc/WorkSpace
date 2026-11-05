@@ -102,6 +102,20 @@ export interface GoalProgress {
   percent: number | null;
 }
 
+/** One day of GET /api/calendar: completed sessions started on that local date. */
+export interface CalendarDay {
+  date: string;
+  completedSessions: number;
+  totalMinutes: number;
+}
+
+/** GET /api/calendar: every day of the month's visible grid, Monday first. */
+export interface CalendarMonth {
+  month: string;
+  timeZone: string;
+  days: CalendarDay[];
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 

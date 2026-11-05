@@ -181,4 +181,15 @@ describe('createApiClient', () => {
       ['PUT http://127.0.0.1:4321/api/settings/pomodoro', JSON.stringify(pomodoro)],
     ]);
   });
+
+  it('requests a calendar month with the encoded time zone', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(json({ days: [] }));
+
+    await createApiClient(config, fetchFn).getCalendar('2026-11', 'Europe/Istanbul');
+
+    expect(fetchFn).toHaveBeenCalledWith(
+      'http://127.0.0.1:4321/api/calendar?month=2026-11&timeZone=Europe%2FIstanbul',
+      { method: 'GET', headers: { [TOKEN_HEADER]: 'secret' } },
+    );
+  });
 });
