@@ -51,7 +51,7 @@ const bridge = () => (window.devpath as DevPathBridge | undefined)?.pomodoro;
 function scheduleEnd(state: TimerState) {
   if (state.status === 'running') {
     void bridge()
-      ?.scheduleEnd(state.endsAt, state.goalTitle)
+      ?.scheduleEnd(state.endsAt, 'Odak süresi bitti', state.goalTitle)
       .catch(() => undefined);
   }
 }

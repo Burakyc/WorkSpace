@@ -51,7 +51,11 @@ describe('PomodoroProvider', () => {
 
     fireEvent.click(screen.getByText('start'));
 
-    expect(scheduleEnd).toHaveBeenCalledWith(Date.now() + 25 * MIN, 'Learn ASP.NET Core');
+    expect(scheduleEnd).toHaveBeenCalledWith(
+      Date.now() + 25 * MIN,
+      'Odak süresi bitti',
+      'Learn ASP.NET Core',
+    );
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
       status: 'running',
       goalId: 'g',
@@ -70,7 +74,11 @@ describe('PomodoroProvider', () => {
     act(() => vi.advanceTimersByTime(10 * MIN));
     expect(text('clock')).toBe('20:00');
     fireEvent.click(screen.getByText('resume'));
-    expect(scheduleEnd).toHaveBeenLastCalledWith(Date.now() + 20 * MIN, 'Learn ASP.NET Core');
+    expect(scheduleEnd).toHaveBeenLastCalledWith(
+      Date.now() + 20 * MIN,
+      'Odak süresi bitti',
+      'Learn ASP.NET Core',
+    );
 
     fireEvent.click(screen.getByText('stop'));
     expect(cancelEnd).toHaveBeenCalledTimes(2);
@@ -99,7 +107,11 @@ describe('PomodoroProvider', () => {
 
     expect(text('status')).toBe('running');
     expect(text('clock')).toBe('15:00');
-    expect(scheduleEnd).toHaveBeenCalledWith(Date.now() + 15 * MIN, 'Learn ASP.NET Core');
+    expect(scheduleEnd).toHaveBeenCalledWith(
+      Date.now() + 15 * MIN,
+      'Odak süresi bitti',
+      'Learn ASP.NET Core',
+    );
   });
 
   it('loads a stored timer that ended meanwhile as finished, and garbage as idle', () => {

@@ -16,8 +16,8 @@ const bridge: DevPathBridge = {
     };
   },
   pomodoro: {
-    scheduleEnd: async (endsAt, body) => {
-      await ipcRenderer.invoke('devpath:pomodoro-schedule-end', endsAt, body);
+    scheduleEnd: async (endsAt, title, body) => {
+      await ipcRenderer.invoke('devpath:pomodoro-schedule-end', endsAt, title, body);
     },
     cancelEnd: async () => {
       await ipcRenderer.invoke('devpath:pomodoro-cancel-end');

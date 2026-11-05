@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 function setup() {
-  const notify = vi.fn<(body: string) => void>();
+  const notify = vi.fn<(title: string, body: string) => void>();
   const notifier = createSessionNotifier({
     now: () => Date.now(),
     setTimer: (callback, ms) => setTimeout(callback, ms),
@@ -24,23 +24,23 @@ describe('createSessionNotifier', () => {
   it('notifies once at the end time', () => {
     const { notifier, notify } = setup();
 
-    notifier.schedule(Date.now() + 60_000, 'Learn ASP.NET Core');
+    notifier.schedule(Date.now() + 60_000, 'Odak süresi bitti', 'Learn ASP.NET Core');
     vi.advanceTimersByTime(59_999);
     expect(notify).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1);
 
-    expect(notify).toHaveBeenCalledExactlyOnceWith('Learn ASP.NET Core');
+    expect(notify).toHaveBeenCalledExactlyOnceWith('Odak süresi bitti', 'Learn ASP.NET Core');
   });
 
   it('replaces an earlier schedule and can be cancelled', () => {
     const { notifier, notify } = setup();
 
-    notifier.schedule(Date.now() + 1_000, 'first');
-    notifier.schedule(Date.now() + 2_000, 'second');
+    notifier.schedule(Date.now() + 1_000, 'T', 'first');
+    notifier.schedule(Date.now() + 2_000, 'T', 'second');
     vi.advanceTimersByTime(5_000);
-    expect(notify).toHaveBeenCalledExactlyOnceWith('second');
+    expect(notify).toHaveBeenCalledExactlyOnceWith('T', 'second');
 
-    notifier.schedule(Date.now() + 1_000, 'third');
+    notifier.schedule(Date.now() + 1_000, 'T', 'third');
     notifier.cancel();
     vi.advanceTimersByTime(5_000);
     expect(notify).toHaveBeenCalledOnce();
@@ -49,10 +49,10 @@ describe('createSessionNotifier', () => {
   it('notifies at once for an end time in the past', () => {
     const { notifier, notify } = setup();
 
-    notifier.schedule(Date.now() - 10_000, 'late');
+    notifier.schedule(Date.now() - 10_000, 'Mola bitti', 'late');
     vi.advanceTimersByTime(0);
 
-    expect(notify).toHaveBeenCalledExactlyOnceWith('late');
+    expect(notify).toHaveBeenCalledExactlyOnceWith('Mola bitti', 'late');
   });
 });
 
@@ -60,16 +60,18 @@ describe('isValidSchedule', () => {
   const now = 1_800_000_000_000;
 
   it('accepts a near end time and a short text', () => {
-    expect(isValidSchedule(now + 25 * 60_000, 'Learn', now)).toBe(true);
+    expect(isValidSchedule(now + 25 * 60_000, 'Odak süresi bitti', 'Learn', now)).toBe(true);
   });
 
-  it.each<[string, unknown, unknown]>([
-    ['a string time', '1800', 'x'],
-    ['infinity', Infinity, 'x'],
-    ['more than a day ahead', now + 25 * 60 * 60_000, 'x'],
-    ['a missing body', now, undefined],
-    ['a long body', now, 'x'.repeat(201)],
-  ])('refuses %s', (_name, endsAt, body) => {
-    expect(isValidSchedule(endsAt, body, now)).toBe(false);
+  it.each<[string, unknown, unknown, unknown]>([
+    ['a string time', '1800', 'T', 'x'],
+    ['infinity', Infinity, 'T', 'x'],
+    ['more than a day ahead', now + 25 * 60 * 60_000, 'T', 'x'],
+    ['a missing title', now, undefined, 'x'],
+    ['a long title', now, 'x'.repeat(101), 'x'],
+    ['a missing body', now, 'T', undefined],
+    ['a long body', now, 'T', 'x'.repeat(201)],
+  ])('refuses %s', (_name, endsAt, title, body) => {
+    expect(isValidSchedule(endsAt, title, body, now)).toBe(false);
   });
 });

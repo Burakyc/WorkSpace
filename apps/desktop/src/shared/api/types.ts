@@ -113,8 +113,8 @@ export interface DevPathBridge {
   /** Main asks the page to open a route (e.g. after a notification click). Returns an unsubscribe function. */
   onOpenPage(callback: (path: string) => void): () => void;
   pomodoro: {
-    /** Schedules the "focus session ended" notification; replaces any earlier one. */
-    scheduleEnd(endsAt: number, body: string): Promise<void>;
+    /** Schedules the end-of-timer notification; replaces any earlier one. */
+    scheduleEnd(endsAt: number, title: string, body: string): Promise<void>;
     cancelEnd(): Promise<void>;
   };
   settings: {

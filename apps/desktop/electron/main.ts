@@ -167,8 +167,8 @@ if (!app.requestSingleInstanceLock()) {
       now: () => Date.now(),
       setTimer: (callback, ms) => setTimeout(callback, ms),
       clearTimer: (timer) => clearTimeout(timer as ReturnType<typeof setTimeout>),
-      notify: (body) => {
-        lastNotification = new Notification({ title: 'Odak süresi bitti', body, silent: true });
+      notify: (title, body) => {
+        lastNotification = new Notification({ title, body, silent: true });
         lastNotification.on('click', () => {
           if (!mainWindow) return;
           if (mainWindow.isMinimized()) mainWindow.restore();
@@ -180,11 +180,11 @@ if (!app.requestSingleInstanceLock()) {
       },
     });
 
-    handle('devpath:pomodoro-schedule-end', (_event, endsAt, body) => {
-      if (!isValidSchedule(endsAt, body, Date.now())) {
+    handle('devpath:pomodoro-schedule-end', (_event, endsAt, title, body) => {
+      if (!isValidSchedule(endsAt, title, body, Date.now())) {
         throw new Error('Invalid session end.');
       }
-      notifier.schedule(endsAt as number, body as string);
+      notifier.schedule(endsAt as number, title as string, body as string);
     });
 
     handle('devpath:pomodoro-cancel-end', () => notifier.cancel());
