@@ -84,4 +84,13 @@ describe('AppLayout', () => {
   it('has one route per sidebar entry', () => {
     expect(new Set(navigation.map((entry) => entry.path)).size).toBe(navigation.length);
   });
+
+  it.each(
+    navigation.filter((entry) => entry.path !== '/settings').map((entry) => [entry.label, entry]),
+  )('%s shows its empty state with a next step', (_label, entry) => {
+    renderAt(entry.path);
+
+    expect(screen.getByRole('heading', { level: 1, name: entry.label })).toBeInTheDocument();
+    expect(screen.getByText(entry.emptyState!.next)).toBeInTheDocument();
+  });
 });
