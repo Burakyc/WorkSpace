@@ -1,6 +1,6 @@
 import type { GoalProgress } from '../../shared/api/types';
-import { formatDuration } from '../../shared/format/formatDuration';
 import styles from './GoalProgressView.module.css';
+import { progressText } from './progressText';
 
 interface GoalProgressViewProps {
   /** Missing until the progress request answers; shown as zero. */
@@ -9,21 +9,21 @@ interface GoalProgressViewProps {
 }
 
 export function GoalProgressView({ progress, targetPomodoros }: GoalProgressViewProps) {
-  const completed = progress?.completedSessions ?? 0;
+  const text = progressText(progress, targetPomodoros);
 
   if (targetPomodoros === null) {
-    return (
-      <p className={styles.text}>
-        {`${completed} pomodoro · ${formatDuration(progress?.totalMinutes ?? 0)}`}
-      </p>
-    );
+    return <p className={styles.text}>{text}</p>;
   }
 
-  const percent = progress?.percent ?? 0;
   return (
     <div className={styles.progress}>
-      <p className={styles.text}>{`${completed} / ${targetPomodoros} pomodoro · %${percent}`}</p>
-      <progress className={styles.bar} aria-label="İlerleme" value={percent} max={100} />
+      <p className={styles.text}>{text}</p>
+      <progress
+        className={styles.bar}
+        aria-label="İlerleme"
+        value={progress?.percent ?? 0}
+        max={100}
+      />
     </div>
   );
 }

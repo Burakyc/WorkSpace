@@ -151,15 +151,77 @@ describe('PomodoroPage controls', () => {
     expect(screen.getByRole('button', { name: 'Başlat' })).toBeEnabled();
   });
 
-  it('finishes after 25 minutes and starts over with "Yeni oturum"', async () => {
+  it('finishes after 25 minutes and offers to save', async () => {
     await startSession();
 
     act(() => vi.advanceTimersByTime(25 * MIN));
 
     expect(screen.getByText('Süre doldu.')).toBeInTheDocument();
     expect(clock()).toHaveTextContent('00:00');
-    fireEvent.click(screen.getByRole('button', { name: 'Yeni oturum' }));
+    expect(screen.getByRole('form', { name: 'Oturumu kaydet' })).toBeInTheDocument();
+  });
+});
+
+describe('PomodoroPage saving', () => {
+  const aspnet20 = goal({ id: 'a', title: 'Learn ASP.NET Core', targetPomodoros: 20 });
+
+  async function finishSession(options: { failSessions?: boolean } = {}) {
+    const api = installFakeGoalsApi([aspnet20], { projects: [todo], ...options });
+    renderPage();
+    await screen.findByRole('button', { name: 'Başlat' });
+    vi.useFakeTimers({ shouldAdvanceTime: false });
+    fireEvent.change(goalSelect(), { target: { value: 'a' } });
+    fireEvent.change(projectSelect(), { target: { value: 'p1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+    act(() => vi.advanceTimersByTime(25 * MIN));
+    vi.useRealTimers();
+    return api;
+  }
+
+  it('saves a finished session with its note and shows the new progress', async () => {
+    const api = await finishSession();
+
+    fireEvent.change(screen.getByLabelText('Not (isteğe bağlı)'), {
+      target: { value: 'DI scopes' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    expect(
+      await screen.findByText('Kaydedildi · Learn ASP.NET Core: 1 / 20 pomodoro · %5'),
+    ).toBeInTheDocument();
+    expect(api.sessions).toEqual([
+      expect.objectContaining({
+        goalId: 'a',
+        projectId: 'p1',
+        durationMinutes: 25,
+        completed: true,
+        note: 'DI scopes',
+      }),
+    ]);
+    const saved = api.sessions[0]!;
+    expect(Date.parse(saved.endedAt) - Date.parse(saved.startedAt)).toBe(25 * MIN);
     expect(clock()).toHaveTextContent('25:00');
     expect(goalSelect()).toHaveValue('a');
+  });
+
+  it('saves an empty note as null', async () => {
+    const api = await finishSession();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    await screen.findByText(/^Kaydedildi/);
+    expect(api.sessions[0]?.note).toBeNull();
+  });
+
+  it('keeps the finished session when saving fails', async () => {
+    await finishSession({ failSessions: true });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Oturum kaydedilemedi. Tekrar dene.',
+    );
+    expect(screen.getByText('Süre doldu.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Kaydet' })).toBeEnabled();
   });
 });

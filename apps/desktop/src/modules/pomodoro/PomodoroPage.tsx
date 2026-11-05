@@ -1,11 +1,13 @@
 import { Timer } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { Link } from 'react-router';
+import { ApiError } from '../../shared/api/client';
 import { getApiClient } from '../../shared/api/getApiClient';
-import type { Goal, Project } from '../../shared/api/types';
+import type { Goal, Project, SessionInput } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import form from '../../shared/ui/form.module.css';
+import { progressText } from '../goals/progressText';
 import { usePomodoro } from './PomodoroContext';
 import styles from './PomodoroPage.module.css';
 import { FOCUS_MINUTES, formatClock, remainingMs } from './timer';
@@ -19,6 +21,11 @@ export function PomodoroPage() {
   const [error, setError] = useState<string | null>(null);
   const [goalId, setGoalId] = useState('');
   const [projectId, setProjectId] = useState('');
+  const [note, setNote] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [noteError, setNoteError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -60,9 +67,60 @@ export function PomodoroPage() {
     pomodoro.stop();
   }
 
-  function newSession() {
-    keepSessionSelection();
-    pomodoro.reset();
+  /** Saves a session, then shows the goal's new progress. Returns false (and shows why) when saving failed. */
+  async function saveSession(input: SessionInput, goalTitle: string): Promise<boolean> {
+    setSaving(true);
+    setSaveError(null);
+    setNoteError(null);
+    try {
+      const client = await getApiClient();
+      await client.createSession(input);
+      try {
+        const progress = (await client.getGoalProgress()).find((p) => p.goalId === input.goalId);
+        const target = goals?.find((g) => g.id === input.goalId)?.targetPomodoros ?? null;
+        setFeedback(`Kaydedildi · ${goalTitle}: ${progressText(progress, target)}`);
+      } catch {
+        setFeedback('Kaydedildi.');
+      }
+      return true;
+    } catch (e) {
+      if (e instanceof ApiError && e.errors?.['note']) {
+        setNoteError(e.errors['note'].join(' '));
+      } else {
+        setSaveError('Oturum kaydedilemedi. Tekrar dene.');
+      }
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveFinished() {
+    if (state.status !== 'finished') return;
+    const saved = await saveSession(
+      {
+        goalId: state.goalId,
+        projectId: state.projectId,
+        startedAt: new Date(state.startedAt).toISOString(),
+        endedAt: new Date(state.endedAt).toISOString(),
+        durationMinutes: Math.round(state.durationMs / 60_000),
+        completed: true,
+        note: note.trim() === '' ? null : note,
+      },
+      state.goalTitle,
+    );
+    if (saved) {
+      keepSessionSelection();
+      setNote('');
+      pomodoro.reset();
+    }
+  }
+
+  function start() {
+    if (!selectedGoal) return;
+    setFeedback(null);
+    setSaveError(null);
+    pomodoro.start(selectedGoal, projectId || null);
   }
 
   if (goals === null) {
@@ -157,7 +215,7 @@ export function PomodoroPage() {
               type="button"
               className={buttons.primary}
               disabled={!selectedGoal}
-              onClick={() => selectedGoal && pomodoro.start(selectedGoal, projectId || null)}
+              onClick={start}
             >
               Başlat
             </button>
@@ -177,12 +235,53 @@ export function PomodoroPage() {
               Durdur
             </button>
           )}
-          {state.status === 'finished' && (
-            <button type="button" className={buttons.primary} onClick={newSession}>
-              Yeni oturum
-            </button>
-          )}
         </div>
+
+        {state.status === 'finished' && (
+          <form
+            className={styles.saveForm}
+            aria-label="Oturumu kaydet"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void saveFinished();
+            }}
+          >
+            <div className={form.field}>
+              <label htmlFor={`${id}-note`}>Not (isteğe bağlı)</label>
+              <textarea
+                id={`${id}-note`}
+                className={form.input}
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                maxLength={500}
+                rows={3}
+                aria-invalid={noteError ? true : undefined}
+                aria-describedby={noteError ? `${id}-note-error` : undefined}
+              />
+              {noteError && (
+                <p id={`${id}-note-error`} className={form.fieldError}>
+                  {noteError}
+                </p>
+              )}
+            </div>
+            <div>
+              <button type="submit" className={buttons.primary} disabled={saving}>
+                Kaydet
+              </button>
+            </div>
+          </form>
+        )}
+
+        {saveError && (
+          <p role="alert" className={styles.error}>
+            {saveError}
+          </p>
+        )}
+        {feedback && idle && (
+          <p role="status" className={styles.feedback}>
+            {feedback}
+          </p>
+        )}
       </section>
     </>
   );
