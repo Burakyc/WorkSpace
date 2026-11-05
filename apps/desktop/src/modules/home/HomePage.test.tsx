@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { FeedItem } from '../../shared/api/types';
+import type { FeedItem, YouTubeVideo } from '../../shared/api/types';
 import { DEFAULT_POMODORO_SETTINGS } from '../../shared/api/types';
 import { todayLocal } from '../calendar/monthGrid';
 import { goal, installFakeGoalsApi } from '../goals/testing/fakeGoalsApi';
@@ -204,5 +204,100 @@ describe('HomePage reminders card', () => {
       .getAllByRole('listitem')
       .map((li) => li.textContent);
     expect(rows).toEqual(['09:00 İngilizcegeçti', '20:00 Tekniksıradaki']);
+  });
+});
+
+const video = (id: string, title: string, publishedAt: string): YouTubeVideo => ({
+  id,
+  title,
+  channelId: 'UC1',
+  channelTitle: 'Google for Developers',
+  publishedAt,
+  thumbnailUrl: `https://i.ytimg.com/vi/${id}/mqdefault.jpg`,
+  url: `https://www.youtube.com/watch?v=${id}`,
+});
+const channel = { id: 'UC1', title: 'Google for Developers' };
+const cached = {
+  videos: [video('aaaaaaaaaaa', 'Yeni video', '2026-11-05T17:00:00Z')],
+  lastRefreshAt: '2026-11-06T06:00:00Z',
+  error: null,
+};
+
+describe('HomePage videos card', () => {
+  it('lists the videos and opens one in the browser', async () => {
+    const api = installFakeGoalsApi([], { youTubeChannels: [channel], youTubeVideos: cached });
+    renderPage();
+
+    const list = await within(card('Yeni videolar')).findByRole('list', { name: 'Videolar' });
+    const item = within(list).getByRole('listitem');
+    expect(item.querySelector('img')).toHaveAttribute(
+      'src',
+      'https://i.ytimg.com/vi/aaaaaaaaaaa/mqdefault.jpg',
+    );
+    expect(within(item).getByText(/^Google for Developers · 5 Kasım 2026$/)).toBeInTheDocument();
+
+    fireEvent.click(within(item).getByRole('button', { name: 'Yeni video' }));
+    expect(api.openExternal).toHaveBeenCalledWith('https://www.youtube.com/watch?v=aaaaaaaaaaa');
+  });
+
+  it('shows the refresh error together with the cached list', async () => {
+    installFakeGoalsApi([], {
+      youTubeChannels: [channel],
+      youTubeVideos: { ...cached, error: 'Güncellenemeyen kanallar: Google for Developers.' },
+    });
+    renderPage();
+
+    const videos = card('Yeni videolar');
+    expect(
+      await within(videos).findByText('Güncellenemeyen kanallar: Google for Developers.'),
+    ).toBeInTheDocument();
+    expect(within(videos).getByRole('button', { name: 'Yeni video' })).toBeInTheDocument();
+  });
+
+  it('refreshes with "Yenile" and keeps the list when the refresh fails', async () => {
+    installFakeGoalsApi([], {
+      youTubeChannels: [channel],
+      youTubeVideos: cached,
+      refreshedVideos: {
+        ...cached,
+        videos: [video('bbbbbbbbbbb', 'Daha yeni', '2026-11-06T08:00:00Z')],
+      },
+    });
+    renderPage();
+    const videos = card('Yeni videolar');
+
+    fireEvent.click(await within(videos).findByRole('button', { name: 'Yenile' }));
+
+    expect(await within(videos).findByRole('button', { name: 'Daha yeni' })).toBeInTheDocument();
+  });
+
+  it('says when a refresh fails', async () => {
+    installFakeGoalsApi([], {
+      youTubeChannels: [channel],
+      youTubeVideos: cached,
+      failRefresh: true,
+    });
+    renderPage();
+    const videos = card('Yeni videolar');
+
+    fireEvent.click(await within(videos).findByRole('button', { name: 'Yenile' }));
+
+    expect(await within(videos).findByText('Videolar yenilenemedi.')).toBeInTheDocument();
+    expect(within(videos).getByRole('button', { name: 'Yeni video' })).toBeInTheDocument();
+  });
+
+  it('points to Ayarlar without channels and says when nothing was fetched yet', async () => {
+    installFakeGoalsApi([]);
+    const first = renderPage();
+    expect(
+      await within(card('Yeni videolar')).findByRole('link', { name: "Ayarlar'dan kanal ekle" }),
+    ).toHaveAttribute('href', '/settings');
+    first.unmount();
+
+    installFakeGoalsApi([], { youTubeChannels: [channel] });
+    renderPage();
+    expect(
+      await within(card('Yeni videolar')).findByText('Videolar henüz çekilmedi.'),
+    ).toBeInTheDocument();
   });
 });

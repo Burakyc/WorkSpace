@@ -24,6 +24,7 @@ The user follows YouTube channels without opening YouTube. In Ayarlar they add c
 | Check on add | **Yes, and keep the name.** Adding fetches the channel's RSS once; a channel that does not exist or cannot be reached is not added. The feed's title is saved as the channel name and its videos go straight into the cache. |
 | Card | **The 10 newest videos across all channels**, one list by `publishedAt`. |
 | Manual refresh | **"Yenile" on the card** refreshes every channel at once. Adding a channel also puts its videos in the cache. |
+| Refresh time (implementation) | The card shows "Son yenileme" (`lastRefreshAt`, the last attempt) instead of a "last successful refresh" time: the API keeps success times per channel only, and the error line already says which channels failed. |
 | Error display (implementation) | The failure is shown **inside the Yeni videolar card** (danger border, the Turkish error above the cached list), the same way 6.1 shows feed errors. |
 
 ## User stories
@@ -97,7 +98,7 @@ Both answer `200` with:
 - **Ana Sayfa → Yeni videolar** (`VideosCard`): each video is a row with the thumbnail (`alt=""`, lazy loaded, 16:9), the title as a button that calls `openExternal(url)`, and "channel · date" muted. "Yenile" (disabled and "Yenileniyor…" while running) calls `POST /api/youtube/refresh` and shows its answer. A failed request keeps the list and shows "Videolar yenilenemedi.".
   - No channels: "Henüz kanal yok." with a link to Ayarlar.
   - Channels but no cached videos: "Videolar henüz çekilmedi." plus "Yenile".
-  - `error` set: danger border and the error text above the cached list, with "Son başarılı yenileme" time when any channel has cached videos.
+  - `error` set: danger border and the error text above the cached list. The card shows "Son yenileme: <lastRefreshAt>" whenever a refresh has run.
   - A failed `GET`: "Videolar yüklenemedi."
 
 ## Out of scope

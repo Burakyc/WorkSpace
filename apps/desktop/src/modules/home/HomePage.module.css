@@ -98,3 +98,33 @@
   color: var(--color-accent);
   font-weight: 600;
 }
+
+.video {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: start;
+  gap: var(--space-3);
+}
+
+.thumbnail {
+  width: 120px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+}
+
+/* A button that reads as a link: it opens the video in the default browser. */
+.linkButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
