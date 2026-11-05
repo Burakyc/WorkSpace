@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import type {
   DayDetail,
   DayNote,
+  FeedResponse,
   Goal,
   GoalInput,
   GoalProgress,
@@ -57,6 +58,9 @@ export function installFakeGoalsApi(
     /** GET /api/notes/search answers by query; queries not listed find nothing. */
     search?: Record<string, NoteSearchResult[]>;
     failSearch?: boolean;
+    /** GET /api/home/feed answer; missing by default. */
+    feed?: FeedResponse;
+    failFeed?: boolean;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -354,6 +358,12 @@ export function installFakeGoalsApi(
     const [, , resource, rawId, action] = pathname.split('/');
     const id = rawId === undefined ? undefined : decodeURIComponent(rawId);
     const includeArchived = searchParams.get('includeArchived') === 'true';
+    if (resource === 'home' && id === 'feed') {
+      if (options.failFeed) return Promise.resolve(json({ title: 'Server error' }, 500));
+      return Promise.resolve(
+        json(options.feed ?? { status: 'missing', generatedAt: null, items: [], errors: [] }),
+      );
+    }
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
     if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
     if (resource === 'notes') {

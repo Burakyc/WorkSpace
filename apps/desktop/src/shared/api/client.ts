@@ -3,6 +3,7 @@ import type {
   AppSettings,
   CalendarMonth,
   DayDetail,
+  FeedResponse,
   Goal,
   GoalInput,
   GoalProgress,
@@ -69,6 +70,8 @@ export interface ApiClient {
   saveNoteContent(id: string, blocks: unknown[]): Promise<NoteNode>;
   /** Pages whose title or text holds every word; title matches first. */
   searchNotes(query: string): Promise<NoteSearchResult[]>;
+  /** The agent-written feed.json: `ok` with the 10 newest items, `missing`, or `invalid` with the error lines. */
+  getFeed(): Promise<FeedResponse>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -141,6 +144,7 @@ export function createApiClient(
     saveNoteContent: (id, blocks) => request<NoteNode>('PUT', `${note(id)}/content`, { blocks }),
     searchNotes: (query) =>
       request<NoteSearchResult[]>('GET', `/api/notes/search?q=${encodeURIComponent(query)}`),
+    getFeed: () => request<FeedResponse>('GET', '/api/home/feed'),
   };
 }
 

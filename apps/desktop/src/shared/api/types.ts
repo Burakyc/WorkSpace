@@ -186,6 +186,23 @@ export interface NoteNode {
   updatedAt: string;
 }
 
+/** One X summary from feed.json (mirrors FeedItem). */
+export interface FeedItem {
+  title: string;
+  summary: string;
+  url: string | null;
+  source: string | null;
+  publishedAt: string | null;
+}
+
+/** GET /api/home/feed. `errors` are Turkish lines with a JSON path; an invalid file has no items. */
+export interface FeedResponse {
+  status: 'ok' | 'missing' | 'invalid';
+  generatedAt: string | null;
+  items: FeedItem[];
+  errors: string[];
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 

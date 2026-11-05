@@ -243,4 +243,14 @@ describe('createApiClient', () => {
       [`GET ${base}/search?q=di%20%C3%B6m%C3%BCr`, undefined],
     ]);
   });
+  it('sends the home requests', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(json({}));
+    const client = createApiClient(config, fetchFn);
+
+    await client.getFeed();
+
+    expect(fetchFn.mock.calls.map(([url, init]) => `${init?.method} ${String(url)}`)).toEqual([
+      'GET http://127.0.0.1:4321/api/home/feed',
+    ]);
+  });
 });
