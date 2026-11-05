@@ -17,3 +17,17 @@ Important: You *must* use your AskUserQuestion tool, grouped on these 3 core are
 Write all documents in English.
 **Result:** created `specs/mission.md`, `specs/tech-stack.md`, `specs/roadmap.md`.
 
+
+## 2026-11-05 – Plan phase 0.1 API skeleton
+**Phase:** 0.1 API skeleton
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 0.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-api-skeleton/` (`requirements.md`, `plan.md`, `validation.md`).
