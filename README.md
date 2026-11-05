@@ -123,6 +123,7 @@ Prerequisites: Node 24 (see `.nvmrc`), npm 11 and the [.NET 10 SDK](https://dotn
 npm install      # install desktop dependencies
 npm run dev      # build the API, then open the desktop app with hot reload
 npm run check    # build and test everything (API + desktop)
+npm run package  # build the Windows installer
 ```
 
 `npm run dev` builds the API first; Electron then starts `DevPath.Api.exe` on a free port with a new token for each launch and stops it when the app quits. The page shows "API: bağlı" when the connection works.
@@ -156,13 +157,22 @@ All data is JSON in one folder, which the API takes from `DEVPATH_DATA_DIR` and 
 
 To use another folder, open **Ayarlar → Veri klasörü → Klasör seç…** and pick a folder. The API restarts with the new folder; existing data is not moved. If the new folder does not work, the app goes back to the old one.
 
-The choice is saved in `app-config.json` in Electron's `userData` folder (`%APPDATA%\@devpath\desktop` while unpackaged). The file can also be edited by hand:
+The choice is saved in `app-config.json` in Electron's `userData` folder: `%APPDATA%\DevPath` for the installed app, `%APPDATA%\@devpath\desktop` while unpackaged. The file can also be edited by hand:
 
 ```json
 { "schemaVersion": 1, "dataDir": "D:\\DevPathData" }
 ```
 
 If that file is not valid JSON, `dataDir` is not an absolute path, or the folder cannot be created, the app shows an error and quits.
+
+### Windows installer
+
+`npm run package` publishes the API as a self-contained `DevPath.Api.exe` (no .NET needed on the target machine), builds the desktop app and writes `apps/desktop/release/DevPath Setup <version>.exe`.
+
+- The installer is a per-user wizard: no admin rights, default folder `%LOCALAPPDATA%\Programs\DevPath`, Start menu and desktop shortcuts. Keep "Sadece benim için" on its first page; "everyone" asks for admin rights.
+- It is not code-signed, so Windows SmartScreen may warn on first run ("More info" → "Run anyway").
+- The first start right after installing takes about 3.5 s; later starts take about 1.5–2 s.
+- Uninstall (Windows Settings → Apps) removes the program and shortcuts but keeps `%APPDATA%\DevPath` with your settings and data.
 
 ## Commit conventions
 

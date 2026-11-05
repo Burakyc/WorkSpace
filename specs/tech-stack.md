@@ -12,7 +12,7 @@
 | Validation | JSON Schema files in `schemas/`, validated in the API with JsonSchema.Net |
 | External data | GitHub REST API (public, optional token), YouTube channel RSS |
 | Tests | xUnit v2 (VSTest) + `WebApplicationFactory` (backend), Vitest + React Testing Library (frontend) |
-| Packaging | electron-builder (NSIS installer) with a self-contained, single-file API executable |
+| Packaging | electron-builder (per-user NSIS wizard, unsigned) with a self-contained, single-file API executable; `node_modules` is not packaged (electron-vite bundles the renderer) |
 | Package manager | npm workspaces |
 | Desktop build | electron-vite (main, preload and renderer); TypeScript 6.0 (typescript-eslint does not support 7.x yet) |
 | Node | 24, pinned in `.nvmrc` and `engines` |
@@ -48,7 +48,7 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 1. Electron main reads `app-config.json` from Electron's `userData` folder (non-secret settings such as `dataDir`).
 2. It picks a free port, creates a random 32-byte token, and starts the API with environment variables `DEVPATH_PORT`, `DEVPATH_TOKEN`, `DEVPATH_ORIGIN` (the renderer's origin for CORS), `DEVPATH_PARENT_PID` (main's PID), `DEVPATH_DATA_DIR` and decrypted secrets (e.g. `DEVPATH_GITHUB_TOKEN`). Secrets live only in that process's memory. The API's working directory is the exe's folder, so it finds `appsettings.json`.
    - Dev: root `npm run dev` runs `dotnet build apps/api/DevPath.slnx` first; main then spawns `apps/api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe` directly. Not `dotnet run`: it is too slow for the 10 s timeout, and killing it on Windows leaves the real API process running.
-   - Packaged: `resources/api/DevPath.Api.exe`.
+   - Packaged: `resources/api/DevPath.Api.exe` (with `appsettings.json` next to it), started in `Production`. `npm run package` runs `dotnet publish -r win-x64 --self-contained -p:PublishSingleFile=true` first. The installed app is named `DevPath` through electron-builder `extraMetadata.productName`, so its `userData` is `%APPDATA%\DevPath`, separate from development (`%APPDATA%\@devpath\desktop`). Uninstall keeps `%APPDATA%\DevPath`.
 3. Main polls `GET /api/health` (with the token) until it answers `200` (timeout 10 s, or earlier if the API process exits). On failure it shows `dialog.showErrorBox` with a Turkish message and quits; the main window is never opened.
 4. When a secret or the data folder changes, main restarts the API. A data folder change (Ayarlar, `settings.changeDataDir()`) creates the folder, writes `app-config.json`, stops the old API, starts a new one on a new port with a new token, and reloads the window. If the new API does not start, the old `app-config.json` is restored and the old API is started again.
 5. On quit, main stops the API process. If main dies without quitting, the API notices that `DEVPATH_PARENT_PID` exited and stops itself.
