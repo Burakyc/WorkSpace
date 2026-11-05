@@ -21,6 +21,8 @@ The Notlar page gets a tree of folders and pages: create, rename, move (drag and
 | Moving | **Drag and drop and "Taşı…"**. Dropping an item on another item makes it that item's last child; dropping it on the "En üste" zone moves it to the top level. "Taşı…" opens a small panel with a list of valid targets (keyboard friendly). Native HTML5 drag and drop, no new package. |
 | Order | **Manual**. A new or moved item goes to the end of its new parent; "Yukarı taşı" / "Aşağı taşı" swap it with its neighbour. Moving and reordering never change `updatedAt`. |
 | Nesting | **Anything can hold anything**: folders and pages can both have folders and pages as children. The only difference: a page has content (a page file, the editor in 4.2), a folder does not. |
+| Delete order (implementation) | The plan said one index write; `IRepository<T>` deletes one item at a time, so nodes are deleted **deepest first** (index entry, then page file). An interrupted delete never leaves a child without its parent. |
+| Shift (implementation) | After the swap the siblings are renumbered `0..n-1` (only changed ones written), so gaps or ties in `order` never block a move. |
 | Notes of the day | **Pages only**, created or edited that day (local date of `createdAt` / `updatedAt` in the page's time zone). "Edited" means title or content changed. Each row links to the page and says "Oluşturuldu" or "Düzenlendi" (created wins when both are on that day). |
 
 ## User stories
@@ -56,7 +58,7 @@ The Notlar page gets a tree of folders and pages: create, rename, move (drag and
 - `parentId` must exist ("Üst öğe bulunamadı.").
 - Moving into itself or one of its descendants → `parentId` error "Bir öğe kendi içine veya alt öğelerinden birine taşınamaz.".
 - `offset` other than -1 or 1 → `offset` error "Kaydırma -1 veya 1 olmalı.".
-- Delete removes the index entries first (one write), then the page files; a missing page file is ignored.
+- Delete removes the nodes deepest first, each index entry followed by its page file; a missing page file is ignored.
 
 ### Day page
 

@@ -105,6 +105,19 @@ public sealed class JsonFileStoreTests : IDisposable
     }
 
     [Fact]
+    public async Task Delete_removes_the_file_and_ignores_a_missing_one()
+    {
+        await _store.WriteAsync("notes/pages/a.json", V1, new JsonObject(), CancellationToken.None);
+
+        await _store.DeleteAsync("notes/pages/a.json", CancellationToken.None);
+        await _store.DeleteAsync("notes/pages/a.json", CancellationToken.None);
+        await _store.DeleteAsync("missing/b.json", CancellationToken.None);
+
+        Assert.False(File.Exists(_folder.File("notes/pages/a.json")));
+        await Assert.ThrowsAsync<ArgumentException>(() => _store.DeleteAsync(@"..\x.json", CancellationToken.None));
+    }
+
+    [Fact]
     public async Task File_on_disk_is_indented_json()
     {
         await _store.WriteAsync("goals.json", V1, new JsonObject { ["schemaVersion"] = 1 }, CancellationToken.None);

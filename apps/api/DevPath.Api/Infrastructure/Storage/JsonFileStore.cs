@@ -80,6 +80,25 @@ public sealed class JsonFileStore(DataDirectory dataDirectory)
         }
     }
 
+    /// <summary>Removes the file under its lock; a missing file is not an error.</summary>
+    public async Task DeleteAsync(string path, CancellationToken cancellationToken)
+    {
+        var fullPath = Resolve(path);
+        var gate = _locks.GetOrAdd(fullPath, _ => new SemaphoreSlim(1, 1));
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
     private string Resolve(string path)
     {
         var root = dataDirectory.Path;
