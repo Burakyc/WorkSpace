@@ -130,3 +130,17 @@ Implement the spec in specs 2026-11-05-storage-foundation
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 0.4 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** API data folder (`DEVPATH_DATA_DIR`), `JsonFileStore` with atomic writes and per-file locks, schema migrations, `JsonRepository<T>`; Electron reads `app-config.json` and passes the data folder; README, tech-stack and specs updated; phase 0.4 done.
+
+## 2026-11-05 – Plan phase 0.5 app shell and design tokens
+**Phase:** 0.5 App shell and design tokens
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 0.5 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-app-shell/` (`requirements.md`, `plan.md`, `validation.md`).
