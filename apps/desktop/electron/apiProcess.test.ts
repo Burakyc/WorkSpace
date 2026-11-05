@@ -1,10 +1,30 @@
 import { once } from 'node:events';
 import { createServer } from 'node:net';
+import { join, resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { TOKEN_HEADER } from '../src/shared/api/client';
-import { createToken, findFreePort, waitForHealth } from './apiProcess';
+import { createToken, findFreePort, resolveApiExePath, waitForHealth } from './apiProcess';
 
 const baseUrl = 'http://127.0.0.1:1234';
+
+describe('resolveApiExePath', () => {
+  const paths = {
+    resourcesPath: 'C:\\Apps\\DevPath\\resources',
+    appPath: 'C:\\Repo\\apps\\desktop',
+  };
+
+  it('uses the bundled API when packaged', () => {
+    expect(resolveApiExePath({ packaged: true, ...paths })).toBe(
+      join(paths.resourcesPath, 'api', 'DevPath.Api.exe'),
+    );
+  });
+
+  it('uses the Debug build next to the desktop app in development', () => {
+    expect(resolveApiExePath({ packaged: false, ...paths })).toBe(
+      resolve('C:\\Repo\\apps\\api\\DevPath.Api\\bin\\Debug\\net10.0\\DevPath.Api.exe'),
+    );
+  });
+});
 
 describe('findFreePort', () => {
   it('returns a port a server can listen on at 127.0.0.1', async () => {

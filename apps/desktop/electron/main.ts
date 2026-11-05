@@ -1,9 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from 'electron';
 import type { ApiConfig, ChangeDataDirResult } from '../src/shared/api/types';
-import { startApi, type ApiHandle } from './apiProcess';
+import { resolveApiExePath, startApi, type ApiHandle } from './apiProcess';
 import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
 import { isAllowedNavigation } from './navigation';
@@ -13,11 +13,11 @@ const rendererFile = join(__dirname, '../renderer/index.html');
 const appUrl = devServerUrl ?? pathToFileURL(rendererFile).href;
 // file:// pages send `Origin: null`.
 const appOrigin = devServerUrl ? new URL(devServerUrl).origin : 'null';
-// Phase 0.6 adds the packaged path (resources/api/DevPath.Api.exe).
-const apiExePath = resolve(
-  app.getAppPath(),
-  '../api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe',
-);
+const apiExePath = resolveApiExePath({
+  packaged: app.isPackaged,
+  resourcesPath: process.resourcesPath,
+  appPath: app.getAppPath(),
+});
 const appConfigFile = join(app.getPath('userData'), 'app-config.json');
 
 let current: ApiState<ApiHandle> | undefined;
@@ -43,9 +43,10 @@ async function launch(): Promise<ApiState<ApiHandle>> {
     throw new Error(`Veri klasörü oluşturulamadı: ${dataDir}`, { cause: error });
   }
   if (!existsSync(apiExePath)) {
-    throw new Error(
-      `API bulunamadı: ${apiExePath}\nÖnce "dotnet build apps/api/DevPath.slnx" komutunu çalıştırın.`,
-    );
+    const hint = app.isPackaged
+      ? 'Uygulamayı yeniden kurun.'
+      : 'Önce "dotnet build apps/api/DevPath.slnx" komutunu çalıştırın.';
+    throw new Error(`API bulunamadı: ${apiExePath}\n${hint}`);
   }
   return { dataDir, api: await startApiFor(dataDir) };
 }

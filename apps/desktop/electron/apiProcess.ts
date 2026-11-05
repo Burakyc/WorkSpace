@@ -2,8 +2,19 @@ import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { once } from 'node:events';
 import { createServer } from 'node:net';
-import { dirname } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { TOKEN_HEADER } from '../src/shared/api/client';
+
+/** The bundled API in the installed app (`resources/api`), or the Debug build next to the desktop app in development. */
+export function resolveApiExePath(options: {
+  packaged: boolean;
+  resourcesPath: string;
+  appPath: string;
+}): string {
+  return options.packaged
+    ? join(options.resourcesPath, 'api', 'DevPath.Api.exe')
+    : resolve(options.appPath, '../api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe');
+}
 
 export interface ApiHandle {
   baseUrl: string;
