@@ -1,0 +1,281 @@
+# Tech Stack
+
+## Overview
+
+| Layer | Choice |
+|---|---|
+| Desktop shell | Electron (latest stable), Windows only |
+| Frontend | React + TypeScript (`strict`), Vite, React Router |
+| Note editor | BlockNote |
+| Backend | ASP.NET Core Web API on **.NET 10 LTS**, controllers |
+| Storage | JSON files behind `IRepository<T>` |
+| Validation | JSON Schema files in `schemas/`, validated in the API with JsonSchema.Net |
+| External data | GitHub REST API (public, optional token), YouTube channel RSS |
+| Tests | xUnit + `WebApplicationFactory` (backend), Vitest + React Testing Library (frontend) |
+| Packaging | electron-builder (NSIS installer) with a self-contained, single-file API executable |
+| Package manager | npm workspaces |
+
+UI text is Turkish. Code, identifiers, comments, commits and docs are English.
+
+## Architecture
+
+```
+┌──────────────────────── Electron ────────────────────────┐
+│ main process                                             │
+│  - picks a free port, generates a per-launch API token   │
+│  - spawns the API process, kills it on quit              │
+│  - safeStorage (secrets), notifications, reminders       │
+│  - reads app config (data folder path)                   │
+│                                                          │
+│ preload (contextBridge, minimal)                         │
+│  - getApiConfig(), secrets.*, notify(), openExternal()   │
+│                                                          │
+│ renderer (React, sandboxed)                              │
+│  - typed fetch client ──HTTP──┐                          │
+└───────────────────────────────┼──────────────────────────┘
+                                ▼
+          ASP.NET Core Web API  (http://127.0.0.1:<port>)
+          controllers → services → repositories → JSON files
+          background refresh: GitHub, YouTube RSS → cache
+          read-only: feed.json, stats.json (written by the agent)
+```
+
+### Process lifecycle
+
+1. Electron main reads `app-config.json` from Electron's `userData` folder (non-secret settings such as `dataDir`).
+2. It picks a free port, creates a random 32-byte token, and starts the API with environment variables `DEVPATH_PORT`, `DEVPATH_TOKEN`, `DEVPATH_DATA_DIR` and decrypted secrets (e.g. `DEVPATH_GITHUB_TOKEN`). Secrets live only in that process's memory.
+   - Dev: `dotnet run --project apps/api/DevPath.Api`.
+   - Packaged: `resources/api/DevPath.Api.exe`.
+3. Main polls `GET /api/health` until it answers (timeout 10 s, then shows an error window), then opens the main window.
+4. When a secret or the data folder changes, main restarts the API.
+5. On quit, main stops the API process.
+
+### API rules
+
+- Kestrel binds to `127.0.0.1` only. Nothing listens on `0.0.0.0` or `localhost` (which can resolve to IPv6/other interfaces).
+- Every request must carry `X-DevPath-Token: <per-launch token>`; requests without it get `401`. This stops other local processes and web pages from using the API.
+- The `Host` header must be `127.0.0.1:<port>` (blocks DNS rebinding).
+- CORS allows only the Vite dev server origin in development and the packaged app origin in production.
+- Errors are returned as RFC 7807 `ProblemDetails`.
+- Controllers are thin: parse input, call one service method, map the result. Business logic lives in services.
+- Everything is `async` and takes a `CancellationToken`.
+- External calls (GitHub, YouTube) go through `HttpClient` from `IHttpClientFactory`, with a timeout. Results are cached in JSON; on failure the last cache is served with an `error` field so the UI can show an error card.
+
+### Frontend rules
+
+- Function components and hooks only. State is React state plus a few contexts (theme, active pomodoro). No global state library.
+- One typed API client (`shared/api/`) wraps `fetch`, adds the token and base URL from `window.devpath.getApiConfig()`, and returns typed results. No `any`.
+- Design tokens live in one file (`shared/ui/tokens.css`) as CSS variables; light/dark switch on `prefers-color-scheme`. Components use CSS Modules.
+- Layout: sidebar + content area. Below 900 px the sidebar collapses to icons and content goes to one column. Icons are SVG (lucide-react).
+- Imported or user text is always rendered as text. No `dangerouslySetInnerHTML`.
+- Notes use BlockNote; saves are debounced by 1 second and run in the background.
+- The pomodoro timer stores `startedAt` and `durationMs` and derives the remaining time from `Date.now()`, so throttled or minimized windows stay accurate. The end-of-session notification is scheduled in the main process.
+- Dates are shown with `Intl` in `tr-TR`; stored as ISO 8601 (UTC timestamps, `YYYY-MM-DD` local dates for days).
+
+## Storage design
+
+### Data folder
+
+- Path is configurable in settings. Default: `%APPDATA%\DevPath\data`.
+- The repo also gitignores `data/` in case it is pointed there, but the default avoids the OneDrive-synced repo, where sync can lock files during writes.
+- Post-MVP backups go to a sibling folder: `%APPDATA%\DevPath\backups\YYYY-MM-DD\`, last 14 days kept.
+
+### Layout
+
+```
+data/
+├── goals.json              # goals with optional pomodoro target
+├── projects.json           # projects, each linked to one goal
+├── sessions.json           # completed pomodoro sessions
+├── settings.json           # timer durations, reminder times, YouTube channels
+├── daily/
+│   └── 2026-11-05.json     # free-text daily log for that day
+├── notes/
+│   ├── index.json          # folder/page tree (id, parentId, title, kind, order)
+│   └── pages/<id>.json     # BlockNote document for one page
+├── content/
+│   ├── english/<topic-slug>.json
+│   ├── learning/<topic-slug>.json
+│   └── interview/<topic-slug>.json
+├── cache/
+│   ├── github.json         # last GitHub stats + fetchedAt
+│   └── youtube.json        # last videos per channel + fetchedAt
+├── feed.json               # written by the agent, read-only for the app
+├── stats.json              # written by the agent, read-only for the app
+├── posts.json              # post drafts (post-MVP)
+└── style.json              # style prompt (post-MVP)
+```
+
+Pomodoros for a day are read from `sessions.json` by date; notes for a day are read from `notes/index.json` by `createdAt`/`updatedAt`. The daily file only holds what is not stored elsewhere.
+
+### File rules
+
+- Every file is an object with `schemaVersion` at the top level:
+
+  ```json
+  { "schemaVersion": 1, "items": [ ... ] }
+  ```
+
+- **Atomic writes:** serialize to `<file>.tmp` in the same folder, flush to disk, then `File.Move(tmp, file, overwrite: true)`. A crash leaves either the old or the new file, never a half-written one. One `SemaphoreSlim` per file path serializes writes inside the process.
+- **Migrations:** each file type has an ordered list of `IMigration` steps (`from → to`). On read, if `schemaVersion` is lower than current, the steps run and the file is saved back. A higher version than the app knows is an error (no silent data loss).
+- IDs are GUIDs (`Guid.NewGuid()`, string form). Timestamps are ISO 8601 UTC.
+- `IRepository<T>` exposes `GetAllAsync`, `GetAsync(id)`, `UpsertAsync`, `DeleteAsync`. The JSON implementation is the only one; the interface exists because the README names SQLite as the likely next store.
+
+### Core entities (MVP)
+
+| Entity | Key fields |
+|---|---|
+| Goal | `id`, `title`, `description?`, `targetPomodoros?`, `archived`, `createdAt` |
+| Project | `id`, `goalId`, `title`, `url?`, `archived`, `createdAt` |
+| Session | `id`, `goalId`, `projectId?`, `tags[]`, `startedAt`, `endedAt`, `durationMinutes`, `completed`, `note?` |
+| DailyLog | `date`, `text` |
+| NoteNode | `id`, `parentId?`, `kind` (`folder` \| `page`), `title`, `order`, `createdAt`, `updatedAt` |
+
+Goal progress = completed sessions for the goal ÷ `targetPomodoros` (capped at 100%). Without a target, the UI shows the session count and total time instead of a percentage.
+
+### Shared import format
+
+All content modules use one envelope; `type` selects the schema for `items`:
+
+```json
+{
+  "schemaVersion": 1,
+  "type": "vocab",
+  "topic": "Phrasal verbs for meetings",
+  "level": "B2",
+  "tags": ["english", "work"],
+  "items": [
+    { "term": "follow up on", "meaning": "...", "example": "..." }
+  ]
+}
+```
+
+| `type` | Module | Schema file | Merge key for items |
+|---|---|---|---|
+| `vocab` | English | `schemas/vocab.schema.json` | normalized `term` |
+| `lesson` | Learning | `schemas/lesson.schema.json` | normalized part `title` |
+| `interview` | Interview | `schemas/interview.schema.json` | normalized `question` |
+| `link-analysis` | Post assistant (post-MVP) | `schemas/link-analysis.schema.json` | `url` |
+
+- **Validation:** the API validates the envelope and the `items` schema. Errors come back as a list of `{ path, line, message }` so the import validator can show missing fields line by line. Invalid content is never saved.
+- **Rejecting executable content:** JSON only, max 2 MB, schemas use `additionalProperties: false`, strings have max lengths, and nothing is ever rendered as HTML.
+- **Merge:** the topic is found by slug of `topic`. New items are appended; items whose merge key already exists are skipped and reported ("12 added, 3 already existed"). User progress on existing items is never touched. New `tags` are unioned.
+- **New content type:** add a schema file, a `type` value, a merge key and a prompt template in `prompts/`. No other layer changes.
+- **Prompt library:** `prompts/<type>.md` holds the template with format instructions. "Copy prompt" in each module copies it to the clipboard.
+
+### Agent files
+
+`feed.json` (X List summaries) and `stats.json` (weekly stats) are written by Claude's morning task into the data folder. The app only reads them, validates them against `schemas/feed.schema.json` / `schemas/stats.schema.json`, and shows an error card if they are missing or invalid.
+
+## Security rules
+
+- API on `127.0.0.1` only, per-launch token header, `Host` header check (see API rules).
+- Secrets (GitHub token; AI API keys post-MVP) are encrypted with Electron `safeStorage` and stored in `userData/secrets.bin`. They are never written to the repo, to JSON data files, to logs or to the renderer. The renderer can only call `secrets.set(name, value)`, `secrets.has(name)` and `secrets.clear(name)`.
+- Electron `BrowserWindow`: `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, `webSecurity: true`.
+- The preload bridge exposes only the functions listed in the architecture diagram, each with typed, validated arguments.
+- Navigation and `window.open` are blocked. `openExternal(url)` accepts `https:` URLs only and opens them in the default browser.
+- CSP (production):
+  `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://avatars.githubusercontent.com; connect-src http://127.0.0.1:*; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`
+  (`'unsafe-inline'` for styles is needed by BlockNote.)
+- Imports are validated before saving (see Shared import format).
+- `.gitignore` covers `data/`, `backups/`, `.env*`, `secrets.bin`, build output.
+- The app only reads from external platforms. There is no code path that posts, likes, comments or follows.
+
+## Testing approach
+
+| What | How | Where |
+|---|---|---|
+| Services, validators, merge logic, migrations | xUnit unit tests | `apps/api/DevPath.Api.Tests/` |
+| JSON store (atomic write, interrupted write, concurrent writes) | xUnit against a temp folder | same |
+| API endpoints, token check | xUnit + `WebApplicationFactory` | same |
+| Hooks, API client, timer math | Vitest | next to the file, `*.test.ts` |
+| Critical UI flows (start pomodoro with goal, import content, open a day) | Vitest + React Testing Library | next to the component, `*.test.tsx` |
+| Packaged app | manual smoke checklist in the release phase | `roadmap.md` |
+
+- External HTTP is faked with a stub `HttpMessageHandler`; tests never hit the network.
+- Each phase is done only when `npm run check` passes. It runs: `dotnet build`, `dotnet test`, `tsc --noEmit`, `eslint`, `vitest run` and `vite build`.
+
+## Coding standards
+
+### General
+
+- SOLID, small single-purpose classes and components. Prefer the standard library and platform features over new dependencies; each new dependency needs a reason in the PR/commit.
+- No abstraction without a second use, with `IRepository<T>` as the documented exception.
+- Validate at trust boundaries (imports, agent files, external APIs, preload arguments). Trust internal code.
+
+### C#
+
+- `<Nullable>enable</Nullable>`, `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`, file-scoped namespaces.
+- Async all the way; no `.Result` or `.Wait()`.
+- Services registered in DI by interface only when there is a test seam or a second implementation; otherwise by concrete class.
+- `System.Text.Json` with camelCase, shared `JsonSerializerOptions`.
+- Records for DTOs and entities.
+
+### TypeScript
+
+- `strict: true`, `noUncheckedIndexedAccess: true`, no `any` (ESLint `@typescript-eslint/no-explicit-any: error`).
+- Function components with hooks; one component per file; named exports.
+- API types live in `shared/api/types.ts` and mirror the C# DTOs.
+- Prettier for formatting, ESLint for rules.
+
+### Git
+
+- Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, with the module as scope: `feat(pomodoro): add goal and tag selection`.
+- Small commits, one change each. One branch per roadmap phase (`feat/2.1-pomodoro-timer`), merged into `main` when the phase's acceptance criteria are met.
+- No AI attribution in commits, PRs or docs.
+- Never commit `data/`, backups, `.env` files or secrets.
+
+## Folder structure
+
+```
+devpath-workspace/
+├── apps/
+│   ├── desktop/
+│   │   ├── electron/
+│   │   │   ├── main.ts            # window, API process, reminders, notifications
+│   │   │   ├── preload.ts         # contextBridge API
+│   │   │   ├── apiProcess.ts      # spawn/health-check/stop the API
+│   │   │   └── secrets.ts         # safeStorage wrapper
+│   │   ├── src/
+│   │   │   ├── app/               # router, layout (sidebar + content), providers
+│   │   │   ├── modules/
+│   │   │   │   ├── home/
+│   │   │   │   ├── goals/
+│   │   │   │   ├── pomodoro/
+│   │   │   │   ├── calendar/
+│   │   │   │   ├── notes/
+│   │   │   │   ├── content/       # shared import UI + english/, learning/, interview/
+│   │   │   │   ├── settings/
+│   │   │   │   └── devpanel/
+│   │   │   └── shared/
+│   │   │       ├── api/           # typed client + types
+│   │   │       └── ui/            # tokens.css, base components
+│   │   ├── electron-builder.yml
+│   │   └── package.json
+│   └── api/
+│       ├── DevPath.Api/
+│       │   ├── Program.cs
+│       │   ├── Modules/
+│       │   │   ├── Goals/         # GoalsController, GoalService, Goal, Project
+│       │   │   ├── Pomodoro/
+│       │   │   ├── Calendar/
+│       │   │   ├── Notes/
+│       │   │   ├── Content/       # ImportService, MergeService, per-type rules
+│       │   │   ├── Home/          # GitHub, YouTube, feed, stats readers
+│       │   │   └── System/        # health, dev panel, settings
+│       │   └── Infrastructure/
+│       │       ├── Storage/       # IRepository<T>, JsonFileStore, migrations
+│       │       ├── Validation/    # schema loading and validation
+│       │       └── Security/      # token + host header middleware
+│       ├── DevPath.Api.Tests/
+│       └── DevPath.sln
+├── schemas/                       # *.schema.json
+├── prompts/                       # prompt templates per content type
+├── specs/                         # mission, tech stack, roadmap, feature specs
+├── package.json                   # npm workspaces, `dev` and `check` scripts
+├── prompts.md
+├── CLAUDE.md
+└── README.md
+```
+
+One API project with a folder per module, not one project per module. Split a module into its own project only if it grows past what a folder can hold.
