@@ -168,4 +168,16 @@ public sealed class SessionServiceTests : IDisposable
         Assert.Equal(["di", "ef-core"], session.Tags);
         Assert.Equal([Tags.InvalidMessage], (await Invalid(Input(goal.Id) with { Tags = ["a/b"] })).Errors["tags"]);
     }
+
+    [Fact]
+    public async Task Lists_tags_most_used_first_then_alphabetically()
+    {
+        var goal = await NewGoal();
+        Assert.Empty(await _sessions.ListTagsAsync(CancellationToken.None));
+
+        await _sessions.CreateAsync(Input(goal.Id) with { Tags = ["efcore", "di"] }, CancellationToken.None);
+        await _sessions.CreateAsync(Input(goal.Id) with { Tags = ["di", "api"] }, CancellationToken.None);
+
+        Assert.Equal(["di", "api", "efcore"], await _sessions.ListTagsAsync(CancellationToken.None));
+    }
 }

@@ -17,6 +17,20 @@ public sealed class SessionService(
     /// <summary>The end time may be at most this far ahead of the server clock (clock differences, rounding).</summary>
     private static readonly TimeSpan FutureTolerance = TimeSpan.FromMinutes(1);
 
+    /// <summary>Every tag used in a session, most used first, ties alphabetically (for suggestions).</summary>
+    public async Task<IReadOnlyList<string>> ListTagsAsync(CancellationToken cancellationToken)
+    {
+        var all = await sessions.GetAllAsync(cancellationToken);
+        return
+        [
+            .. all.SelectMany(session => session.Tags)
+                .GroupBy(tag => tag)
+                .OrderByDescending(group => group.Count())
+                .ThenBy(group => group.Key, StringComparer.Ordinal)
+                .Select(group => group.Key),
+        ];
+    }
+
     public async Task<Session> CreateAsync(SessionInput input, CancellationToken cancellationToken)
     {
         var errors = new Dictionary<string, string[]>();

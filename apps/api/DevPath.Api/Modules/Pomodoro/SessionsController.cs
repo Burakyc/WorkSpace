@@ -6,6 +6,9 @@ namespace DevPath.Api.Modules.Pomodoro;
 [Route("api/sessions")]
 public sealed class SessionsController(SessionService sessions) : ControllerBase
 {
+    [HttpGet("tags")]
+    public Task<IReadOnlyList<string>> Tags(CancellationToken cancellationToken) => sessions.ListTagsAsync(cancellationToken);
+
     [HttpPost]
     public async Task<ActionResult<Session>> Create(SessionInput input, CancellationToken cancellationToken)
     {

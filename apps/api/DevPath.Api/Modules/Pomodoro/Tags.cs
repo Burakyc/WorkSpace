@@ -22,12 +22,12 @@ public static partial class Tags
     [GeneratedRegex(@"^[\p{L}\p{N}_-]{1,30}$")]
     private static partial Regex Allowed();
 
-    /// <summary>Trim, drop leading '#', 'İ' → 'i', lower-case (invariant), drop U+0307, whitespace runs → '-'.</summary>
+    /// <summary>Trim, drop leading '#', '\u0130' → 'i', lower-case (invariant), drop U+0307, whitespace runs → '-'.</summary>
     public static string Normalize(string raw)
     {
-        // .NET's invariant lower-casing leaves 'İ' as it is, while JavaScript turns it into 'i' + U+0307:
+        // .NET's invariant lower-casing leaves '\u0130' as it is, while JavaScript turns it into 'i' + U+0307:
         // map it to 'i' here and drop U+0307, so both sides agree.
-        var tag = raw.Trim().TrimStart('#').Trim().Replace('İ', 'i').ToLowerInvariant().Replace("̇", "");
+        var tag = raw.Trim().TrimStart('#').Trim().Replace('\u0130', 'i').ToLowerInvariant().Replace("\u0307", "");
         return Whitespace().Replace(tag, "-");
     }
 

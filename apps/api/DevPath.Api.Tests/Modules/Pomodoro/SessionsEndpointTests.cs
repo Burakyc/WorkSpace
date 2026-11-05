@@ -60,6 +60,25 @@ public class SessionsEndpointTests
         Assert.Equal(5, progress.GetProperty("percent").GetInt32());
     }
 
+    [Fact]
+    public async Task Lists_previously_used_tags()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+        var goalId = await CreateGoal(client);
+        await client.PostAsJsonAsync("/api/sessions", new
+        {
+            goalId,
+            startedAt = DateTimeOffset.UtcNow.AddMinutes(-25),
+            endedAt = DateTimeOffset.UtcNow,
+            durationMinutes = 25,
+            completed = true,
+            tags = new[] { "#DI" },
+        });
+
+        Assert.Equal("[\"di\"]", await client.GetStringAsync("/api/sessions/tags"));
+    }
+
     private static async Task<string> CreateGoal(HttpClient client)
     {
         var response = await client.PostAsJsonAsync("/api/goals", new { title = "Learn ASP.NET Core", targetPomodoros = 20 });
