@@ -27,7 +27,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 899px) {
+@media (width < 900px) {
   .text {
     position: absolute;
     width: 1px;
