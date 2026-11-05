@@ -105,3 +105,17 @@ Implement the spec in specs 2026-11-05-electron-starts-api
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 0.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** API host check, token middleware, CORS and parent watcher; Electron starts/stops the API, preload `getApiConfig()`, typed API client and status line; README, tech-stack and specs updated; phase 0.3 done.
+
+## 2026-11-05 – Plan phase 0.4 storage foundation
+**Phase:** 0.4 Storage foundation
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 0.4 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-storage-foundation/` (`requirements.md`, `plan.md`, `validation.md`).
