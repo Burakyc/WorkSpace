@@ -14,8 +14,9 @@ interface ContentEmptyPageProps {
 
 /** A content module before it has topics: what it is for, the prompt to copy and the import panel. */
 export function ContentEmptyPage({ type, icon, title, description }: ContentEmptyPageProps) {
+  // The module routes render this same component; the key gives each type its own panel state.
   return (
-    <div className={styles.page}>
+    <div key={type} className={styles.page}>
       <EmptyState
         icon={icon}
         title={title}
