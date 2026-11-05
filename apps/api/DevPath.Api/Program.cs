@@ -2,6 +2,7 @@ using DevPath.Api.Infrastructure.Hosting;
 using DevPath.Api.Infrastructure.Security;
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
+using DevPath.Api.Modules.Goals;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ builder.Services.AddSingleton(services => DataDirectory.Resolve(
     services.GetRequiredService<IConfiguration>()["DEVPATH_DATA_DIR"],
     services.GetRequiredService<IHostEnvironment>().IsDevelopment()));
 builder.Services.AddSingleton<JsonFileStore>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddGoals();
 
 var app = builder.Build();
 
