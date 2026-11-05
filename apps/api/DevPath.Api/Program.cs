@@ -4,6 +4,7 @@ using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Goals;
 using DevPath.Api.Modules.Pomodoro;
+using DevPath.Api.Modules.Projects;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddSingleton<JsonFileStore>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddPomodoro();
 builder.Services.AddGoals();
+builder.Services.AddProjects();
 
 var app = builder.Build();
 
