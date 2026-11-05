@@ -33,3 +33,14 @@
   margin: 0;
   color: var(--color-danger);
 }
+
+.settingsForm {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+}

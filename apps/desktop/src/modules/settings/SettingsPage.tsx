@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import buttons from '../../shared/ui/buttons.module.css';
+import { PomodoroSettingsForm } from './PomodoroSettingsForm';
 import styles from './SettingsPage.module.css';
 
 export function SettingsPage() {
@@ -62,6 +63,7 @@ export function SettingsPage() {
           </p>
         )}
       </section>
+      <PomodoroSettingsForm />
     </>
   );
 }
