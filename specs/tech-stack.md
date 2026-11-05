@@ -80,6 +80,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 - `app-config.json` is read and written only by Electron main, atomically, with `schemaVersion: 1`.
 - Imported or user text is always rendered as text. No `dangerouslySetInnerHTML`.
 - Notes use BlockNote; saves are debounced by 1 second and run in the background.
+- The Notlar page (`/notes`, the open item at `/notes/:id`) shows the tree from `GET /api/notes` (every node, sorted by parent and `order`). Changes: `POST /api/notes` (`{ parentId, kind, title }`, appended as the last child; a page also gets an empty `notes/pages/<id>.json`), `PUT /api/notes/{id}` (`{ title }`, 1–200 characters, sets `updatedAt`), `POST /api/notes/{id}/move` (`{ parentId }`, last child of the new parent; never into itself or a descendant), `POST /api/notes/{id}/shift` (`{ offset: -1 | 1 }`, swap with a sibling, then siblings renumbered `0..n-1`) and `DELETE /api/notes/{id}` (the node, its descendants and their page files, deepest first). Moving and reordering never change `updatedAt`. Any node can hold folders and pages; only pages have content. Items move with "Taşı…" or native drag and drop (onto an item = inside it, onto "En üste" = top level).
+- The day page also lists `notes` from `GET /api/days/{date}`: pages whose local `createdAt` or `updatedAt` date is that day (`created: true` when created that day), oldest edit first, each linking to `/notes/<id>`.
 - The pomodoro timer is a small state machine (`idle` → `running` ⇄ `paused` → `finished`, `src/modules/pomodoro/timer.ts`) that stores times (`startedAt`, `endsAt` or `remainingMs`) and derives the remaining time from `Date.now()`, so throttled or minimized windows stay accurate. `PomodoroProvider` owns it for the whole app, ticks every 250 ms while running and keeps it in `localStorage` (`devpath.pomodoro`), so it survives reloads and restarts; invalid stored data loads as idle. The goal and project are locked while a session exists.
 - Sessions are logged from the Pomodoro page with `POST /api/sessions` (goal must exist, archived allowed; project must belong to the goal; end not in the future; 1–600 minutes and no more than the start–end span; note at most 500 characters). A finished session is saved with "Kaydet" and an optional note (`completed: true`); "Durdur" saves the focused minutes (pauses excluded, rounded down) with `completed: false`, and nothing under 1 minute. A failed save keeps the timer so the user can retry; after a save the page shows the goal's new progress.
 - Session tags are normalized the same way in the API (`Tags.cs`) and the renderer (`tags.ts`): trim, drop leading `#`, `İ` → `i`, invariant lower case, drop U+0307, whitespace → `-`; 1–30 letters, digits, `-`, `_`; at most 10 per session. They are chosen before starting (editable in the save form); `GET /api/sessions/tags` (most used first) feeds the suggestions.
@@ -111,7 +113,7 @@ data/
 │   └── 2026-11-05.json     # free-text daily log for that day
 ├── notes/
 │   ├── index.json          # folder/page tree (id, parentId, title, kind, order)
-│   └── pages/<id>.json     # BlockNote document for one page
+│   └── pages/<id>.json     # BlockNote document for one page ({ schemaVersion, blocks })
 ├── content/
 │   ├── english/<topic-slug>.json
 │   ├── learning/<topic-slug>.json
@@ -125,7 +127,7 @@ data/
 └── style.json              # style prompt (post-MVP)
 ```
 
-Pomodoros for a day are read from `sessions.json` by the local date of `startedAt` (in the time zone the page sends); notes for a day will be read from `notes/index.json` by `createdAt`/`updatedAt` (phase 4.1). The daily file only holds what is not stored elsewhere: `{ "schemaVersion": 1, "date": "YYYY-MM-DD", "text": "…" }`, plain text up to 10,000 characters, trailing whitespace trimmed, written atomically through `JsonFileStore`; a day without a file has an empty log.
+Pomodoros for a day are read from `sessions.json` by the local date of `startedAt` (in the time zone the page sends); notes for a day are read from `notes/index.json` by `createdAt`/`updatedAt` in the same time zone (pages only). The daily file only holds what is not stored elsewhere: `{ "schemaVersion": 1, "date": "YYYY-MM-DD", "text": "…" }`, plain text up to 10,000 characters, trailing whitespace trimmed, written atomically through `JsonFileStore`; a day without a file has an empty log.
 
 ### File rules
 
