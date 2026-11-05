@@ -9,8 +9,19 @@ builder.WebHost.ConfigureKestrel(options => options.Listen(IPAddress.Loopback, p
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddCors();
 
 var app = builder.Build();
+
+// CORS runs before the token check so browser preflights (which carry no custom headers) are answered.
+var origin = app.Configuration["DEVPATH_ORIGIN"];
+if (!string.IsNullOrWhiteSpace(origin))
+{
+    app.UseCors(policy => policy
+        .WithOrigins(origin)
+        .WithHeaders(ApiTokenMiddleware.HeaderName, "Content-Type")
+        .WithMethods("GET", "POST", "PUT", "DELETE"));
+}
 
 var token = app.Configuration["DEVPATH_TOKEN"];
 if (!string.IsNullOrWhiteSpace(token))
