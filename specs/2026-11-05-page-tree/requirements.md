@@ -23,6 +23,7 @@ The Notlar page gets a tree of folders and pages: create, rename, move (drag and
 | Nesting | **Anything can hold anything**: folders and pages can both have folders and pages as children. The only difference: a page has content (a page file, the editor in 4.2), a folder does not. |
 | Delete order (implementation) | The plan said one index write; `IRepository<T>` deletes one item at a time, so nodes are deleted **deepest first** (index entry, then page file). An interrupted delete never leaves a child without its parent. |
 | Shift (implementation) | After the swap the siblings are renumbered `0..n-1` (only changed ones written), so gaps or ties in `order` never block a move. |
+| Tree helpers file (implementation) | The plan named `noteTree.ts`; on Windows' case-insensitive file system `./NoteTree` resolved to it, so it is `treeHelpers.ts`. |
 | Notes of the day | **Pages only**, created or edited that day (local date of `createdAt` / `updatedAt` in the page's time zone). "Edited" means title or content changed. Each row links to the page and says "Oluşturuldu" or "Düzenlendi" (created wins when both are on that day). |
 
 ## User stories

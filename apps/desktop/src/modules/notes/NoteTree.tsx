@@ -30,6 +30,11 @@ export interface TreeState {
   setPanel(panel: ItemPanel): void;
   collapsed: ReadonlySet<string>;
   toggle(id: string): void;
+  /** The item being dragged and the item it hovers over. */
+  dragging: string | null;
+  setDragging(id: string | null): void;
+  dropTarget: string | null;
+  setDropTarget(id: string | null): void;
   actions: TreeActions;
 }
 
@@ -43,6 +48,9 @@ interface NoteTreeProps {
 export function NoteTree({ nodes, openId, renamingId, actions }: NoteTreeProps) {
   const [panel, setPanel] = useState<ItemPanel>(null);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
+  const [dragging, setDragging] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<string | null>(null);
+  const [overRoot, setOverRoot] = useState(false);
 
   // A new child must be visible, so creating under an item expands it.
   const tree: TreeState = {
@@ -58,6 +66,14 @@ export function NoteTree({ nodes, openId, renamingId, actions }: NoteTreeProps) 
         if (!next.delete(id)) next.add(id);
         return next;
       }),
+    dragging,
+    setDragging: (id) => {
+      setDragging(id);
+      setDropTarget(null);
+      setOverRoot(false);
+    },
+    dropTarget,
+    setDropTarget,
     actions: {
       ...actions,
       create: (parentId, kind) => {
@@ -92,6 +108,23 @@ export function NoteTree({ nodes, openId, renamingId, actions }: NoteTreeProps) 
           <FolderPlus size={16} aria-hidden="true" />
         </button>
       </div>
+      {dragging !== null && (
+        <div
+          className={`${styles.dropRoot} ${overRoot ? styles.dropTarget : ''}`}
+          onDragOver={(event) => {
+            event.preventDefault();
+            setOverRoot(true);
+          }}
+          onDragLeave={() => setOverRoot(false)}
+          onDrop={(event) => {
+            event.preventDefault();
+            void tree.actions.move(dragging, null);
+            tree.setDragging(null);
+          }}
+        >
+          En üste
+        </div>
+      )}
       <ul className={styles.items}>
         {childrenOf(nodes, null).map((node) => (
           <NoteTreeItem key={node.id} node={node} tree={tree} />

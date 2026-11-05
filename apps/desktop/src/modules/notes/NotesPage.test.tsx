@@ -139,6 +139,53 @@ describe('NotesPage', () => {
     );
   });
 
+  it('moves an item with the move panel, offering valid targets only', async () => {
+    const api = renderAt('/notes', [
+      ...folderWithPages,
+      noteNode({ id: 'other', title: 'Other', kind: 'folder', order: 1 }),
+    ]);
+
+    await openMenu('ASP.NET');
+    fireEvent.click(screen.getByRole('button', { name: 'Taşı…' }));
+    const panel = screen.getByRole('dialog', { name: 'ASP.NET taşı' });
+    const select = within(panel).getByRole('combobox', { name: 'Nereye?' });
+    expect(
+      within(select)
+        .getAllByRole('option')
+        .map((o) => o.textContent),
+    ).toEqual(['En üst seviye', 'Other']);
+
+    fireEvent.change(select, { target: { value: 'other' } });
+    fireEvent.click(within(panel).getByRole('button', { name: 'Taşı' }));
+
+    await waitFor(() => expect(api.notes.find((n) => n.id === 'f')?.parentId).toBe('other'));
+  });
+
+  it('moves an item by drag and drop', async () => {
+    const api = renderAt('/notes', [
+      ...folderWithPages,
+      noteNode({ id: 'p', title: 'Loose page', order: 1 }),
+    ]);
+    await screen.findByRole('navigation', { name: 'Not ağacı' });
+    const row = async (title: string) =>
+      (await within(tree()).findByRole('link', { name: title })).parentElement!;
+
+    fireEvent.dragStart(await row('Loose page'));
+    fireEvent.dragOver(await row('ASP.NET'));
+    fireEvent.drop(await row('ASP.NET'));
+    await waitFor(() => expect(api.notes.find((n) => n.id === 'p')?.parentId).toBe('f'));
+
+    fireEvent.dragStart(await row('Loose page'));
+    fireEvent.drop(screen.getByText('En üste'));
+    await waitFor(() => expect(api.notes.find((n) => n.id === 'p')?.parentId).toBeNull());
+
+    const before = api.fetchFn.mock.calls.length;
+    fireEvent.dragStart(await row('ASP.NET'));
+    fireEvent.dragOver(await row('DI'));
+    fireEvent.drop(await row('DI'));
+    expect(api.fetchFn.mock.calls.length).toBe(before);
+  });
+
   it('says when the open note does not exist', async () => {
     renderAt('/notes/missing', folderWithPages);
     expect(await screen.findByText('Not bulunamadı.')).toBeInTheDocument();

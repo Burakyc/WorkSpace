@@ -4,8 +4,9 @@ import { Link } from 'react-router';
 import type { NoteNode } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import form from '../../shared/ui/form.module.css';
+import { MovePanel } from './MovePanel';
 import type { TreeState } from './NoteTree';
-import { childrenOf, descendantIds } from './treeHelpers';
+import { canMoveInto, childrenOf, descendantIds } from './treeHelpers';
 import styles from './NotesPage.module.css';
 
 export function NoteTreeItem({ node, tree }: { node: NoteNode; tree: TreeState }) {
@@ -13,10 +14,34 @@ export function NoteTreeItem({ node, tree }: { node: NoteNode; tree: TreeState }
   const expanded = !tree.collapsed.has(node.id);
   const panel = tree.panel?.id === node.id ? tree.panel.kind : null;
   const Icon = node.kind === 'folder' ? Folder : FileText;
+  const accepts = tree.dragging !== null && canMoveInto(tree.nodes, tree.dragging, node.id);
 
   return (
     <li>
-      <div className={`${styles.row} ${tree.openId === node.id ? styles.open : ''}`}>
+      <div
+        className={`${styles.row} ${tree.openId === node.id ? styles.open : ''} ${
+          accepts && tree.dropTarget === node.id ? styles.dropTarget : ''
+        }`}
+        draggable={tree.renamingId !== node.id}
+        onDragStart={(event) => {
+          event.stopPropagation();
+          event.dataTransfer?.setData('text/plain', node.id);
+          if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+          tree.setDragging(node.id);
+        }}
+        onDragEnd={() => tree.setDragging(null)}
+        onDragOver={(event) => {
+          if (!accepts) return;
+          event.preventDefault();
+          tree.setDropTarget(node.id);
+        }}
+        onDragLeave={() => tree.setDropTarget(null)}
+        onDrop={(event) => {
+          event.preventDefault();
+          if (accepts && tree.dragging) void tree.actions.move(tree.dragging, node.id);
+          tree.setDragging(null);
+        }}
+      >
         {children.length > 0 ? (
           <button
             type="button"
@@ -59,6 +84,7 @@ export function NoteTreeItem({ node, tree }: { node: NoteNode; tree: TreeState }
 
       {panel === 'menu' && <ItemMenu node={node} tree={tree} />}
       {panel === 'delete' && <DeleteConfirm node={node} tree={tree} />}
+      {panel === 'move' && <MovePanel node={node} tree={tree} />}
 
       {children.length > 0 && expanded && (
         <ul className={styles.items}>
@@ -96,6 +122,15 @@ function ItemMenu({ node, tree }: { node: NoteNode; tree: TreeState }) {
           </button>
         </li>
       ))}
+      <li>
+        <button
+          type="button"
+          className={styles.menuItem}
+          onClick={() => tree.setPanel({ id: node.id, kind: 'move' })}
+        >
+          Taşı…
+        </button>
+      </li>
       <li>
         <button
           type="button"

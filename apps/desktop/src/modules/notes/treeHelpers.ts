@@ -52,3 +52,8 @@ export function moveTargets(nodes: readonly NoteNode[], id: string) {
   const excluded = descendantIds(nodes, id).add(id);
   return flatten(nodes).filter(({ node }) => !excluded.has(node.id));
 }
+
+/** Whether `id` may become a child of `targetId`: not into itself or one of its descendants. */
+export function canMoveInto(nodes: readonly NoteNode[], id: string, targetId: string): boolean {
+  return id !== targetId && !descendantIds(nodes, id).has(targetId);
+}
