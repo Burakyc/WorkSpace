@@ -15,35 +15,78 @@ interface ProjectListProps {
   onChanged(): void;
 }
 
+/** `'new'` while the add form is open, a project id while that project is edited. */
+type Editing = 'new' | string | null;
+
 export function ProjectList({ goal, projects, showArchived, onChanged }: ProjectListProps) {
-  const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<Editing>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const visible = projects.filter((project) => showArchived || !project.archived);
 
-  async function create(input: ProjectUpdateInput) {
+  async function save(input: ProjectUpdateInput, project?: Project) {
     const client = await getApiClient();
-    await client.createProject({ goalId: goal.id, ...input });
-    setAdding(false);
+    await (project
+      ? client.updateProject(project.id, input)
+      : client.createProject({ goalId: goal.id, ...input }));
+    setEditing(null);
     onChanged();
+  }
+
+  async function setArchived(project: Project, archived: boolean) {
+    setBusyId(project.id);
+    setError(null);
+    try {
+      const client = await getApiClient();
+      await (archived ? client.archiveProject(project.id) : client.restoreProject(project.id));
+      onChanged();
+    } catch {
+      setError('İşlem tamamlanamadı.');
+    } finally {
+      setBusyId(null);
+    }
   }
 
   return (
     <section className={styles.projects} aria-label={`${goal.title} projeleri`}>
       <h3 className={styles.heading}>Projeler</h3>
+      {error && (
+        <p role="alert" className={styles.muted}>
+          {error}
+        </p>
+      )}
       {visible.length === 0 ? (
         <p className={styles.muted}>Henüz proje yok.</p>
       ) : (
         <ul className={styles.list}>
-          {visible.map((project) => (
-            <ProjectItem key={project.id} project={project} />
-          ))}
+          {visible.map((project) =>
+            editing === project.id ? (
+              <li key={project.id}>
+                <ProjectForm
+                  project={project}
+                  onSave={(input) => save(input, project)}
+                  onCancel={() => setEditing(null)}
+                />
+              </li>
+            ) : (
+              <ProjectItem
+                key={project.id}
+                project={project}
+                busy={busyId === project.id}
+                onEdit={() => setEditing(project.id)}
+                onArchive={() => void setArchived(project, true)}
+                onRestore={() => void setArchived(project, false)}
+              />
+            ),
+          )}
         </ul>
       )}
-      {adding ? (
-        <ProjectForm onSave={create} onCancel={() => setAdding(false)} />
+      {editing === 'new' ? (
+        <ProjectForm onSave={(input) => save(input)} onCancel={() => setEditing(null)} />
       ) : (
         !goal.archived && (
           <div>
-            <button type="button" className={buttons.secondary} onClick={() => setAdding(true)}>
+            <button type="button" className={buttons.secondary} onClick={() => setEditing('new')}>
               Proje ekle
             </button>
           </div>

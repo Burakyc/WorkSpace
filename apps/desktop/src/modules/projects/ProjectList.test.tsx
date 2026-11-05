@@ -57,4 +57,66 @@ describe('Projects under their goal', () => {
     const archived = await projectsOf('Learn ASP.NET Core');
     expect(within(archived).queryByRole('button', { name: 'Proje ekle' })).toBeNull();
   });
+
+  it('edits a project in place', async () => {
+    installFakeGoalsApi([aspnet], {
+      projects: [project({ id: 'p', goalId: 'a', title: 'Todo API' })],
+    });
+    render(<GoalsPage />);
+    const section = await projectsOf('Learn ASP.NET Core');
+
+    fireEvent.click(within(section).getByRole('button', { name: 'Düzenle' }));
+    const form = within(section).getByRole('form', { name: 'Projeyi düzenle' });
+    expect(within(form).getByLabelText('Proje adı')).toHaveValue('Todo API');
+    fireEvent.change(within(form).getByLabelText('Proje adı'), {
+      target: { value: 'Todo API v2' },
+    });
+    fireEvent.click(within(form).getByRole('button', { name: 'Kaydet' }));
+
+    expect(await within(section).findByText('Todo API v2')).toBeInTheDocument();
+  });
+
+  it('archives a project and restores it from the archived view', async () => {
+    installFakeGoalsApi([aspnet], {
+      projects: [project({ id: 'p', goalId: 'a', title: 'Todo API' })],
+    });
+    render(<GoalsPage />);
+    const section = await projectsOf('Learn ASP.NET Core');
+
+    fireEvent.click(within(section).getByRole('button', { name: 'Arşivle' }));
+    expect(await within(section).findByText('Henüz proje yok.')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Arşivlenenleri göster' }));
+    const archived = within(section).getByRole('listitem', { name: 'Todo API' });
+    expect(within(archived).getByText('Arşivlendi')).toBeInTheDocument();
+    fireEvent.click(within(archived).getByRole('button', { name: 'Geri al' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Arşivlenenleri göster' }));
+
+    const restored = await within(section).findByRole('listitem', { name: 'Todo API' });
+    expect(within(restored).queryByText('Arşivlendi')).toBeNull();
+  });
+
+  it('shows an invalid link next to the field and keeps the form open', async () => {
+    installFakeGoalsApi([aspnet]);
+    render(<GoalsPage />);
+    const section = await projectsOf('Learn ASP.NET Core');
+
+    fireEvent.click(within(section).getByRole('button', { name: 'Proje ekle' }));
+    fireEvent.change(within(section).getByLabelText('Proje adı'), {
+      target: { value: 'Todo API' },
+    });
+    fireEvent.change(within(section).getByLabelText('Bağlantı (isteğe bağlı)'), {
+      target: { value: 'http://github.com/x' },
+    });
+    fireEvent.click(within(section).getByRole('button', { name: 'Kaydet' }));
+
+    expect(
+      await within(section).findByText('Bağlantı https:// ile başlayan geçerli bir adres olmalı.'),
+    ).toBeInTheDocument();
+    expect(within(section).getByLabelText('Bağlantı (isteğe bağlı)')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+    expect(within(section).getByRole('form', { name: 'Yeni proje' })).toBeInTheDocument();
+  });
 });
