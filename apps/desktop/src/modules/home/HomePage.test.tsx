@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { FeedItem } from '../../shared/api/types';
 import { DEFAULT_POMODORO_SETTINGS } from '../../shared/api/types';
 import { todayLocal } from '../calendar/monthGrid';
 import { goal, installFakeGoalsApi } from '../goals/testing/fakeGoalsApi';
@@ -98,5 +99,110 @@ describe('HomePage today card', () => {
     expect(
       await within(card('Bugün')).findByText('Bugünün özeti yüklenemedi.'),
     ).toBeInTheDocument();
+  });
+});
+
+const feedItem = (title: string, extra: Partial<FeedItem> = {}): FeedItem => ({
+  title,
+  summary: `${title} özeti`,
+  url: null,
+  source: null,
+  publishedAt: null,
+  ...extra,
+});
+
+describe('HomePage feed card', () => {
+  it('lists the summaries and opens a link in the browser', async () => {
+    const api = installFakeGoalsApi([], {
+      feed: {
+        status: 'ok',
+        generatedAt: '2026-11-06T07:00:00Z',
+        items: [
+          feedItem('.NET 10 çıktı', {
+            url: 'https://x.com/dotnet/1',
+            source: 'dotnet',
+            publishedAt: '2026-11-05T20:00:00Z',
+          }),
+          feedItem('Linksiz özet'),
+        ],
+        errors: [],
+      },
+    });
+    renderPage();
+
+    const feed = card('Akış');
+    const list = await within(feed).findByRole('list', { name: 'Özetler' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+    expect(within(list).getByText('.NET 10 çıktı özeti')).toBeInTheDocument();
+    expect(within(list).getByText(/^dotnet · /)).toBeInTheDocument();
+    expect(within(feed).getByText(/^Güncellendi: /)).toBeInTheDocument();
+
+    fireEvent.click(within(list).getByRole('button', { name: 'Aç: .NET 10 çıktı' }));
+    expect(api.openExternal).toHaveBeenCalledWith('https://x.com/dotnet/1');
+    expect(within(list).getAllByRole('button')).toHaveLength(1);
+  });
+
+  it.each([
+    [
+      'missing',
+      { status: 'missing', generatedAt: null, items: [], errors: [] },
+      'Akış dosyası bulunamadı.',
+    ],
+    [
+      'empty',
+      { status: 'ok', generatedAt: '2026-11-06T07:00:00Z', items: [], errors: [] },
+      'Akışta özet yok.',
+    ],
+  ] as const)('shows the %s state', async (_name, feed, text) => {
+    installFakeGoalsApi([], { feed: { ...feed, items: [], errors: [] } });
+    renderPage();
+
+    expect(await within(card('Akış')).findByText(text)).toBeInTheDocument();
+  });
+
+  it('shows the error lines of an invalid file', async () => {
+    installFakeGoalsApi([], {
+      feed: {
+        status: 'invalid',
+        generatedAt: null,
+        items: [],
+        errors: ['items[0].title: Başlık gerekli.', 'schemaVersion: 1 olmalı.'],
+      },
+    });
+    renderPage();
+
+    const feed = card('Akış');
+    expect(await within(feed).findByText('Akış dosyası geçersiz.')).toBeInTheDocument();
+    expect(
+      within(within(feed).getByRole('list', { name: 'Hatalar' }))
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
+    ).toEqual(['items[0].title: Başlık gerekli.', 'schemaVersion: 1 olmalı.']);
+  });
+
+  it('shows an error card when the request fails, and the other cards still work', async () => {
+    installFakeGoalsApi([aspnet], { failFeed: true });
+    renderPage();
+
+    expect(await within(card('Akış')).findByText('Akış yüklenemedi.')).toBeInTheDocument();
+    expect(await within(card('Bugün')).findByText('Bugün 0 pomodoro · 0 dk')).toBeInTheDocument();
+  });
+});
+
+describe('HomePage reminders card', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("shows today's reminders with their status", () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 10, 6, 12, 30));
+    installFakeGoalsApi([]);
+    renderPage();
+
+    const rows = within(card('Hatırlatmalar'))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent);
+    expect(rows).toEqual(['09:00 İngilizcegeçti', '20:00 Tekniksıradaki']);
   });
 });
