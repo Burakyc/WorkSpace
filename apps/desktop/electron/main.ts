@@ -1,11 +1,31 @@
-import { join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
+import { startApi, type ApiHandle } from './apiProcess';
 import { isAllowedNavigation } from './navigation';
 
 const devServerUrl = process.env['ELECTRON_RENDERER_URL'];
 const rendererFile = join(__dirname, '../renderer/index.html');
 const appUrl = devServerUrl ?? pathToFileURL(rendererFile).href;
+// file:// pages send `Origin: null`.
+const appOrigin = devServerUrl ? new URL(devServerUrl).origin : 'null';
+// Phase 0.6 adds the packaged path (resources/api/DevPath.Api.exe).
+const apiExePath = resolve(
+  app.getAppPath(),
+  '../api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe',
+);
+
+let api: ApiHandle | undefined;
+
+async function launchApi(): Promise<ApiHandle> {
+  if (!existsSync(apiExePath)) {
+    throw new Error(
+      `API bulunamadı: ${apiExePath}\nÖnce "dotnet build apps/api/DevPath.slnx" komutunu çalıştırın.`,
+    );
+  }
+  return startApi({ exePath: apiExePath, origin: appOrigin, development: !app.isPackaged });
+}
 
 app.on('web-contents-created', (_event, contents) => {
   contents.on('will-navigate', (event, url) => {
@@ -55,11 +75,25 @@ if (!app.requestSingleInstanceLock()) {
     mainWindow.focus();
   });
 
-  void app.whenReady().then(() => {
+  void app.whenReady().then(async () => {
+    try {
+      api = await launchApi();
+    } catch (error) {
+      dialog.showErrorBox(
+        'DevPath başlatılamadı',
+        error instanceof Error ? error.message : String(error),
+      );
+      app.quit();
+      return;
+    }
     mainWindow = createWindow();
   });
 }
 
 app.on('window-all-closed', () => {
   app.quit();
+});
+
+app.on('will-quit', () => {
+  api?.stop();
 });
