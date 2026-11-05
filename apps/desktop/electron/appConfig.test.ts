@@ -75,24 +75,24 @@ describe('writeAppConfig', () => {
   const readJson = (): unknown => JSON.parse(readFileSync(file, 'utf8'));
 
   it('creates the file with schemaVersion 1', () => {
-    writeAppConfig(file, { dataDir: 'D:\Data' });
+    writeAppConfig(file, { dataDir: 'D:\\Data' });
 
-    expect(readJson()).toEqual({ schemaVersion: 1, dataDir: 'D:\Data' });
+    expect(readJson()).toEqual({ schemaVersion: 1, dataDir: 'D:\\Data' });
   });
 
   it('keeps other keys', () => {
-    writeFileSync(file, JSON.stringify({ other: 1, dataDir: 'C:\Old' }));
+    writeFileSync(file, JSON.stringify({ other: 1, dataDir: 'C:\\Old' }));
 
-    writeAppConfig(file, { dataDir: 'D:\Data' });
+    writeAppConfig(file, { dataDir: 'D:\\Data' });
 
-    expect(readJson()).toEqual({ schemaVersion: 1, other: 1, dataDir: 'D:\Data' });
+    expect(readJson()).toEqual({ schemaVersion: 1, other: 1, dataDir: 'D:\\Data' });
   });
 
   it('leaves no temp file and reads back', () => {
-    writeAppConfig(file, { dataDir: 'D:\Data' });
+    writeAppConfig(file, { dataDir: 'D:\\Data' });
 
     expect(existsSync(`${file}.tmp`)).toBe(false);
-    expect(readAppConfig(file)).toEqual({ dataDir: 'D:\Data' });
+    expect(readAppConfig(file)).toEqual({ dataDir: 'D:\\Data' });
   });
 
   it.each(['2', '"1"'])('refuses to read schemaVersion %s', (version) => {
