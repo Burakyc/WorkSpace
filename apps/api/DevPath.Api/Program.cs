@@ -1,6 +1,7 @@
 using System.Net;
 using DevPath.Api.Infrastructure.Hosting;
 using DevPath.Api.Infrastructure.Security;
+using DevPath.Api.Infrastructure.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,15 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddCors();
 builder.Services.AddHostedService<ParentProcessWatcher>();
+builder.Services.AddSingleton(services => DataDirectory.Resolve(
+    services.GetRequiredService<IConfiguration>()["DEVPATH_DATA_DIR"],
+    services.GetRequiredService<IHostEnvironment>().IsDevelopment()));
 
 var app = builder.Build();
+
+var dataDirectory = app.Services.GetRequiredService<DataDirectory>();
+Directory.CreateDirectory(dataDirectory.Path);
+app.Logger.LogInformation("Data folder: {DataFolder}", dataDirectory.Path);
 
 // CORS runs before the token check so browser preflights (which carry no custom headers) are answered.
 var origin = app.Configuration["DEVPATH_ORIGIN"];
