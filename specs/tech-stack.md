@@ -16,6 +16,7 @@
 | Package manager | npm workspaces |
 | Desktop build | electron-vite (main, preload and renderer); TypeScript 6.0 (typescript-eslint does not support 7.x yet) |
 | Node | 24, pinned in `.nvmrc` and `engines` |
+| Docker (optional) | API-only dev container: multi-stage `apps/api/Dockerfile` (`sdk:10.0` → `aspnet:10.0`, non-root, Production) and root `docker-compose.yml` (`127.0.0.1` port, token from `.env`, repo `data/` mounted). Never needed by the desktop app or `npm run check`. |
 
 UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 
@@ -56,6 +57,7 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 ### API rules
 
 - Kestrel binds to `127.0.0.1` only. Nothing listens on `0.0.0.0` or `localhost` (which can resolve to IPv6/other interfaces).
+  - **Exception: the optional Docker container.** With `DEVPATH_IN_CONTAINER=1` (set only in `apps/api/Dockerfile`) the API binds `0.0.0.0` inside the container, because Docker's port mapping cannot reach a container's loopback. `docker-compose.yml` publishes the port on `127.0.0.1` only, so nothing outside the machine can reach it, and the token and `Host` checks stay on. Any other value of the variable keeps `127.0.0.1`.
 - Every request must carry `X-DevPath-Token: <per-launch token>`; requests without it get `401`. This stops other local processes and web pages from using the API. When `DEVPATH_TOKEN` is not set, the check is off in Development only (with a warning, for running the API on its own); any other environment refuses to start.
 - The `Host` must be `127.0.0.1` (built-in host filtering, `AllowedHosts: "127.0.0.1"`, `400` otherwise). This blocks DNS rebinding. The port is not compared: a rebinding attack always changes the host name.
 - CORS allows only the origin in `DEVPATH_ORIGIN`: the Vite dev server origin in development, `null` for the `file://` page in a build. Without it, no cross-origin request is allowed. CORS runs before the token check so browser preflights are answered.

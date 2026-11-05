@@ -174,6 +174,25 @@ If that file is not valid JSON, `dataDir` is not an absolute path, or the folder
 - The first start right after installing takes about 3.5 s; later starts take about 1.5–2 s.
 - Uninstall (Windows Settings → Apps) removes the program and shortcuts but keeps `%APPDATA%\DevPath` with your settings and data.
 
+### API in Docker (optional)
+
+A development container for the API only. The desktop app and `npm run check` never need Docker.
+
+1. Copy `.env.example` to `.env` (gitignored) and set `DEVPATH_TOKEN` to a long random value (the file shows a PowerShell command for one).
+2. Start it in the foreground (Ctrl+C stops it):
+
+   ```bash
+   npm run docker:api
+   ```
+
+3. Call it with the token:
+
+   ```powershell
+   curl.exe -H "X-DevPath-Token: <token>" http://127.0.0.1:5180/api/health
+   ```
+
+The container runs in Production (no OpenAPI document), is published on `127.0.0.1` only, runs as a non-root user, and keeps its data in the repo's gitignored `data/` folder, which survives `docker compose down`. Without a token, compose stops with an error. The repo is in OneDrive: if writes to `data/` fail because sync locks a file, pause OneDrive sync or keep the repo outside OneDrive.
+
 ## Commit conventions
 
 Conventional Commits are used: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
