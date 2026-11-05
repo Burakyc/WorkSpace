@@ -6,7 +6,7 @@
 |---|---|
 | Desktop shell | Electron (latest stable), Windows only |
 | Frontend | React + TypeScript (`strict`), Vite, React Router |
-| Note editor | BlockNote |
+| Note editor | BlockNote 0.56.0 (`@blocknote/core`, `@blocknote/react`, `@blocknote/mantine` with `@mantine/core` / `@mantine/hooks` 9.7.4, `@blocknote/code-block` for syntax highlighting) |
 | Backend | ASP.NET Core Web API on **.NET 10 LTS**, controllers |
 | Storage | JSON files behind `IRepository<T>` |
 | Validation | JSON Schema files in `schemas/`, validated in the API with JsonSchema.Net |
