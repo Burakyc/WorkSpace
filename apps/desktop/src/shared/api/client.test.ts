@@ -224,6 +224,8 @@ describe('createApiClient', () => {
     await client.moveNote('n 1', null);
     await client.shiftNote('n 1', -1);
     await expect(client.deleteNote('n 1')).resolves.toBeUndefined();
+    await client.getNoteContent('n 1');
+    await client.saveNoteContent('n 1', [{ type: 'paragraph' }]);
 
     const base = 'http://127.0.0.1:4321/api/notes';
     expect(
@@ -235,6 +237,8 @@ describe('createApiClient', () => {
       [`POST ${base}/n%201/move`, JSON.stringify({ parentId: null })],
       [`POST ${base}/n%201/shift`, JSON.stringify({ offset: -1 })],
       [`DELETE ${base}/n%201`, undefined],
+      [`GET ${base}/n%201/content`, undefined],
+      [`PUT ${base}/n%201/content`, JSON.stringify({ blocks: [{ type: 'paragraph' }] })],
     ]);
   });
 });

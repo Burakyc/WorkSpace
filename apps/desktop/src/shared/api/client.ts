@@ -62,6 +62,10 @@ export interface ApiClient {
   shiftNote(id: string, offset: -1 | 1): Promise<NoteNode>;
   /** Deletes the node and everything under it. */
   deleteNote(id: string): Promise<void>;
+  /** A page's BlockNote blocks, stored as they are. */
+  getNoteContent(id: string): Promise<{ blocks: unknown[] }>;
+  /** Replaces a page's blocks; returns the node with its new `updatedAt`. */
+  saveNoteContent(id: string, blocks: unknown[]): Promise<NoteNode>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -130,6 +134,8 @@ export function createApiClient(
     moveNote: (id, parentId) => request<NoteNode>('POST', `${note(id)}/move`, { parentId }),
     shiftNote: (id, offset) => request<NoteNode>('POST', `${note(id)}/shift`, { offset }),
     deleteNote: (id) => request<void>('DELETE', note(id)),
+    getNoteContent: (id) => request<{ blocks: unknown[] }>('GET', `${note(id)}/content`),
+    saveNoteContent: (id, blocks) => request<NoteNode>('PUT', `${note(id)}/content`, { blocks }),
   };
 }
 
