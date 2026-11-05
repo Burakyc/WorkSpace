@@ -47,11 +47,14 @@ public sealed class JsonFileStore(DataDirectory dataDirectory)
         await UpdateAsync(path, schema, _ => document, cancellationToken);
     }
 
-    /// <summary>Reads, applies <paramref name="update"/> and writes under one lock, so concurrent updates are never lost.</summary>
-    public async Task<JsonObject> UpdateAsync(
+    /// <summary>
+    /// Reads, applies <paramref name="update"/> and writes under one lock, so concurrent updates are never lost.
+    /// When <paramref name="update"/> returns null, nothing is written.
+    /// </summary>
+    public async Task<JsonObject?> UpdateAsync(
         string path,
         DocumentSchema schema,
-        Func<JsonObject?, JsonObject> update,
+        Func<JsonObject?, JsonObject?> update,
         CancellationToken cancellationToken)
     {
         var fullPath = Resolve(path);
@@ -61,7 +64,13 @@ public sealed class JsonFileStore(DataDirectory dataDirectory)
         {
             var stored = await ReadFileAsync(fullPath, cancellationToken);
             var current = stored is null ? null : schema.Migrate(stored, path).Document;
-            var document = schema.Stamp(update(current));
+            var updated = update(current);
+            if (updated is null)
+            {
+                return current;
+            }
+
+            var document = schema.Stamp(updated);
             await WriteFileAsync(fullPath, document, cancellationToken);
             return document;
         }
