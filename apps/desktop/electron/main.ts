@@ -1,7 +1,8 @@
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow, dialog } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import type { ApiConfig } from '../src/shared/api/types';
 import { startApi, type ApiHandle } from './apiProcess';
 import { isAllowedNavigation } from './navigation';
 
@@ -86,6 +87,16 @@ if (!app.requestSingleInstanceLock()) {
       app.quit();
       return;
     }
+
+    const config: ApiConfig = { baseUrl: api.baseUrl, token: api.token };
+    ipcMain.handle('devpath:get-api-config', (event): ApiConfig => {
+      const senderUrl = event.senderFrame?.url;
+      if (!senderUrl || !isAllowedNavigation(senderUrl, appUrl)) {
+        throw new Error('getApiConfig is only available to the app page.');
+      }
+      return config;
+    });
+
     mainWindow = createWindow();
   });
 }
