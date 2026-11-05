@@ -68,7 +68,7 @@ export function CalendarPage() {
           type="button"
           className={`${buttons.secondary} ${styles.icon}`}
           aria-label="Önceki ay"
-          onClick={() => setMonth(shiftMonth(month, -1))}
+          onClick={() => setMonth((m) => shiftMonth(m, -1))}
         >
           <ChevronLeft size={18} aria-hidden="true" />
         </button>
@@ -79,7 +79,7 @@ export function CalendarPage() {
           type="button"
           className={`${buttons.secondary} ${styles.icon}`}
           aria-label="Sonraki ay"
-          onClick={() => setMonth(shiftMonth(month, 1))}
+          onClick={() => setMonth((m) => shiftMonth(m, 1))}
         >
           <ChevronRight size={18} aria-hidden="true" />
         </button>
