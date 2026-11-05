@@ -29,6 +29,8 @@ An Electron + React + TypeScript app in `apps/desktop` that opens a secure windo
 | Node version | Pinned to 24 (`.nvmrc`, `engines: { "node": ">=24" }`) |
 | Single instance | In this phase, with `app.requestSingleInstanceLock()` |
 | Window content | Turkish placeholder page; light/dark follows the OS |
+| TypeScript version | 6.0.3 (decided during task 3: typescript-eslint supports TypeScript up to 6.0, not 7.x) |
+| `frame-ancestors` | Dropped from the CSP (decided during task 6: Chromium ignores it in a `<meta>` tag and logs a console error) |
 
 ## User stories
 
@@ -44,7 +46,7 @@ An Electron + React + TypeScript app in `apps/desktop` that opens a secure windo
 - **Preload** is built as CommonJS (required for sandboxed preloads). In this phase it exposes nothing; phase 0.3 adds `getApiConfig()`.
 - **Navigation:** `will-navigate` is cancelled for any URL other than the app's own page, and `setWindowOpenHandler` always returns `{ action: "deny" }`. This applies to every `webContents` (`app.on("web-contents-created")`).
 - **CSP** is built in one function, `buildCsp(mode)`, and injected as a `<meta http-equiv="Content-Security-Policy">` tag in `index.html` at build time.
-  - Production: the policy from tech-stack.md: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://avatars.githubusercontent.com; connect-src http://127.0.0.1:*; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`.
+  - Production: the policy from tech-stack.md: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://avatars.githubusercontent.com; connect-src http://127.0.0.1:*; object-src 'none'; base-uri 'none'`.
   - Development: the same, plus what the Vite dev server needs for hot reload: `'unsafe-inline'` for scripts (React Refresh preamble) and `ws://localhost:*` / `http://localhost:*` in `connect-src`.
 - **Single instance:** if `requestSingleInstanceLock()` returns `false`, the new process quits at once. The first instance restores (if minimized) and focuses its window on `second-instance`.
 - **Quit:** closing the window quits the app on Windows (`window-all-closed` → `app.quit()`).

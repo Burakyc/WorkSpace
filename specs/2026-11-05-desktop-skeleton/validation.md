@@ -36,7 +36,7 @@ npm run check
 | T5 | Invalid URL | same | False for `""` and `not a url` |
 | T6 | Production CSP | `electron/csp.test.ts` | Equals the policy in requirements.md; contains no `'unsafe-inline'` in `script-src`, no `ws:` and no `localhost` |
 | T7 | Development CSP | same | Production directives plus `'unsafe-inline'` in `script-src` and `ws://localhost:*` / `http://localhost:*` in `connect-src`; nothing else added |
-| T8 | Both modes | same | Contain `object-src 'none'`, `base-uri 'none'`, `frame-ancestors 'none'` |
+| T8 | Both modes | same | Contain `object-src 'none'` and `base-uri 'none'` (`frame-ancestors` dropped, see requirements.md) |
 | — | API tests from phase 0.1 | `apps/api/DevPath.Api.Tests` | Still 18 passing |
 
 Not automated: the Electron window itself (security flags at runtime, single instance, theme). There are no end-to-end tests in this phase; M1–M13 cover it.

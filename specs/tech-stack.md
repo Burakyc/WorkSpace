@@ -14,6 +14,8 @@
 | Tests | xUnit v2 (VSTest) + `WebApplicationFactory` (backend), Vitest + React Testing Library (frontend) |
 | Packaging | electron-builder (NSIS installer) with a self-contained, single-file API executable |
 | Package manager | npm workspaces |
+| Desktop build | electron-vite (main, preload and renderer); TypeScript 6.0 (typescript-eslint does not support 7.x yet) |
+| Node | 24, pinned in `.nvmrc` and `engines` |
 
 UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 
@@ -176,9 +178,10 @@ All content modules use one envelope; `type` selects the schema for `items`:
 - Electron `BrowserWindow`: `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, `webSecurity: true`.
 - The preload bridge exposes only the functions listed in the architecture diagram, each with typed, validated arguments.
 - Navigation and `window.open` are blocked. `openExternal(url)` accepts `https:` URLs only and opens them in the default browser.
-- CSP (production):
-  `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://avatars.githubusercontent.com; connect-src http://127.0.0.1:*; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`
-  (`'unsafe-inline'` for styles is needed by BlockNote.)
+- Single instance: `app.requestSingleInstanceLock()`; a second launch focuses the existing window and quits.
+- CSP (production), built by `buildCsp(mode)` in `electron/csp.ts` and injected as a `<meta>` tag at build time:
+  `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://avatars.githubusercontent.com; connect-src http://127.0.0.1:*; object-src 'none'; base-uri 'none'`
+  (`'unsafe-inline'` for styles is needed by BlockNote. `frame-ancestors` is left out because browsers ignore it in a `<meta>` tag, and nothing can frame the app's top-level window.) In development, `buildCsp` adds only what Vite hot reload needs: `'unsafe-inline'` in `script-src` and `ws://localhost:*` / `http://localhost:*` in `connect-src`.
 - Imports are validated before saving (see Shared import format).
 - `.gitignore` covers `data/`, `backups/`, `.env*`, `secrets.bin`, build output.
 - The app only reads from external platforms. There is no code path that posts, likes, comments or follows.
