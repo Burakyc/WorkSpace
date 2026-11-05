@@ -29,8 +29,11 @@ const apiExePath = resolveApiExePath({
 });
 const appConfigFile = join(app.getPath('userData'), 'app-config.json');
 
-// Windows shows toasts only for apps with an AppUserModelID; this also covers the unpackaged dev app.
-app.setAppUserModelId('com.devpath.workspace');
+// Windows shows toasts only for an AppUserModelID that has a Start menu shortcut. The installer creates one for
+// com.devpath.workspace (electron-builder appId); unpackaged runs keep Electron's default id, which Windows knows.
+if (app.isPackaged) {
+  app.setAppUserModelId('com.devpath.workspace');
+}
 
 let current: ApiState<ApiHandle> | undefined;
 
