@@ -87,7 +87,7 @@ Errors are sorted by line, then path. A file with errors is never saved.
   ```
 
 - New topic: the file is created with the imported `topic`, `level` and normalized `tags`.
-- Existing topic: `topic` (display name) and `level` stay; `tags` are unioned (existing first); each item whose normalized key is not in the topic yet is appended with a new `id` and `addedAt`; items whose key exists are skipped. Duplicates inside one file: the first is added, the rest skipped. Existing items (and any progress fields later phases add to them) are never changed. `updatedAt` changes only when something was added.
+- Existing topic: `topic` (display name) and `level` stay; `tags` are unioned (existing first); each item whose normalized key is not in the topic yet is appended with a new `id` and `addedAt`; items whose key exists are skipped. Duplicates inside one file: the first is added, the rest skipped. Existing items (and any progress fields later phases add to them) are never changed. `updatedAt` changes only when items or tags were added; when nothing is new the file is not written. The tag union has no cap of 10 (each import still has at most 10).
 - Report: `{ type, topic, slug, created, added, skipped, levelKept }` (`topic` is the stored name; `levelKept` is true when the file's `level` differed and was ignored).
 
 ### Endpoints
