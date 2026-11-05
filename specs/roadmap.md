@@ -115,7 +115,7 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Tests: per-day grouping across month and timezone boundaries.
 
 #### 3.2 Day detail and daily log — `todo`
-- [ ] Clicking a day opens its detail: sessions (time, goal, project, tags, note), goals worked on, notes created or edited that day.
+- [ ] Clicking a day opens its detail: sessions (time, goal, project, tags, note), goals worked on. (Notes of the day moved to 4.1.)
 - [ ] Free-text daily log for the day saved to `daily/YYYY-MM-DD.json`.
 - [ ] The "Looking back" scenario works: click last Tuesday → see count, goals and notes.
 - [ ] Tests: day detail service; open-a-day flow (RTL).
@@ -126,6 +126,7 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [ ] Folders and pages in a tree (`notes/index.json`); create, rename, move (drag or "move to"), delete with confirmation.
 - [ ] Subpages: a page can have child pages.
 - [ ] Empty pages stored as `notes/pages/<id>.json`.
+- [ ] The day page (3.2) lists the notes created or edited that day.
 - [ ] Tests: tree operations (move into own child is rejected, delete removes children).
 
 #### 4.2 BlockNote editor — `todo`
