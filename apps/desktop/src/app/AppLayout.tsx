@@ -13,7 +13,7 @@ function skipToContent(event: MouseEvent<HTMLAnchorElement>) {
   document.getElementById('content')?.focus();
 }
 
-/** Remaining time next to "Pomodoro" while a session runs or is paused. */
+/** Remaining time next to "Pomodoro" while a focus session or break runs or is paused. */
 function PomodoroBadge() {
   const { state, now } = usePomodoro();
   if (state.status !== 'running' && state.status !== 'paused') return null;
@@ -22,7 +22,7 @@ function PomodoroBadge() {
   return (
     <span
       className={styles.timerBadge}
-      aria-label={`Kalan süre ${clock}${paused ? ' (duraklatıldı)' : ''}`}
+      aria-label={`${state.kind === 'focus' ? 'Kalan süre' : 'Mola kalan süre'} ${clock}${paused ? ' (duraklatıldı)' : ''}`}
     >
       {clock}
     </span>

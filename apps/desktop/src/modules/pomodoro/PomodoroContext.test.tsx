@@ -7,12 +7,13 @@ const MIN = 60_000;
 const goal = { id: 'g', title: 'Learn ASP.NET Core' };
 
 function Probe() {
-  const { state, now, start, pause, resume, stop } = usePomodoro();
+  const { state, now, start, startBreak, pause, resume, stop } = usePomodoro();
   return (
     <>
       <p data-testid="status">{state.status}</p>
       <p data-testid="clock">{formatClock(remainingMs(state, now))}</p>
       <button onClick={() => start(goal, null, [], 25 * MIN)}>start</button>
+      <button onClick={() => startBreak('shortBreak', goal, null, 5 * MIN)}>break</button>
       <button onClick={pause}>pause</button>
       <button onClick={resume}>resume</button>
       <button onClick={stop}>stop</button>
@@ -130,5 +131,17 @@ describe('PomodoroProvider', () => {
     setup();
 
     expect(text('status')).toBe('idle');
+  });
+
+  it('notifies the end of a break with its own title', () => {
+    const { scheduleEnd } = setup();
+
+    fireEvent.click(screen.getByText('break'));
+
+    expect(scheduleEnd).toHaveBeenCalledWith(
+      Date.now() + 5 * MIN,
+      'Mola bitti',
+      'Yeni odak oturumuna hazırsın.',
+    );
   });
 });

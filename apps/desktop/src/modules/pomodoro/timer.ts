@@ -1,4 +1,8 @@
+export type TimerKind = 'focus' | 'shortBreak' | 'longBreak';
+
 interface SessionInfo {
+  /** Breaks keep the last focus session's goal for display; they are never saved. */
+  kind: TimerKind;
   goalId: string;
   /** Kept with the session so it can be shown even if the goal is archived meanwhile. */
   goalTitle: string;
@@ -30,6 +34,7 @@ export function startTimer(
 ): RunningTimer {
   return {
     status: 'running',
+    kind: 'focus',
     goalId: goal.id,
     goalTitle: goal.title,
     projectId,
@@ -38,6 +43,16 @@ export function startTimer(
     durationMs,
     endsAt: now + durationMs,
   };
+}
+
+export function startBreak(
+  kind: 'shortBreak' | 'longBreak',
+  goal: { id: string; title: string },
+  projectId: string | null,
+  durationMs: number,
+  now: number,
+): RunningTimer {
+  return { ...startTimer(goal, projectId, durationMs, now), kind };
 }
 
 export function remainingMs(state: TimerState, now: number): number {
@@ -91,7 +106,9 @@ export function parseStoredTimer(value: unknown): TimerState {
   const v = value as Record<string, unknown>;
   const isNumber = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
 
+  const kind = v['kind'] ?? 'focus';
   if (
+    (kind !== 'focus' && kind !== 'shortBreak' && kind !== 'longBreak') ||
     typeof v['goalId'] !== 'string' ||
     typeof v['goalTitle'] !== 'string' ||
     !(v['projectId'] === null || typeof v['projectId'] === 'string') ||
@@ -106,6 +123,8 @@ export function parseStoredTimer(value: unknown): TimerState {
     return IDLE;
   }
   const info: SessionInfo = {
+    // Timers stored before breaks existed are focus timers.
+    kind,
     goalId: v['goalId'],
     goalTitle: v['goalTitle'],
     projectId: v['projectId'],

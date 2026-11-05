@@ -8,6 +8,7 @@ import {
   pauseTimer,
   remainingMs,
   resumeTimer,
+  startBreak,
   startTimer,
   type TimerState,
 } from './timer';
@@ -23,6 +24,7 @@ describe('timer', () => {
 
     expect(state).toEqual({
       status: 'running',
+      kind: 'focus',
       goalId: 'g',
       goalTitle: 'Learn ASP.NET Core',
       projectId: 'p',
@@ -90,6 +92,7 @@ describe('timer', () => {
     ['a wrong type', { ...start(), endsAt: '1800' }],
     ['a zero duration', { ...start(), durationMs: 0 }],
     ['tags that are not strings', { ...start(), tags: [1] }],
+    ['an unknown kind', { ...start(), kind: 'nap' }],
     ['a negative remainder', { ...pauseTimer(start(), T0), remainingMs: -1 }],
   ])('reads %s from storage as idle', (_name, value) => {
     expect(parseStoredTimer(value)).toEqual(IDLE);
@@ -100,13 +103,15 @@ describe('timer', () => {
     pauseTimer(start(), T0 + MIN),
     advance(start(), T0 + 99 * MIN),
     { ...start(), projectId: null },
+    startBreak('longBreak', goal, null, 15 * MIN, T0),
   ])('round-trips %o through JSON', (state) => {
     expect(parseStoredTimer(JSON.parse(JSON.stringify(state)))).toEqual(state);
   });
 
-  it('loads a timer stored before tags existed with no tags', () => {
+  it('loads a timer stored before tags and breaks existed as a focus timer with no tags', () => {
     const stored: Record<string, unknown> = { ...start() };
     delete stored['tags'];
+    delete stored['kind'];
 
     expect(parseStoredTimer(stored)).toEqual(start());
   });

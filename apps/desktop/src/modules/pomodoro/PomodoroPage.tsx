@@ -32,6 +32,12 @@ export function PomodoroPage() {
   const [savedTags, setSavedTags] = useState<string[] | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [settings, setSettings] = useState<PomodoroSettings>(DEFAULT_POMODORO_SETTINGS);
+  const [breakOffer, setBreakOffer] = useState<'shortBreak' | 'longBreak' | null>(null);
+  // The goal and project of the last saved focus session; a break shows them.
+  const [lastFocus, setLastFocus] = useState<{
+    goal: { id: string; title: string };
+    projectId: string | null;
+  } | null>(null);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -68,6 +74,7 @@ export function PomodoroPage() {
   }, []);
 
   const idle = state.status === 'idle';
+  const onBreak = !idle && state.kind !== 'focus';
   // While a session exists, the pickers show (and lock) its goal and project.
   const shownGoalId = idle ? goalId : state.goalId;
   const shownProjectId = idle ? projectId : (state.projectId ?? '');
@@ -92,6 +99,12 @@ export function PomodoroPage() {
   /** Saves the focused minutes as a stopped session (not under 1 minute), then stops; a failed save keeps the timer. */
   async function stop() {
     if (state.status !== 'running' && state.status !== 'paused') return;
+    if (state.kind !== 'focus') {
+      // A break is never saved.
+      keepSessionSelection();
+      pomodoro.stop();
+      return;
+    }
     const t = Date.now();
     const focused = focusedMs(state, t);
     if (focused >= 60_000) {
@@ -164,14 +177,39 @@ export function PomodoroPage() {
       keepSessionSelection();
       setNote('');
       setSavedTags(null);
+      setLastFocus({
+        goal: { id: state.goalId, title: state.goalTitle },
+        projectId: state.projectId,
+      });
+      setBreakOffer(pomodoro.cycle + 1 >= settings.longBreakInterval ? 'longBreak' : 'shortBreak');
+      pomodoro.recordCompletedFocus();
       pomodoro.reset();
     }
+  }
+
+  function startBreak(kind: 'shortBreak' | 'longBreak') {
+    if (!lastFocus) return;
+    if (kind === 'longBreak') pomodoro.resetCycle();
+    setBreakOffer(null);
+    const minutes = kind === 'longBreak' ? settings.longBreakMinutes : settings.shortBreakMinutes;
+    pomodoro.startBreak(kind, lastFocus.goal, lastFocus.projectId, minutes * 60_000);
+  }
+
+  function skipBreak() {
+    if (breakOffer === 'longBreak') pomodoro.resetCycle();
+    setBreakOffer(null);
+  }
+
+  function endBreak() {
+    keepSessionSelection();
+    pomodoro.reset();
   }
 
   function start() {
     if (!selectedGoal) return;
     setFeedback(null);
     setSaveError(null);
+    setBreakOffer(null);
     pomodoro.start(selectedGoal, projectId || null, tags, settings.focusMinutes * 60_000);
   }
 
@@ -269,8 +307,13 @@ export function PomodoroPage() {
           {clock}
         </p>
 
+        {onBreak && state.status !== 'finished' && (
+          <p className={styles.state}>{state.kind === 'longBreak' ? 'Uzun mola' : 'Mola'}</p>
+        )}
         {state.status === 'paused' && <p className={styles.state}>Duraklatıldı</p>}
-        {state.status === 'finished' && <p className={styles.state}>Süre doldu.</p>}
+        {state.status === 'finished' && (
+          <p className={styles.state}>{onBreak ? 'Mola bitti.' : 'Süre doldu.'}</p>
+        )}
 
         <div className={styles.controls}>
           {idle && (
@@ -300,12 +343,33 @@ export function PomodoroPage() {
               onClick={() => void stop()}
               disabled={saving}
             >
-              Durdur
+              {onBreak ? 'Molayı bitir' : 'Durdur'}
             </button>
+          )}
+          {state.status === 'finished' && onBreak && (
+            <button type="button" className={buttons.primary} onClick={endBreak}>
+              Tamam
+            </button>
+          )}
+          {idle && breakOffer && lastFocus && (
+            <>
+              <button
+                type="button"
+                className={buttons.secondary}
+                onClick={() => startBreak(breakOffer)}
+              >
+                {breakOffer === 'longBreak'
+                  ? `Uzun molaya başla (${settings.longBreakMinutes} dk)`
+                  : `Molaya başla (${settings.shortBreakMinutes} dk)`}
+              </button>
+              <button type="button" className={buttons.secondary} onClick={skipBreak}>
+                Molayı atla
+              </button>
+            </>
           )}
         </div>
 
-        {state.status === 'finished' && (
+        {state.status === 'finished' && !onBreak && (
           <form
             className={styles.saveForm}
             aria-label="Oturumu kaydet"

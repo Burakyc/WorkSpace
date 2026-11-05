@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { goal, installFakeGoalsApi, project } from '../goals/testing/fakeGoalsApi';
-import { PomodoroProvider, STORAGE_KEY } from './PomodoroContext';
+import { CYCLE_KEY, PomodoroProvider, STORAGE_KEY } from './PomodoroContext';
 import { PomodoroPage } from './PomodoroPage';
 import { startTimer } from './timer';
 
@@ -358,5 +358,80 @@ describe('PomodoroPage focus length', () => {
     act(() => vi.advanceTimersByTime(MIN));
 
     expect(screen.getByText('Süre doldu.')).toBeInTheDocument();
+  });
+});
+
+describe('PomodoroPage breaks', () => {
+  const learn = goal({ id: 'a', title: 'Learn ASP.NET Core' });
+
+  async function open(longBreakInterval = 4) {
+    const api = installFakeGoalsApi([learn], {
+      settings: { focusMinutes: 25, shortBreakMinutes: 5, longBreakMinutes: 15, longBreakInterval },
+    });
+    renderPage();
+    await screen.findByRole('button', { name: 'Başlat' });
+    fireEvent.change(goalSelect(), { target: { value: 'a' } });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    return api;
+  }
+
+  async function completeFocus() {
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+    act(() => vi.advanceTimersByTime(25 * MIN));
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+    await screen.findByRole('button', { name: /Molaya başla|Uzun molaya başla/ });
+  }
+
+  it('offers a short break after a saved focus session', async () => {
+    await open();
+
+    await completeFocus();
+
+    expect(screen.getByRole('button', { name: 'Molaya başla (5 dk)' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Molayı atla' })).toBeInTheDocument();
+  });
+
+  it('runs a break that is never saved', async () => {
+    const api = await open();
+    await completeFocus();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Molaya başla (5 dk)' }));
+    expect(clock()).toHaveTextContent('05:00');
+    expect(screen.getByText('Mola')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Molayı bitir' })).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(5 * MIN));
+
+    expect(screen.getByText('Mola bitti.')).toBeInTheDocument();
+    expect(screen.queryByRole('form', { name: 'Oturumu kaydet' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Tamam' }));
+    expect(screen.getByRole('button', { name: 'Başlat' })).toBeInTheDocument();
+    expect(api.sessions).toHaveLength(1);
+  });
+
+  it('offers the long break every interval and resets the cycle when it is taken', async () => {
+    await open(2);
+    await completeFocus();
+    fireEvent.click(screen.getByRole('button', { name: 'Molayı atla' }));
+
+    await completeFocus();
+
+    expect(screen.getByRole('button', { name: 'Uzun molaya başla (15 dk)' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Uzun molaya başla (15 dk)' }));
+    expect(screen.getByText('Uzun mola')).toBeInTheDocument();
+    expect(localStorage.getItem(CYCLE_KEY)).toBe('0');
+  });
+
+  it('does not count a stopped session toward the long break', async () => {
+    await open(2);
+    await completeFocus();
+    fireEvent.click(screen.getByRole('button', { name: 'Molayı atla' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+    act(() => vi.advanceTimersByTime(5 * MIN));
+    fireEvent.click(screen.getByRole('button', { name: 'Durdur' }));
+    await screen.findByText(/^Kaydedildi/);
+
+    expect(screen.queryByRole('button', { name: /mola/i })).toBeNull();
+    expect(localStorage.getItem(CYCLE_KEY)).toBe('1');
   });
 });
