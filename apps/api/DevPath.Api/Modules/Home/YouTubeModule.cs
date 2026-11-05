@@ -12,6 +12,7 @@ public static class YouTubeModule
         });
         services.AddSingleton<YouTubeFeedClient>();
         services.AddSingleton<YouTubeService>();
+        services.AddHostedService<YouTubeRefresher>();
         return services;
     }
 }
