@@ -17,15 +17,16 @@ public sealed class DayServiceTests : IDisposable
     private readonly JsonRepository<Session> _sessions;
     private readonly JsonRepository<Goal> _goals;
     private readonly JsonRepository<Project> _projects;
+    private readonly JsonFileStore _store;
     private readonly DayService _days;
 
     public DayServiceTests()
     {
-        var store = new JsonFileStore(new DataDirectory(_folder.Path));
+        var store = _store = new JsonFileStore(new DataDirectory(_folder.Path));
         _sessions = new JsonRepository<Session>(store, PomodoroModule.SessionsFileName, PomodoroModule.SessionsSchema);
         _goals = new JsonRepository<Goal>(store, GoalsModule.FileName, GoalsModule.Schema);
         _projects = new JsonRepository<Project>(store, ProjectsModule.FileName, ProjectsModule.Schema);
-        _days = new DayService(_sessions, _goals, _projects);
+        _days = new DayService(_sessions, _goals, _projects, store);
     }
 
     public void Dispose() => _folder.Dispose();
@@ -120,5 +121,53 @@ public sealed class DayServiceTests : IDisposable
         var ex = await Assert.ThrowsAsync<ValidationException>(() => _days.GetAsync(date, zone, CancellationToken.None));
 
         Assert.Equal([field], ex.Errors.Keys);
+    }
+
+    [Fact]
+    public async Task Saves_and_reads_the_daily_log()
+    {
+        var saved = await _days.SaveLogAsync("2026-11-05", new DayLogInput("Finished the DI chapter."), CancellationToken.None);
+
+        Assert.Equal("Finished the DI chapter.", saved.Text);
+        Assert.Equal("Finished the DI chapter.", (await Get("2026-11-05")).Log);
+        var file = await _store.ReadAsync("daily/2026-11-05.json", DayService.LogSchema, CancellationToken.None);
+        Assert.Equal(1, file!["schemaVersion"]!.GetValue<int>());
+        Assert.Equal("2026-11-05", file["date"]!.GetValue<string>());
+        Assert.True(File.Exists(Path.Combine(_folder.Path, "daily", "2026-11-05.json")));
+    }
+
+    [Fact]
+    public async Task Log_text_is_trimmed_at_the_end_and_replaced_on_save()
+    {
+        await _days.SaveLogAsync("2026-11-05", new DayLogInput("first"), CancellationToken.None);
+
+        var saved = await _days.SaveLogAsync("2026-11-05", new DayLogInput("  - indented\nline \n\n"), CancellationToken.None);
+
+        Assert.Equal("  - indented\nline", saved.Text);
+        Assert.Equal("  - indented\nline", (await Get("2026-11-05")).Log);
+        Assert.Equal("", (await _days.SaveLogAsync("2026-11-05", new DayLogInput(null), CancellationToken.None)).Text);
+        Assert.Equal("", (await Get("2026-11-05")).Log);
+    }
+
+    [Fact]
+    public async Task Rejects_a_too_long_log_or_a_bad_date()
+    {
+        var longest = await _days.SaveLogAsync("2026-11-05", new DayLogInput(new string('a', 10_000)), CancellationToken.None);
+        Assert.Equal(10_000, longest.Text.Length);
+
+        var tooLong = await Assert.ThrowsAsync<ValidationException>(() =>
+            _days.SaveLogAsync("2026-11-05", new DayLogInput(new string('a', 10_001)), CancellationToken.None));
+        var badDate = await Assert.ThrowsAsync<ValidationException>(() =>
+            _days.SaveLogAsync("2026-02-30", new DayLogInput("x"), CancellationToken.None));
+
+        Assert.Equal(["text"], tooLong.Errors.Keys);
+        Assert.Equal(["date"], badDate.Errors.Keys);
+    }
+
+    [Fact]
+    public async Task A_day_without_a_log_has_empty_text()
+    {
+        Assert.Equal("", (await Get("2026-11-05")).Log);
+        Assert.False(Directory.Exists(Path.Combine(_folder.Path, "daily")));
     }
 }
