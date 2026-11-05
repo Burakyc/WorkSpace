@@ -1,10 +1,11 @@
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import type { ApiConfig } from '../src/shared/api/types';
+import { app, BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from 'electron';
+import type { ApiConfig, ChangeDataDirResult } from '../src/shared/api/types';
 import { startApi, type ApiHandle } from './apiProcess';
-import { readAppConfig, resolveDataDir } from './appConfig';
+import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
+import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
 import { isAllowedNavigation } from './navigation';
 
 const devServerUrl = process.env['ELECTRON_RENDERER_URL'];
@@ -17,32 +18,64 @@ const apiExePath = resolve(
   app.getAppPath(),
   '../api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe',
 );
+const appConfigFile = join(app.getPath('userData'), 'app-config.json');
 
-let api: ApiHandle | undefined;
+let current: ApiState<ApiHandle> | undefined;
 
-function prepareDataDir(): string {
-  const config = readAppConfig(join(app.getPath('userData'), 'app-config.json'));
-  const dataDir = resolveDataDir(config, app.getPath('appData'), app.isPackaged);
-  try {
-    mkdirSync(dataDir, { recursive: true });
-  } catch (error) {
-    throw new Error(`Veri klasörü oluşturulamadı: ${dataDir}`, { cause: error });
-  }
-  return dataDir;
-}
-
-async function launchApi(): Promise<ApiHandle> {
-  const dataDir = prepareDataDir();
-  if (!existsSync(apiExePath)) {
-    throw new Error(
-      `API bulunamadı: ${apiExePath}\nÖnce "dotnet build apps/api/DevPath.slnx" komutunu çalıştırın.`,
-    );
-  }
+function startApiFor(dataDir: string): Promise<ApiHandle> {
   return startApi({
     exePath: apiExePath,
     origin: appOrigin,
     dataDir,
     development: !app.isPackaged,
+  });
+}
+
+async function launch(): Promise<ApiState<ApiHandle>> {
+  const dataDir = resolveDataDir(
+    readAppConfig(appConfigFile),
+    app.getPath('appData'),
+    app.isPackaged,
+  );
+  try {
+    mkdirSync(dataDir, { recursive: true });
+  } catch (error) {
+    throw new Error(`Veri klasörü oluşturulamadı: ${dataDir}`, { cause: error });
+  }
+  if (!existsSync(apiExePath)) {
+    throw new Error(
+      `API bulunamadı: ${apiExePath}\nÖnce "dotnet build apps/api/DevPath.slnx" komutunu çalıştırın.`,
+    );
+  }
+  return { dataDir, api: await startApiFor(dataDir) };
+}
+
+const switchSteps: SwitchSteps<ApiHandle> = {
+  createFolder: (dataDir) => mkdirSync(dataDir, { recursive: true }),
+  readConfigFile: () => (existsSync(appConfigFile) ? readFileSync(appConfigFile, 'utf8') : null),
+  restoreConfigFile: (text) =>
+    text === null ? rmSync(appConfigFile, { force: true }) : writeFileSync(appConfigFile, text),
+  writeConfig: (dataDir) => writeAppConfig(appConfigFile, { dataDir }),
+  stopApi: (api) => api.stop(),
+  startApi: startApiFor,
+};
+
+function fail(error: unknown): void {
+  dialog.showErrorBox(
+    'DevPath başlatılamadı',
+    error instanceof Error ? error.message : String(error),
+  );
+  app.quit();
+}
+
+/** Every IPC handler answers only the app's own page. */
+function handle<T>(channel: string, listener: (event: IpcMainInvokeEvent) => T): void {
+  ipcMain.handle(channel, (event) => {
+    const senderUrl = event.senderFrame?.url;
+    if (!senderUrl || !isAllowedNavigation(senderUrl, appUrl)) {
+      throw new Error(`${channel} is only available to the app page.`);
+    }
+    return listener(event);
   });
 }
 
@@ -96,23 +129,51 @@ if (!app.requestSingleInstanceLock()) {
 
   void app.whenReady().then(async () => {
     try {
-      api = await launchApi();
+      current = await launch();
     } catch (error) {
-      dialog.showErrorBox(
-        'DevPath başlatılamadı',
-        error instanceof Error ? error.message : String(error),
-      );
-      app.quit();
+      fail(error);
       return;
     }
 
-    const config: ApiConfig = { baseUrl: api.baseUrl, token: api.token };
-    ipcMain.handle('devpath:get-api-config', (event): ApiConfig => {
-      const senderUrl = event.senderFrame?.url;
-      if (!senderUrl || !isAllowedNavigation(senderUrl, appUrl)) {
-        throw new Error('getApiConfig is only available to the app page.');
+    handle('devpath:get-api-config', (): ApiConfig => {
+      const { api } = current!;
+      return { baseUrl: api.baseUrl, token: api.token };
+    });
+
+    handle('devpath:get-data-dir', () => current!.dataDir);
+
+    handle('devpath:change-data-dir', async (): Promise<ChangeDataDirResult> => {
+      const window = mainWindow!;
+      const choice = await dialog.showOpenDialog(window, {
+        title: 'Veri klasörü seç',
+        defaultPath: current!.dataDir,
+        properties: ['openDirectory', 'createDirectory'],
+      });
+      const picked = choice.filePaths[0];
+      if (choice.canceled || picked === undefined) {
+        return { dataDir: null };
       }
-      return config;
+
+      const before = current!;
+      try {
+        const result = await switchDataDir(before, picked, switchSteps);
+        current = result.state;
+        if (result.error) {
+          return { error: result.error };
+        }
+      } catch (error) {
+        current = undefined;
+        if (error instanceof FatalSwitchError) {
+          fail(error);
+        }
+        throw error;
+      }
+
+      if (current.dataDir !== before.dataDir) {
+        // The new API has a new port and token: reload so nothing in the page keeps the old ones.
+        setTimeout(() => window.webContents.reload(), 0);
+      }
+      return { dataDir: current.dataDir };
     });
 
     mainWindow = createWindow();
@@ -124,5 +185,5 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
-  api?.stop();
+  current?.api.stop();
 });

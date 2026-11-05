@@ -6,7 +6,7 @@ import { ApiStatus } from './ApiStatus';
 const config = { baseUrl: 'http://127.0.0.1:4321', token: 'secret' };
 
 function stubBridge(getApiConfig: DevPathBridge['getApiConfig']) {
-  vi.stubGlobal('devpath', { getApiConfig } satisfies DevPathBridge);
+  vi.stubGlobal('devpath', { getApiConfig } satisfies Pick<DevPathBridge, 'getApiConfig'>);
 }
 
 afterEach(() => {
