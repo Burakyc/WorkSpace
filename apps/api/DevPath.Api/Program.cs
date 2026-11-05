@@ -4,6 +4,7 @@ using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Calendar;
 using DevPath.Api.Modules.Goals;
+using DevPath.Api.Modules.Home;
 using DevPath.Api.Modules.Notes;
 using DevPath.Api.Modules.Pomodoro;
 using DevPath.Api.Modules.Projects;
@@ -31,6 +32,7 @@ builder.Services.AddNotes();
 builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<DayService>();
+builder.Services.AddSingleton<FeedService>();
 
 var app = builder.Build();
 
