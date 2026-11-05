@@ -1,0 +1,13 @@
+{
+  "name": "devpath-workspace",
+  "private": true,
+  "workspaces": [
+    "apps/desktop"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "npm run dev -w apps/desktop"
+  }
+}
