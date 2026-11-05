@@ -161,6 +161,51 @@ public sealed class NoteService(IRepository<NoteNode> nodes, JsonFileStore store
         return true;
     }
 
+    /// <summary>The page's blocks (empty when its file is missing). Null for an unknown id; a folder is a validation error.</summary>
+    public async Task<NoteContent?> GetContentAsync(string id, CancellationToken cancellationToken)
+    {
+        var node = await nodes.GetAsync(id, cancellationToken);
+        if (node is null)
+        {
+            return null;
+        }
+
+        ThrowIfFolder(node);
+        var document = await store.ReadAsync(NotesModule.PagePath(id), NotesModule.PageSchema, cancellationToken);
+        var blocks = document?["blocks"] as JsonArray ?? [];
+        return new NoteContent((JsonArray)blocks.DeepClone());
+    }
+
+    /// <summary>Replaces the page's blocks and sets its <see cref="NoteNode.UpdatedAt"/>. Null for an unknown id.</summary>
+    public async Task<NoteNode?> SaveContentAsync(string id, NoteContentInput input, CancellationToken cancellationToken)
+    {
+        var node = await nodes.GetAsync(id, cancellationToken);
+        if (node is null)
+        {
+            return null;
+        }
+
+        ThrowIfFolder(node);
+        if (input.Blocks is not JsonArray blocks)
+        {
+            throw new ValidationException(new Dictionary<string, string[]> { ["blocks"] = ["İçerik bir blok listesi olmalı."] });
+        }
+
+        var document = new JsonObject { ["blocks"] = blocks.DeepClone() };
+        await store.WriteAsync(NotesModule.PagePath(id), NotesModule.PageSchema, document, cancellationToken);
+        var saved = node with { UpdatedAt = time.GetUtcNow() };
+        await nodes.UpsertAsync(saved, cancellationToken);
+        return saved;
+    }
+
+    private static void ThrowIfFolder(NoteNode node)
+    {
+        if (node.Kind == NoteNode.Folder)
+        {
+            throw new ValidationException(new Dictionary<string, string[]> { ["id"] = ["Klasörlerin içeriği yoktur."] });
+        }
+    }
+
     /// <summary>Every node under <paramref name="id"/>, parents before their children.</summary>
     private static IEnumerable<NoteNode> Descendants(IReadOnlyList<NoteNode> all, string id)
     {

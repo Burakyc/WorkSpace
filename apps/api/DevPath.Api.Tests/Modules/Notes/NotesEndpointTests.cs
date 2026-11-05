@@ -55,4 +55,21 @@ public class NotesEndpointTests
         Assert.Equal(HttpStatusCode.NotFound, (await client.PostAsJsonAsync("/api/notes/missing/shift", new { offset = 1 })).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync("/api/notes/missing")).StatusCode);
     }
+
+    [Fact]
+    public async Task Saves_and_reads_page_content()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+        var pageId = (await Json(await client.PostAsJsonAsync("/api/notes", new { kind = "page", title = "DI" }))).GetProperty("id").GetString();
+        var folderId = (await Json(await client.PostAsJsonAsync("/api/notes", new { kind = "folder", title = "F" }))).GetProperty("id").GetString();
+
+        var saved = await client.PutAsJsonAsync($"/api/notes/{pageId}/content", new { blocks = new[] { new { id = "a", type = "paragraph" } } });
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        var content = await Json(await client.GetAsync($"/api/notes/{pageId}/content"));
+        Assert.Equal("paragraph", content.GetProperty("blocks")[0].GetProperty("type").GetString());
+
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/notes/missing/content")).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync($"/api/notes/{folderId}/content")).StatusCode);
+    }
 }

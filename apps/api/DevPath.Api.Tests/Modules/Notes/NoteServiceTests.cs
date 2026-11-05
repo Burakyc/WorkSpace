@@ -152,4 +152,45 @@ public sealed class NoteServiceTests : IDisposable
         Assert.True(File.Exists(PageFile(sibling.Id)));
         Assert.False(await _notes.DeleteAsync("missing", None));
     }
+
+    [Fact]
+    public async Task Content_round_trip_sets_the_updated_time()
+    {
+        var page = await Create("DI");
+        Assert.Empty((await _notes.GetContentAsync(page.Id, None))!.Blocks);
+        _clock.Now = Start.AddHours(2);
+        var blocks = JsonNode.Parse("""[{"id":"a","type":"paragraph","content":[]},{"id":"b","type":"heading"}]""");
+
+        var saved = await _notes.SaveContentAsync(page.Id, new NoteContentInput(blocks), None);
+
+        Assert.Equal(Start.AddHours(2), saved!.UpdatedAt);
+        Assert.Equal(Start.AddHours(2), (await _notes.ListAsync(None)).Single().UpdatedAt);
+        Assert.True(JsonNode.DeepEquals(blocks, (await _notes.GetContentAsync(page.Id, None))!.Blocks));
+        var file = JsonNode.Parse(await File.ReadAllTextAsync(PageFile(page.Id)))!;
+        Assert.Equal(1, file["schemaVersion"]!.GetValue<int>());
+        Assert.Equal(2, file["blocks"]!.AsArray().Count);
+    }
+
+    [Fact]
+    public async Task Content_rejects_folders_bad_blocks_and_unknown_ids()
+    {
+        var folder = await Create("Folder", NoteNode.Folder);
+        var page = await Create("Page");
+
+        Assert.Null(await _notes.GetContentAsync("missing", None));
+        Assert.Null(await _notes.SaveContentAsync("missing", new NoteContentInput(new JsonArray()), None));
+        Assert.Equal(["Klasörlerin içeriği yoktur."], (await Errors(() => _notes.GetContentAsync(folder.Id, None)))["id"]);
+        Assert.Equal(["Klasörlerin içeriği yoktur."], (await Errors(() => _notes.SaveContentAsync(folder.Id, new NoteContentInput(new JsonArray()), None)))["id"]);
+        Assert.Equal(["İçerik bir blok listesi olmalı."], (await Errors(() => _notes.SaveContentAsync(page.Id, new NoteContentInput(new JsonObject()), None)))["blocks"]);
+        Assert.Equal(["İçerik bir blok listesi olmalı."], (await Errors(() => _notes.SaveContentAsync(page.Id, new NoteContentInput(null), None)))["blocks"]);
+    }
+
+    [Fact]
+    public async Task A_page_without_a_file_reads_as_empty()
+    {
+        var page = await Create("Page");
+        File.Delete(PageFile(page.Id));
+
+        Assert.Empty((await _notes.GetContentAsync(page.Id, None))!.Blocks);
+    }
 }

@@ -28,9 +28,20 @@ public sealed class NotesController(NoteService notes) : ControllerBase
     public async Task<ActionResult<NoteNode>> Shift(string id, NoteShiftInput input, CancellationToken cancellationToken) =>
         OkOrNotFound(await notes.ShiftAsync(id, input, cancellationToken));
 
+    [HttpGet("{id}/content")]
+    public async Task<ActionResult<NoteContent>> GetContent(string id, CancellationToken cancellationToken) =>
+        await notes.GetContentAsync(id, cancellationToken) is { } content ? Ok(content) : NotFound();
+
+    [HttpPut("{id}/content")]
+    [RequestSizeLimit(MaxContentBytes)]
+    public async Task<ActionResult<NoteNode>> SaveContent(string id, NoteContentInput input, CancellationToken cancellationToken) =>
+        OkOrNotFound(await notes.SaveContentAsync(id, input, cancellationToken));
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken) =>
         await notes.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
+
+    private const long MaxContentBytes = 5 * 1024 * 1024;
 
     private ActionResult<NoteNode> OkOrNotFound(NoteNode? node) => node is null ? NotFound() : Ok(node);
 }
