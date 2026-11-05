@@ -1,12 +1,21 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow, dialog, ipcMain, shell, type IpcMainInvokeEvent } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Notification,
+  shell,
+  type IpcMainInvokeEvent,
+} from 'electron';
 import type { ApiConfig, ChangeDataDirResult } from '../src/shared/api/types';
 import { resolveApiExePath, startApi, type ApiHandle } from './apiProcess';
 import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
 import { isAllowedExternalUrl, isAllowedNavigation } from './navigation';
+import { createSessionNotifier, isValidSchedule } from './sessionNotifier';
 
 const devServerUrl = process.env['ELECTRON_RENDERER_URL'];
 const rendererFile = join(__dirname, '../renderer/index.html');
@@ -19,6 +28,9 @@ const apiExePath = resolveApiExePath({
   appPath: app.getAppPath(),
 });
 const appConfigFile = join(app.getPath('userData'), 'app-config.json');
+
+// Windows shows toasts only for apps with an AppUserModelID; this also covers the unpackaged dev app.
+app.setAppUserModelId('com.devpath.workspace');
 
 let current: ApiState<ApiHandle> | undefined;
 
@@ -145,6 +157,34 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     handle('devpath:get-data-dir', () => current!.dataDir);
+
+    // Kept so the notification is not garbage collected before it is clicked.
+    let lastNotification: Notification | undefined;
+    const notifier = createSessionNotifier({
+      now: () => Date.now(),
+      setTimer: (callback, ms) => setTimeout(callback, ms),
+      clearTimer: (timer) => clearTimeout(timer as ReturnType<typeof setTimeout>),
+      notify: (body) => {
+        lastNotification = new Notification({ title: 'Odak süresi bitti', body, silent: true });
+        lastNotification.on('click', () => {
+          if (!mainWindow) return;
+          if (mainWindow.isMinimized()) mainWindow.restore();
+          mainWindow.show();
+          mainWindow.focus();
+          mainWindow.webContents.send('devpath:open-page', '/pomodoro');
+        });
+        lastNotification.show();
+      },
+    });
+
+    handle('devpath:pomodoro-schedule-end', (_event, endsAt, body) => {
+      if (!isValidSchedule(endsAt, body, Date.now())) {
+        throw new Error('Invalid session end.');
+      }
+      notifier.schedule(endsAt as number, body as string);
+    });
+
+    handle('devpath:pomodoro-cancel-end', () => notifier.cancel());
 
     handle('devpath:open-external', async (_event, url) => {
       if (typeof url !== 'string' || !isAllowedExternalUrl(url)) {

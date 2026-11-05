@@ -64,6 +64,13 @@ export interface DevPathBridge {
   getApiConfig(): Promise<ApiConfig>;
   /** Opens an https link in the default browser; main refuses anything else. */
   openExternal(url: string): Promise<void>;
+  /** Main asks the page to open a route (e.g. after a notification click). Returns an unsubscribe function. */
+  onOpenPage(callback: (path: string) => void): () => void;
+  pomodoro: {
+    /** Schedules the "focus session ended" notification; replaces any earlier one. */
+    scheduleEnd(endsAt: number, body: string): Promise<void>;
+    cancelEnd(): Promise<void>;
+  };
   settings: {
     getDataDir(): Promise<string>;
     /** Opens the folder dialog and switches to the chosen folder. Resolves null on cancel; rejects with a Turkish message. */

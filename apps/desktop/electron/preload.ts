@@ -1,10 +1,27 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import type { ApiConfig, ChangeDataDirResult, DevPathBridge } from '../src/shared/api/types';
 
 const bridge: DevPathBridge = {
   getApiConfig: () => ipcRenderer.invoke('devpath:get-api-config') as Promise<ApiConfig>,
   openExternal: async (url) => {
     await ipcRenderer.invoke('devpath:open-external', url);
+  },
+  onOpenPage: (callback) => {
+    const listener = (_event: IpcRendererEvent, path: unknown) => {
+      if (typeof path === 'string') callback(path);
+    };
+    ipcRenderer.on('devpath:open-page', listener);
+    return () => {
+      ipcRenderer.removeListener('devpath:open-page', listener);
+    };
+  },
+  pomodoro: {
+    scheduleEnd: async (endsAt, body) => {
+      await ipcRenderer.invoke('devpath:pomodoro-schedule-end', endsAt, body);
+    },
+    cancelEnd: async () => {
+      await ipcRenderer.invoke('devpath:pomodoro-cancel-end');
+    },
   },
   settings: {
     getDataDir: () => ipcRenderer.invoke('devpath:get-data-dir') as Promise<string>,
