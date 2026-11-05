@@ -3,7 +3,8 @@
 services:
   api:
     build:
-      context: apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
       DEVPATH_TOKEN: ${DEVPATH_TOKEN:?Set DEVPATH_TOKEN in .env (copy .env.example to .env)}
       DEVPATH_PORT: ${DEVPATH_PORT:-5180}

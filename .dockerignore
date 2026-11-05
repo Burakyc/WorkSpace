@@ -1,0 +1,7 @@
+# The API image is built from the repo root (docker-compose.yml) but needs only the API and the import schemas.
+*
+!apps/api/Directory.Build.props
+!apps/api/DevPath.Api/
+!schemas/
+**/bin
+**/obj

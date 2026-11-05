@@ -1,13 +1,15 @@
-# Development container for the API only (phase 0.7). Built by `npm run docker:api` at the repo root.
+# Development container for the API only (phase 0.7). Built by `npm run docker:api` with the repo root as the
+# context, because the API embeds the import schemas from schemas/.
 
 # Build: restore first (cached while the project file does not change), then publish.
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY Directory.Build.props ./
-COPY DevPath.Api/DevPath.Api.csproj DevPath.Api/
-RUN dotnet restore DevPath.Api/DevPath.Api.csproj
-COPY DevPath.Api/ DevPath.Api/
-RUN dotnet publish DevPath.Api/DevPath.Api.csproj -c Release --no-restore -p:DebugType=None -o /app
+COPY apps/api/Directory.Build.props apps/api/
+COPY apps/api/DevPath.Api/DevPath.Api.csproj apps/api/DevPath.Api/
+RUN dotnet restore apps/api/DevPath.Api/DevPath.Api.csproj
+COPY schemas/ schemas/
+COPY apps/api/DevPath.Api/ apps/api/DevPath.Api/
+RUN dotnet publish apps/api/DevPath.Api/DevPath.Api.csproj -c Release --no-restore -p:DebugType=None -o /app
 
 # Run: ASP.NET runtime only, as the image's non-root "app" user.
 FROM mcr.microsoft.com/dotnet/aspnet:10.0

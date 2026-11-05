@@ -1,7 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <PackageReference Include="JsonSchema.Net" Version="9.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+  </ItemGroup>
+
+  <!-- The import schemas live in the repo's schemas/ folder and are embedded, so the single-file exe needs no extra files. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\schemas\*.schema.json" LogicalName="DevPath.Schemas.%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
