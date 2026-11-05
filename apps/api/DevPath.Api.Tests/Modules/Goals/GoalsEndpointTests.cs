@@ -81,6 +81,24 @@ public class GoalsEndpointTests
     }
 
     [Fact]
+    public async Task Progress_has_one_entry_per_goal_and_zeros_without_sessions()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+        await client.PostAsJsonAsync("/api/goals", new { title = "With target", targetPomodoros = 20 });
+        var withoutTarget = await CreateGoal(client, "Without target");
+
+        var progress = JsonDocument.Parse(await client.GetStringAsync("/api/goals/progress")).RootElement;
+
+        Assert.Equal(2, progress.GetArrayLength());
+        Assert.Equal(withoutTarget, progress[0].GetProperty("goalId").GetString());
+        Assert.Equal(JsonValueKind.Null, progress[0].GetProperty("percent").ValueKind);
+        Assert.Equal(0, progress[1].GetProperty("completedSessions").GetInt32());
+        Assert.Equal(0, progress[1].GetProperty("totalMinutes").GetInt32());
+        Assert.Equal(0, progress[1].GetProperty("percent").GetInt32());
+    }
+
+    [Fact]
     public async Task Goals_need_the_token()
     {
         await using var factory = new ApiFactory();

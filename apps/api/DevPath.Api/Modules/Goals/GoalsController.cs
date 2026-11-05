@@ -10,6 +10,10 @@ public sealed class GoalsController(GoalService goals) : ControllerBase
     public Task<IReadOnlyList<Goal>> List([FromQuery] bool includeArchived, CancellationToken cancellationToken) =>
         goals.ListAsync(includeArchived, cancellationToken);
 
+    [HttpGet("progress")]
+    public Task<IReadOnlyList<GoalProgress>> Progress(CancellationToken cancellationToken) =>
+        goals.ListProgressAsync(cancellationToken);
+
     [HttpPost]
     public async Task<ActionResult<Goal>> Create(GoalInput input, CancellationToken cancellationToken)
     {

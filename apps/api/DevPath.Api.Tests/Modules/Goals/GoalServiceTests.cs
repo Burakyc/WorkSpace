@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Goals;
+using DevPath.Api.Modules.Pomodoro;
 using DevPath.Api.Tests.Infrastructure.Storage;
 
 namespace DevPath.Api.Tests.Modules.Goals;
@@ -17,7 +18,10 @@ public sealed class GoalServiceTests : IDisposable
     public GoalServiceTests()
     {
         var store = new JsonFileStore(new DataDirectory(_folder.Path));
-        _service = new GoalService(new JsonRepository<Goal>(store, GoalsModule.FileName, GoalsModule.Schema), _clock);
+        _service = new GoalService(
+            new JsonRepository<Goal>(store, GoalsModule.FileName, GoalsModule.Schema),
+            new JsonRepository<Session>(store, PomodoroModule.SessionsFileName, PomodoroModule.SessionsSchema),
+            _clock);
     }
 
     public void Dispose() => _folder.Dispose();

@@ -1,10 +1,19 @@
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
+using DevPath.Api.Modules.Pomodoro;
 
 namespace DevPath.Api.Modules.Goals;
 
-public sealed class GoalService(IRepository<Goal> goals, TimeProvider time)
+public sealed class GoalService(IRepository<Goal> goals, IRepository<Session> sessions, TimeProvider time)
 {
+    /// <summary>Progress of every goal (archived included), in the order of <see cref="ListAsync"/> with archived goals.</summary>
+    public async Task<IReadOnlyList<GoalProgress>> ListProgressAsync(CancellationToken cancellationToken)
+    {
+        var all = await ListAsync(includeArchived: true, cancellationToken);
+        var allSessions = await sessions.GetAllAsync(cancellationToken);
+        return [.. all.Select(goal => GoalProgress.Calculate(goal, allSessions))];
+    }
+
     /// <summary>Active goals newest first; with <paramref name="includeArchived"/>, archived goals follow, newest first.</summary>
     public async Task<IReadOnlyList<Goal>> ListAsync(bool includeArchived, CancellationToken cancellationToken)
     {
