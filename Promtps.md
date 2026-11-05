@@ -380,3 +380,17 @@ Implement the spec in specs/2026-11-05-day-detail/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 3.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `DayService` (sessions, goals worked on, daily log in `daily/YYYY-MM-DD.json`) with `GET /api/days/{date}` and `PUT /api/days/{date}/log`; day links in the month grid, month in `?month=`, the day page `/calendar/:date` with previous/next day and the "Günlük" form; link style fix; tech-stack and specs updated; phase 3.2 done.
+
+## 2026-11-05 – Plan phase 4.1 page tree
+**Phase:** 4.1 Page tree
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 4.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-page-tree/` (`requirements.md`, `plan.md`, `validation.md`).
