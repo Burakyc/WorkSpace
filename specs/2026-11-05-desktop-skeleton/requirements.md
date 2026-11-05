@@ -30,6 +30,7 @@ An Electron + React + TypeScript app in `apps/desktop` that opens a secure windo
 | Single instance | In this phase, with `app.requestSingleInstanceLock()` |
 | Window content | Turkish placeholder page; light/dark follows the OS |
 | TypeScript version | 6.0.3 (decided during task 3: typescript-eslint supports TypeScript up to 6.0, not 7.x) |
+| Electron binary | `postinstall` in `apps/desktop/package.json` runs `electron/install.js` (decided during task 12: npm 11 blocks dependency install scripts, so a clean `npm install` left Electron without its binary) |
 | `frame-ancestors` | Dropped from the CSP (decided during task 6: Chromium ignores it in a `<meta>` tag and logs a console error) |
 
 ## User stories
