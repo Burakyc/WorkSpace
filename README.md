@@ -115,6 +115,18 @@ devpath-workspace/
 └── README.md
 ```
 
+## Development
+
+Prerequisite: [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+
+```bash
+dotnet build apps/api/DevPath.slnx
+dotnet test apps/api/DevPath.slnx
+dotnet run --project apps/api/DevPath.Api
+```
+
+The API listens on `127.0.0.1` only. The default URL is http://127.0.0.1:5180/api/health. Set `DEVPATH_PORT` to use another port. In Development, the OpenAPI document is at http://127.0.0.1:5180/openapi/v1.json.
+
 ## Commit conventions
 
 Conventional Commits are used: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
