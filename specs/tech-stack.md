@@ -27,10 +27,11 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 │  - picks a free port, generates a per-launch API token   │
 │  - spawns the API process, kills it on quit              │
 │  - safeStorage (secrets), notifications, reminders       │
-│  - reads app config (data folder path)                   │
+│  - reads and writes app config (data folder path)        │
 │                                                          │
 │ preload (contextBridge, minimal)                         │
-│  - getApiConfig(), secrets.*, notify(), openExternal()   │
+│  - getApiConfig(), settings.*, secrets.*, notify(),      │
+│    openExternal()                                        │
 │                                                          │
 │ renderer (React, sandboxed)                              │
 │  - typed fetch client ──HTTP──┐                          │
@@ -49,7 +50,7 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
    - Dev: root `npm run dev` runs `dotnet build apps/api/DevPath.slnx` first; main then spawns `apps/api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe` directly. Not `dotnet run`: it is too slow for the 10 s timeout, and killing it on Windows leaves the real API process running.
    - Packaged: `resources/api/DevPath.Api.exe`.
 3. Main polls `GET /api/health` (with the token) until it answers `200` (timeout 10 s, or earlier if the API process exits). On failure it shows `dialog.showErrorBox` with a Turkish message and quits; the main window is never opened.
-4. When a secret or the data folder changes, main restarts the API.
+4. When a secret or the data folder changes, main restarts the API. A data folder change (Ayarlar, `settings.changeDataDir()`) creates the folder, writes `app-config.json`, stops the old API, starts a new one on a new port with a new token, and reloads the window. If the new API does not start, the old `app-config.json` is restored and the old API is started again.
 5. On quit, main stops the API process. If main dies without quitting, the API notices that `DEVPATH_PARENT_PID` exited and stops itself.
 
 ### API rules
@@ -69,8 +70,10 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 
 - Function components and hooks only. State is React state plus a few contexts (theme, active pomodoro). No global state library.
 - One typed API client (`shared/api/`) wraps `fetch`, adds the token and base URL from `await window.devpath.getApiConfig()` (async: the preload asks main over IPC, and main answers only the app's own page), and returns typed results. No `any`.
-- Design tokens live in one file (`shared/ui/tokens.css`) as CSS variables; light/dark switch on `prefers-color-scheme`. Components use CSS Modules.
-- Layout: sidebar + content area. Below 900 px the sidebar collapses to icons and content goes to one column. Icons are SVG (lucide-react).
+- Design tokens live in one file (`shared/ui/tokens.css`) as CSS variables (`--color-*`, `--font-*`, `--space-*`, `--radius-*`, sidebar widths); light/dark switch on `prefers-color-scheme`. Accent is indigo. Fonts are the system stack (Segoe UI Variable, Cascadia Code); no bundled web fonts. Components use CSS Modules and only token values.
+- Routing: `HashRouter` (the production page is a `file://` URL). One route table (`src/app/navigation.tsx`) drives the sidebar and the routes; paths are English, labels Turkish. A module replaces its empty state entry with its page.
+- Layout: sidebar + content area, with a skip link and a visible `:focus-visible` ring. Below 900 px (`width < 900px`, so fractional widths on scaled displays are covered) the sidebar collapses to icons and content goes to one column. Icons are SVG (lucide-react). The API status sits in the sidebar footer.
+- `app-config.json` is read and written only by Electron main, atomically, with `schemaVersion: 1`.
 - Imported or user text is always rendered as text. No `dangerouslySetInnerHTML`.
 - Notes use BlockNote; saves are debounced by 1 second and run in the background.
 - The pomodoro timer stores `startedAt` and `durationMs` and derives the remaining time from `Date.now()`, so throttled or minimized windows stay accurate. The end-of-session notification is scheduled in the main process.

@@ -154,10 +154,12 @@ All data is JSON in one folder, which the API takes from `DEVPATH_DATA_DIR` and 
 | `npm run dev`, `npm run start`, `dotnet run` (Development) | `%APPDATA%\DevPath\dev-data`, so development never touches real data |
 | API outside Development | none: it refuses to start without `DEVPATH_DATA_DIR` |
 
-To use another folder with the desktop app, put an absolute path in `app-config.json` in Electron's `userData` folder (`%APPDATA%\@devpath\desktop` while unpackaged):
+To use another folder, open **Ayarlar → Veri klasörü → Klasör seç…** and pick a folder. The API restarts with the new folder; existing data is not moved. If the new folder does not work, the app goes back to the old one.
+
+The choice is saved in `app-config.json` in Electron's `userData` folder (`%APPDATA%\@devpath\desktop` while unpackaged). The file can also be edited by hand:
 
 ```json
-{ "dataDir": "D:\\DevPathData" }
+{ "schemaVersion": 1, "dataDir": "D:\\DevPathData" }
 ```
 
 If that file is not valid JSON, `dataDir` is not an absolute path, or the folder cannot be created, the app shows an error and quits.
