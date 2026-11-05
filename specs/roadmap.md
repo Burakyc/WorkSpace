@@ -73,11 +73,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 1 — Goals and projects
 
-#### 1.1 Goals — `todo`
-- [ ] API: create, list, update, archive goals (`goals.json`); validation (title required, max length).
-- [ ] UI: goals list and a create/edit form; archived goals hidden by default.
-- [ ] Optional `targetPomodoros` per goal.
-- [ ] Tests: `GoalService` (xUnit), create-goal flow (RTL).
+#### 1.1 Goals — `done`
+- [x] API: create, list, update, archive goals (`goals.json`); validation (title required, max length).
+- [x] UI: goals list and a create/edit form; archived goals hidden by default.
+- [x] Optional `targetPomodoros` per goal.
+- [x] Tests: `GoalService` (xUnit), create-goal flow (RTL).
 
 #### 1.2 Projects and progress — `todo`
 - [ ] API: create, list, update, archive projects linked to a goal (`projects.json`); a project's goal must exist.

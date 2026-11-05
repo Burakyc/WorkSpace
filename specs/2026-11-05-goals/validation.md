@@ -6,13 +6,13 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 1.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] API: list, create, update, archive and restore goals in `goals.json`; title required and at most 120 characters; description at most 1000; `targetPomodoros` optional, 1–10000.
-- [ ] Invalid input returns `400` `ValidationProblemDetails` with Turkish messages per field; nothing is saved.
-- [ ] UI: goals list (newest first) with an inline create/edit form; archived goals hidden by default, shown with the toggle, restorable.
-- [ ] Creating a goal takes two clicks plus typing.
-- [ ] Empty state with a "Yeni hedef" button when there are no goals.
-- [ ] Tests: `GoalService` (xUnit) and the create-goal flow (RTL), plus the tests below.
-- [ ] `tech-stack.md` is updated.
+- [x] API: list, create, update, archive and restore goals in `goals.json`; title required and at most 120 characters; description at most 1000; `targetPomodoros` optional, 1–10000.
+- [x] Invalid input returns `400` `ValidationProblemDetails` with Turkish messages per field; nothing is saved.
+- [x] UI: goals list (newest first) with an inline create/edit form; archived goals hidden by default, shown with the toggle, restorable.
+- [x] Creating a goal takes two clicks plus typing.
+- [x] Empty state with a "Yeni hedef" button when there are no goals.
+- [x] Tests: `GoalService` (xUnit) and the create-goal flow (RTL), plus the tests below.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -80,7 +80,7 @@ Run `npm run dev` from the repo root.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 1.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 1.1 ticked and set to `done`

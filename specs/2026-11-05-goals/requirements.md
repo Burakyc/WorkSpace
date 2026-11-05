@@ -26,6 +26,9 @@ The first real module. The user creates, edits, archives and restores goals on t
 | Validation messages | Turkish, produced by the API (they are shown to the user as they are). The form also uses `required`, `maxLength`, `min` and `max` so most mistakes never reach the API. |
 | Service registration | `IRepository<Goal>` is registered with its `JsonRepository<Goal>` (the documented test seam); `GoalService` is registered as a concrete class (one implementation). `TimeProvider.System` gives `createdAt`, so tests can fix the time. |
 | Client caching | One `getApiClient()` per page load caches the client built from `getApiConfig()`. The window reloads after a data-folder switch (phase 0.5), so the cache is never stale. |
+| List loading | The page always asks for `includeArchived=true` and filters on the client, so it can tell "no goals at all" (empty state) from "all archived" ("Aktif hedef yok.") with one request. While loading it shows only the heading and "Yükleniyor…", so no button appears and then disappears (decided during task 6). |
+| Module wiring file | `Modules/Goals/GoalsModule.cs` (`AddGoals()`, file name, schema) instead of `GoalsStorage.cs`: it registers the service too. |
+| Shared buttons | `src/shared/ui/buttons.module.css` (`primary`, `secondary`); the Settings page uses it too. `EmptyState` takes optional children for its action button. |
 
 ## User stories
 
