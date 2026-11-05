@@ -15,6 +15,7 @@
 .icon {
   display: inline-flex;
   padding: var(--space-2);
+  color: var(--color-text);
 }
 
 .month {
@@ -49,8 +50,7 @@
 }
 
 .day {
-  height: 64px;
-  padding: var(--space-2);
+  padding: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -64,6 +64,20 @@
 .day[aria-current='date'] {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
+}
+
+.dayLink {
+  display: block;
+  box-sizing: border-box;
+  min-height: 64px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+}
+
+.dayLink:hover {
+  box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
 .number {

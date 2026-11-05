@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installFakeGoalsApi } from '../goals/testing/fakeGoalsApi';
 import { CalendarPage } from './CalendarPage';
@@ -13,6 +14,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const renderPage = () =>
+  render(
+    <MemoryRouter initialEntries={['/calendar']}>
+      <CalendarPage />
+    </MemoryRouter>,
+  );
+
 const calendarRequests = (fetchFn: ReturnType<typeof installFakeGoalsApi>['fetchFn']) =>
   fetchFn.mock.calls
     .map(([url]) => new URL(String(url)))
@@ -23,7 +31,7 @@ describe('CalendarPage', () => {
   it('shows the month in Turkish with Monday-first weekdays', async () => {
     installFakeGoalsApi();
 
-    render(<CalendarPage />);
+    renderPage();
 
     expect(screen.getByRole('heading', { level: 2, name: 'Kasım 2026' })).toBeInTheDocument();
     expect(screen.getAllByRole('columnheader').map((th) => th.textContent)).toEqual([
@@ -36,35 +44,36 @@ describe('CalendarPage', () => {
       'Paz',
     ]);
     expect(
-      await screen.findByRole('cell', { name: '1 Kasım 2026, pomodoro yok' }),
+      await screen.findByRole('link', { name: '1 Kasım 2026, pomodoro yok' }),
     ).toBeInTheDocument();
   });
 
   it('shows the count with its shading', async () => {
     installFakeGoalsApi([], { calendar: { '2026-11-03': 3 } });
 
-    render(<CalendarPage />);
+    renderPage();
 
-    const cell = await screen.findByRole('cell', { name: '3 Kasım 2026, 3 pomodoro' });
-    expect(cell).toHaveTextContent('3');
-    expect(cell.className).toMatch(/level2/);
+    const link = await screen.findByRole('link', { name: '3 Kasım 2026, 3 pomodoro' });
+    expect(link).toHaveTextContent('3');
+    expect(link).toHaveAttribute('href', '/calendar/2026-11-03');
+    expect(link.closest('td')?.className).toMatch(/level2/);
   });
 
   it('marks today', async () => {
     installFakeGoalsApi();
 
-    render(<CalendarPage />);
+    renderPage();
 
-    expect(await screen.findByRole('cell', { name: /^5 Kasım 2026/ })).toHaveAttribute(
+    const today = await screen.findByRole('link', { name: /^5 Kasım 2026/ });
+    expect(today.closest('td')).toHaveAttribute('aria-current', 'date');
+    expect(screen.getByRole('link', { name: /^6 Kasım 2026/ }).closest('td')).not.toHaveAttribute(
       'aria-current',
-      'date',
     );
-    expect(screen.getByRole('cell', { name: /^6 Kasım 2026/ })).not.toHaveAttribute('aria-current');
   });
 
   it('moves between months and back to today', async () => {
     const { fetchFn } = installFakeGoalsApi([], { calendar: { '2026-10-12': 1 } });
-    render(<CalendarPage />);
+    renderPage();
     const today = screen.getByRole('button', { name: 'Bugün' });
     expect(today).toBeDisabled();
 
@@ -72,7 +81,7 @@ describe('CalendarPage', () => {
 
     expect(screen.getByRole('heading', { level: 2, name: 'Ekim 2026' })).toBeInTheDocument();
     expect(
-      await screen.findByRole('cell', { name: '12 Ekim 2026, 1 pomodoro' }),
+      await screen.findByRole('link', { name: '12 Ekim 2026, 1 pomodoro' }),
     ).toBeInTheDocument();
     expect(today).toBeEnabled();
 
@@ -88,7 +97,7 @@ describe('CalendarPage', () => {
   it('shows an error when the calendar cannot load', async () => {
     installFakeGoalsApi([], { failCalendar: true });
 
-    render(<CalendarPage />);
+    renderPage();
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Takvim yüklenemedi.');
   });

@@ -1,10 +1,11 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
 import { getApiClient } from '../../shared/api/getApiClient';
 import type { CalendarDay } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import styles from './CalendarPage.module.css';
-import { buildMonthGrid, monthOf, shiftMonth, todayLocal } from './monthGrid';
+import { buildMonthGrid, isValidDate, monthOf, shiftMonth, todayLocal } from './monthGrid';
 
 // Dates are formatted at UTC midnight with timeZone UTC, so the Y-M-D never shifts.
 const utc = (date: string) => new Date(`${date}T00:00:00Z`);
@@ -33,11 +34,21 @@ function shade(count: number): string | undefined {
 
 export function CalendarPage() {
   const today = todayLocal();
-  const [month, setMonth] = useState(() => monthOf(today));
+  const [params, setParams] = useSearchParams();
+  // The month lives in state (so quick clicks step from the latest one) and is mirrored to ?month=,
+  // so "Takvime dön" and the back button return to it.
+  const [month, setMonth] = useState(() => {
+    const requested = params.get('month') ?? '';
+    return isValidDate(`${requested}-01`) ? requested : monthOf(today);
+  });
   // Counts by date; a date's count is the same in every month that shows it, so loads simply merge.
   const [days, setDays] = useState<Record<string, CalendarDay>>({});
   const [loaded, setLoaded] = useState<string | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (params.get('month') !== month) setParams({ month }, { replace: true });
+  }, [month, params, setParams]);
 
   useEffect(() => {
     let active = true;
@@ -119,10 +130,15 @@ export function CalendarPage() {
                     key={date}
                     className={classes.filter(Boolean).join(' ')}
                     aria-current={date === today ? 'date' : undefined}
-                    aria-label={`${longDate.format(utc(date))}, ${count > 0 ? `${count} pomodoro` : 'pomodoro yok'}`}
                   >
-                    <span className={styles.number}>{Number(date.slice(8))}</span>
-                    {count > 0 && <span className={styles.count}>{count}</span>}
+                    <Link
+                      to={`/calendar/${date}`}
+                      className={styles.dayLink}
+                      aria-label={`${longDate.format(utc(date))}, ${count > 0 ? `${count} pomodoro` : 'pomodoro yok'}`}
+                    >
+                      <span className={styles.number}>{Number(date.slice(8))}</span>
+                      {count > 0 && <span className={styles.count}>{count}</span>}
+                    </Link>
                   </td>
                 );
               })}

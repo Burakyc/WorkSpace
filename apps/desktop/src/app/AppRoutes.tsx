@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router';
+import { DayPage } from '../modules/calendar/DayPage';
 import { PomodoroProvider } from '../modules/pomodoro/PomodoroContext';
 import { AppLayout } from './AppLayout';
 import { navigation, pageFor } from './navigation';
@@ -16,6 +17,7 @@ export function AppRoutes() {
         {navigation.map((entry) => (
           <Route key={entry.path} path={entry.path} element={pageFor(entry)} />
         ))}
+        <Route path="/calendar/:date" element={<DayPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
