@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createApiClient } from '../shared/api/client';
+import styles from './ApiStatus.module.css';
 
 type Status = 'connecting' | 'connected' | 'disconnected';
 
@@ -29,5 +30,10 @@ export function ApiStatus() {
     };
   }, []);
 
-  return <p role="status">{labels[status]}</p>;
+  return (
+    <p role="status" className={styles.status} title={labels[status]}>
+      <span className={`${styles.dot} ${styles[status] ?? ''}`} aria-hidden="true" />
+      <span className={styles.text}>{labels[status]}</span>
+    </p>
+  );
 }

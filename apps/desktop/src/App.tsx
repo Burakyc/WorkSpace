@@ -1,11 +1,10 @@
-import { ApiStatus } from './app/ApiStatus';
+import { HashRouter } from 'react-router';
+import { AppRoutes } from './app/AppRoutes';
 
 export function App() {
   return (
-    <main className="placeholder">
-      <h1>DevPath Workspace</h1>
-      <p>Kurulum devam ediyor.</p>
-      <ApiStatus />
-    </main>
+    <HashRouter>
+      <AppRoutes />
+    </HashRouter>
   );
 }

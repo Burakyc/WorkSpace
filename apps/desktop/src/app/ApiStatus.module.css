@@ -1,0 +1,28 @@
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+}
+
+.connected {
+  background: var(--color-success);
+}
+
+.disconnected {
+  background: var(--color-danger);
+}
+
+.text {
+  white-space: nowrap;
+}
