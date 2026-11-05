@@ -1,8 +1,8 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { readAppConfig, resolveDataDir } from './appConfig';
+import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 
 let folder: string;
 let file: string;
@@ -68,5 +68,36 @@ describe('resolveDataDir', () => {
   it('defaults to DevPath\\data when packaged and DevPath\\dev-data when not', () => {
     expect(resolveDataDir({}, appData, true)).toBe(join(appData, 'DevPath', 'data'));
     expect(resolveDataDir({}, appData, false)).toBe(join(appData, 'DevPath', 'dev-data'));
+  });
+});
+
+describe('writeAppConfig', () => {
+  const readJson = (): unknown => JSON.parse(readFileSync(file, 'utf8'));
+
+  it('creates the file with schemaVersion 1', () => {
+    writeAppConfig(file, { dataDir: 'D:\Data' });
+
+    expect(readJson()).toEqual({ schemaVersion: 1, dataDir: 'D:\Data' });
+  });
+
+  it('keeps other keys', () => {
+    writeFileSync(file, JSON.stringify({ other: 1, dataDir: 'C:\Old' }));
+
+    writeAppConfig(file, { dataDir: 'D:\Data' });
+
+    expect(readJson()).toEqual({ schemaVersion: 1, other: 1, dataDir: 'D:\Data' });
+  });
+
+  it('leaves no temp file and reads back', () => {
+    writeAppConfig(file, { dataDir: 'D:\Data' });
+
+    expect(existsSync(`${file}.tmp`)).toBe(false);
+    expect(readAppConfig(file)).toEqual({ dataDir: 'D:\Data' });
+  });
+
+  it.each(['2', '"1"'])('refuses to read schemaVersion %s', (version) => {
+    writeFileSync(file, `{ "schemaVersion": ${version} }`);
+
+    expect(() => readAppConfig(file)).toThrow(file);
   });
 });
