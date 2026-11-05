@@ -12,13 +12,13 @@
 
 ### Milestone 0 — Skeleton
 
-#### 0.1 API skeleton — `todo`
+#### 0.1 API skeleton — `done`
 ASP.NET Core Web API on .NET 10 that answers a health check.
-- [ ] `apps/api/DevPath.slnx` with `DevPath.Api` and `DevPath.Api.Tests`; nullable enabled, warnings as errors.
-- [ ] `GET /api/health` returns `{ status: "ok", version }`.
-- [ ] Kestrel binds to `127.0.0.1:<DEVPATH_PORT>` only.
-- [ ] An xUnit test with `WebApplicationFactory` covers the health endpoint.
-- [ ] `.gitignore` covers `data/`, `backups/`, `.env*`, `bin/`, `obj/`, `node_modules/`, `dist/`.
+- [x] `apps/api/DevPath.slnx` with `DevPath.Api` and `DevPath.Api.Tests`; nullable enabled, warnings as errors.
+- [x] `GET /api/health` returns `{ status: "ok", version }`.
+- [x] Kestrel binds to `127.0.0.1:<DEVPATH_PORT>` only.
+- [x] An xUnit test with `WebApplicationFactory` covers the health endpoint.
+- [x] `.gitignore` covers `data/`, `backups/`, `.env*`, `bin/`, `obj/`, `node_modules/`, `dist/`.
 
 #### 0.2 Desktop skeleton — `todo`
 Electron + Vite + React + TypeScript window with the security baseline.

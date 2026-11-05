@@ -6,17 +6,17 @@ The phase is done only when every acceptance criterion below is checked, all aut
 
 From `roadmap.md` phase 0.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] `apps/api/DevPath.slnx` contains `DevPath.Api` and `DevPath.Api.Tests`; nullable is enabled and warnings are errors.
-- [ ] `dotnet build apps/api/DevPath.slnx` finishes with 0 warnings and 0 errors.
-- [ ] `GET /api/health` returns `200` with `{ "status": "ok", "version": "0.0.1" }`.
-- [ ] Kestrel listens on `127.0.0.1:<DEVPATH_PORT>` only, and on `127.0.0.1:5180` when `DEVPATH_PORT` is not set.
-- [ ] An invalid `DEVPATH_PORT` stops startup with a clear error and a non-zero exit code.
-- [ ] `/openapi/v1.json` is served in Development and returns `404` in Production.
-- [ ] xUnit tests with `WebApplicationFactory` cover the health endpoint; all tests pass.
-- [ ] `.gitignore` covers `data/`, `backups/`, `.env*`, `secrets.bin`, `bin/`, `obj/`, `node_modules/`, `dist/`.
-- [ ] No `WeatherForecast` template code is left.
-- [ ] README has a "Development" section with the build, test and run commands.
-- [ ] `tech-stack.md` and `roadmap.md` match the phase decisions (`.slnx`, OpenAPI in Development, port fallback).
+- [x] `apps/api/DevPath.slnx` contains `DevPath.Api` and `DevPath.Api.Tests`; nullable is enabled and warnings are errors.
+- [x] `dotnet build apps/api/DevPath.slnx` finishes with 0 warnings and 0 errors.
+- [x] `GET /api/health` returns `200` with `{ "status": "ok", "version": "0.0.1" }`.
+- [x] Kestrel listens on `127.0.0.1:<DEVPATH_PORT>` only, and on `127.0.0.1:5180` when `DEVPATH_PORT` is not set.
+- [x] An invalid `DEVPATH_PORT` stops startup with a clear error and a non-zero exit code.
+- [x] `/openapi/v1.json` is served in Development and returns `404` in Production.
+- [x] xUnit tests with `WebApplicationFactory` cover the health endpoint; all tests pass.
+- [x] `.gitignore` covers `data/`, `backups/`, `.env*`, `secrets.bin`, `bin/`, `obj/`, `node_modules/`, `dist/`.
+- [x] No `WeatherForecast` template code is left.
+- [x] README has a "Development" section with the build, test and run commands.
+- [x] `tech-stack.md` and `roadmap.md` match the phase decisions (`.slnx`, OpenAPI in Development, port fallback).
 
 ## Automated tests
 
@@ -59,7 +59,7 @@ Run from the repo root in PowerShell. Stop the API with `Ctrl+C` between steps.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `dotnet build` 0 warnings, `dotnet test` all green
-- [ ] M1–M10 done with the expected results
-- [ ] `roadmap.md` phase 0.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `dotnet build` 0 warnings, `dotnet test` all green
+- [x] M1–M10 done with the expected results
+- [x] `roadmap.md` phase 0.1 ticked and set to `done`
