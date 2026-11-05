@@ -305,3 +305,17 @@ Implement the spec in specs/2026-11-05-session-log/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 2.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `SessionService` and `POST /api/sessions`, client `createSession`, finished sessions saved with a note, stopped-early sessions saved (not under 1 minute), progress feedback on the Pomodoro page; tech-stack and specs updated; phase 2.2 done.
+
+## 2026-11-05 – Plan phase 2.3 tags and timer settings
+**Phase:** 2.3 Tags and timer settings
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 2.3 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-tags-timer-settings/` (`requirements.md`, `plan.md`, `validation.md`).
