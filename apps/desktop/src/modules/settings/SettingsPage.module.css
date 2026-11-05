@@ -29,22 +29,6 @@
   font-size: var(--font-size-sm);
 }
 
-.button {
-  padding: var(--space-2) var(--space-4);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--color-accent);
-  color: var(--color-accent-text);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.button:disabled {
-  opacity: 0.6;
-  cursor: progress;
-}
-
 .error {
   margin: 0;
   color: var(--color-danger);

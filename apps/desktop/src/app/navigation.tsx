@@ -11,6 +11,7 @@ import {
   Timer,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { GoalsPage } from '../modules/goals/GoalsPage';
 import { SettingsPage } from '../modules/settings/SettingsPage';
 import { EmptyState } from '../shared/ui/EmptyState';
 
@@ -33,15 +34,7 @@ export const navigation: readonly NavEntry[] = [
       next: 'Başlamak için soldan bir bölüm seç.',
     },
   },
-  {
-    path: '/goals',
-    label: 'Hedefler',
-    icon: Target,
-    emptyState: {
-      description: 'Hedeflerin ve onlara bağlı projeler burada listelenecek.',
-      next: 'Hedef ekleme bir sonraki adımda geliyor.',
-    },
-  },
+  { path: '/goals', label: 'Hedefler', icon: Target, element: <GoalsPage /> },
   {
     path: '/pomodoro',
     label: 'Pomodoro',

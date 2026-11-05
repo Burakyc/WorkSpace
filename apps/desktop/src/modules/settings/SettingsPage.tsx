@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import buttons from '../../shared/ui/buttons.module.css';
 import styles from './SettingsPage.module.css';
 
 export function SettingsPage() {
@@ -48,7 +49,7 @@ export function SettingsPage() {
         <div>
           <button
             type="button"
-            className={styles.button}
+            className={buttons.primary}
             onClick={() => void changeDataDir()}
             disabled={busy}
           >

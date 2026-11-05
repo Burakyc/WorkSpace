@@ -86,7 +86,9 @@ describe('AppLayout', () => {
   });
 
   it.each(
-    navigation.filter((entry) => entry.path !== '/settings').map((entry) => [entry.label, entry]),
+    navigation
+      .filter((entry) => entry.emptyState !== undefined)
+      .map((entry) => [entry.label, entry]),
   )('%s shows its empty state with a next step', (_label, entry) => {
     renderAt(entry.path);
 
