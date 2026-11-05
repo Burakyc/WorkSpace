@@ -1,4 +1,13 @@
-import type { ApiConfig, Goal, GoalInput, HealthResponse } from './types';
+import type {
+  ApiConfig,
+  Goal,
+  GoalInput,
+  GoalProgress,
+  HealthResponse,
+  Project,
+  ProjectCreateInput,
+  ProjectUpdateInput,
+} from './types';
 
 export const TOKEN_HEADER = 'X-DevPath-Token';
 
@@ -21,6 +30,12 @@ export interface ApiClient {
   updateGoal(id: string, input: GoalInput): Promise<Goal>;
   archiveGoal(id: string): Promise<Goal>;
   restoreGoal(id: string): Promise<Goal>;
+  getGoalProgress(): Promise<GoalProgress[]>;
+  listProjects(includeArchived?: boolean): Promise<Project[]>;
+  createProject(input: ProjectCreateInput): Promise<Project>;
+  updateProject(id: string, input: ProjectUpdateInput): Promise<Project>;
+  archiveProject(id: string): Promise<Project>;
+  restoreProject(id: string): Promise<Project>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT';
@@ -46,6 +61,7 @@ export function createApiClient(
   }
 
   const goal = (id: string) => `/api/goals/${encodeURIComponent(id)}`;
+  const project = (id: string) => `/api/projects/${encodeURIComponent(id)}`;
 
   return {
     getHealth: () => request<HealthResponse>('GET', '/api/health'),
@@ -55,6 +71,13 @@ export function createApiClient(
     updateGoal: (id, input) => request<Goal>('PUT', goal(id), input),
     archiveGoal: (id) => request<Goal>('POST', `${goal(id)}/archive`),
     restoreGoal: (id) => request<Goal>('POST', `${goal(id)}/restore`),
+    getGoalProgress: () => request<GoalProgress[]>('GET', '/api/goals/progress'),
+    listProjects: (includeArchived = false) =>
+      request<Project[]>('GET', `/api/projects?includeArchived=${includeArchived}`),
+    createProject: (input) => request<Project>('POST', '/api/projects', input),
+    updateProject: (id, input) => request<Project>('PUT', project(id), input),
+    archiveProject: (id) => request<Project>('POST', `${project(id)}/archive`),
+    restoreProject: (id) => request<Project>('POST', `${project(id)}/restore`),
   };
 }
 

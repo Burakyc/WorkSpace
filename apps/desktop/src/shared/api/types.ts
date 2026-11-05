@@ -27,6 +27,35 @@ export interface GoalInput {
   targetPomodoros: number | null;
 }
 
+/** A project under one goal (mirrors Project in DevPath.Api). Its goal never changes. */
+export interface Project {
+  id: string;
+  goalId: string;
+  title: string;
+  url: string | null;
+  archived: boolean;
+  createdAt: string;
+}
+
+export interface ProjectCreateInput {
+  goalId: string;
+  title: string;
+  url: string | null;
+}
+
+export interface ProjectUpdateInput {
+  title: string;
+  url: string | null;
+}
+
+/** GET /api/goals/progress. `percent` is null when the goal has no target. */
+export interface GoalProgress {
+  goalId: string;
+  completedSessions: number;
+  totalMinutes: number;
+  percent: number | null;
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 

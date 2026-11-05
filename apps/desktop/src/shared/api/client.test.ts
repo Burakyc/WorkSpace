@@ -98,4 +98,42 @@ describe('createApiClient', () => {
     expect((error as ApiError).status).toBe(400);
     expect((error as ApiError).errors).toEqual({ title: ['Başlık gerekli.'] });
   });
+
+  it('uses the project paths and bodies', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockImplementation(() => Promise.resolve(json({})));
+    const client = createApiClient(config, fetchFn);
+
+    await client.listProjects(true);
+    await client.createProject({ goalId: 'g', title: 'Todo API', url: null });
+    await client.updateProject('p 1', { title: 'New', url: 'https://github.com/x' });
+    await client.archiveProject('p 1');
+    await client.restoreProject('p 1');
+
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      ['GET http://127.0.0.1:4321/api/projects?includeArchived=true', undefined],
+      [
+        'POST http://127.0.0.1:4321/api/projects',
+        JSON.stringify({ goalId: 'g', title: 'Todo API', url: null }),
+      ],
+      [
+        'PUT http://127.0.0.1:4321/api/projects/p%201',
+        JSON.stringify({ title: 'New', url: 'https://github.com/x' }),
+      ],
+      ['POST http://127.0.0.1:4321/api/projects/p%201/archive', undefined],
+      ['POST http://127.0.0.1:4321/api/projects/p%201/restore', undefined],
+    ]);
+  });
+
+  it('reads goal progress', async () => {
+    const progress = [{ goalId: 'g', completedSessions: 7, totalMinutes: 175, percent: 35 }];
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(json(progress));
+
+    expect(await createApiClient(config, fetchFn).getGoalProgress()).toEqual(progress);
+    expect(fetchFn).toHaveBeenCalledWith('http://127.0.0.1:4321/api/goals/progress', {
+      method: 'GET',
+      headers: { [TOKEN_HEADER]: 'secret' },
+    });
+  });
 });
