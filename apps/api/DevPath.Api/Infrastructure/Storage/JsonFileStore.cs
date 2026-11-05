@@ -6,21 +6,34 @@ namespace DevPath.Api.Infrastructure.Storage;
 
 /// <summary>
 /// Reads and writes JSON documents under the data folder. Writes are atomic (temp file, flush, replace),
-/// and every access to a file goes through that file's lock.
+/// every access to a file goes through that file's lock, and older files are migrated on read.
 /// </summary>
 public sealed class JsonFileStore(DataDirectory dataDirectory)
 {
     // ponytail: one lock per file ever touched, never removed; fine for thousands of files.
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new(StringComparer.OrdinalIgnoreCase);
 
-    public async Task<JsonObject?> ReadAsync(string path, CancellationToken cancellationToken)
+    /// <summary>Returns the document at the current schema version (saving it back if it was migrated), or null when the file does not exist.</summary>
+    public async Task<JsonObject?> ReadAsync(string path, DocumentSchema schema, CancellationToken cancellationToken)
     {
         var fullPath = Resolve(path);
         var gate = _locks.GetOrAdd(fullPath, _ => new SemaphoreSlim(1, 1));
         await gate.WaitAsync(cancellationToken);
         try
         {
-            return await ReadFileAsync(fullPath, cancellationToken);
+            var stored = await ReadFileAsync(fullPath, cancellationToken);
+            if (stored is null)
+            {
+                return null;
+            }
+
+            var (document, changed) = schema.Migrate(stored, path);
+            if (changed)
+            {
+                await WriteFileAsync(fullPath, document, cancellationToken);
+            }
+
+            return document;
         }
         finally
         {
@@ -28,14 +41,16 @@ public sealed class JsonFileStore(DataDirectory dataDirectory)
         }
     }
 
-    public async Task WriteAsync(string path, JsonObject document, CancellationToken cancellationToken)
+    /// <summary>Replaces the document. Refuses (and keeps) a file written by a newer app version.</summary>
+    public async Task WriteAsync(string path, DocumentSchema schema, JsonObject document, CancellationToken cancellationToken)
     {
-        await UpdateAsync(path, _ => document, cancellationToken);
+        await UpdateAsync(path, schema, _ => document, cancellationToken);
     }
 
     /// <summary>Reads, applies <paramref name="update"/> and writes under one lock, so concurrent updates are never lost.</summary>
     public async Task<JsonObject> UpdateAsync(
         string path,
+        DocumentSchema schema,
         Func<JsonObject?, JsonObject> update,
         CancellationToken cancellationToken)
     {
@@ -44,7 +59,9 @@ public sealed class JsonFileStore(DataDirectory dataDirectory)
         await gate.WaitAsync(cancellationToken);
         try
         {
-            var document = update(await ReadFileAsync(fullPath, cancellationToken));
+            var stored = await ReadFileAsync(fullPath, cancellationToken);
+            var current = stored is null ? null : schema.Migrate(stored, path).Document;
+            var document = schema.Stamp(update(current));
             await WriteFileAsync(fullPath, document, cancellationToken);
             return document;
         }
