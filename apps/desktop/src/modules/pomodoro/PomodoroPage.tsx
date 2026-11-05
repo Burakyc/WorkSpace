@@ -77,6 +77,7 @@ export function PomodoroPage() {
           durationMinutes: Math.floor(focused / 60_000),
           completed: false,
           note: null,
+          tags: [],
         },
         state.goalTitle,
       );
@@ -127,6 +128,7 @@ export function PomodoroPage() {
         durationMinutes: Math.round(state.durationMs / 60_000),
         completed: true,
         note: note.trim() === '' ? null : note,
+        tags: [],
       },
       state.goalTitle,
     );

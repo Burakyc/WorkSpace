@@ -1,9 +1,11 @@
 import type {
   ApiConfig,
+  AppSettings,
   Goal,
   GoalInput,
   GoalProgress,
   HealthResponse,
+  PomodoroSettings,
   Project,
   ProjectCreateInput,
   ProjectUpdateInput,
@@ -39,6 +41,9 @@ export interface ApiClient {
   archiveProject(id: string): Promise<Project>;
   restoreProject(id: string): Promise<Project>;
   createSession(input: SessionInput): Promise<Session>;
+  listTags(): Promise<string[]>;
+  getSettings(): Promise<AppSettings>;
+  savePomodoroSettings(settings: PomodoroSettings): Promise<PomodoroSettings>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT';
@@ -82,6 +87,10 @@ export function createApiClient(
     archiveProject: (id) => request<Project>('POST', `${project(id)}/archive`),
     restoreProject: (id) => request<Project>('POST', `${project(id)}/restore`),
     createSession: (input) => request<Session>('POST', '/api/sessions', input),
+    listTags: () => request<string[]>('GET', '/api/sessions/tags'),
+    getSettings: () => request<AppSettings>('GET', '/api/settings'),
+    savePomodoroSettings: (settings) =>
+      request<PomodoroSettings>('PUT', '/api/settings/pomodoro', settings),
   };
 }
 

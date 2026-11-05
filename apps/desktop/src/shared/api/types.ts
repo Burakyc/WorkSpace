@@ -70,7 +70,29 @@ export interface SessionInput {
   durationMinutes: number;
   completed: boolean;
   note: string | null;
+  /** Normalized by the API (lower case, no '#'). */
+  tags: string[];
 }
+
+/** Timer lengths in minutes and the number of completed focus sessions before a long break. */
+export interface PomodoroSettings {
+  focusMinutes: number;
+  shortBreakMinutes: number;
+  longBreakMinutes: number;
+  longBreakInterval: number;
+}
+
+/** GET /api/settings. */
+export interface AppSettings {
+  pomodoro: PomodoroSettings;
+}
+
+export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {
+  focusMinutes: 25,
+  shortBreakMinutes: 5,
+  longBreakMinutes: 15,
+  longBreakInterval: 4,
+};
 
 /** GET /api/goals/progress. `percent` is null when the goal has no target. */
 export interface GoalProgress {

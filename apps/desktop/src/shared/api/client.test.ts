@@ -147,6 +147,7 @@ describe('createApiClient', () => {
       durationMinutes: 25,
       completed: true,
       note: null,
+      tags: ['di'],
     };
 
     await createApiClient(config, fetchFn).createSession(input);
@@ -156,5 +157,28 @@ describe('createApiClient', () => {
       headers: { [TOKEN_HEADER]: 'secret', 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
     });
+  });
+
+  it('reads tags and reads and saves settings', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockImplementation(() => Promise.resolve(json({})));
+    const client = createApiClient(config, fetchFn);
+    const pomodoro = {
+      focusMinutes: 50,
+      shortBreakMinutes: 10,
+      longBreakMinutes: 20,
+      longBreakInterval: 3,
+    };
+
+    await client.listTags();
+    await client.getSettings();
+    await client.savePomodoroSettings(pomodoro);
+
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      ['GET http://127.0.0.1:4321/api/sessions/tags', undefined],
+      ['GET http://127.0.0.1:4321/api/settings', undefined],
+      ['PUT http://127.0.0.1:4321/api/settings/pomodoro', JSON.stringify(pomodoro)],
+    ]);
   });
 });

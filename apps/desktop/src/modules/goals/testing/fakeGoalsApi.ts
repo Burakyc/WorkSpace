@@ -3,11 +3,13 @@ import type {
   Goal,
   GoalInput,
   GoalProgress,
+  PomodoroSettings,
   Project,
   ProjectCreateInput,
   Session,
   SessionInput,
 } from '../../../shared/api/types';
+import { DEFAULT_POMODORO_SETTINGS } from '../../../shared/api/types';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -23,11 +25,18 @@ const notFound = () => json({ title: 'Not Found' }, 404);
  */
 export function installFakeGoalsApi(
   initialGoals: Goal[] = [],
-  options: { progress?: GoalProgress[]; projects?: Project[]; failSessions?: boolean } = {},
+  options: {
+    progress?: GoalProgress[];
+    projects?: Project[];
+    failSessions?: boolean;
+    settings?: PomodoroSettings;
+    tags?: string[];
+  } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
   const projects = (options.projects ?? []).map((p) => ({ ...p }));
   const sessions: Session[] = [];
+  let settings: PomodoroSettings = { ...(options.settings ?? DEFAULT_POMODORO_SETTINGS) };
   let created = 0;
   const nextCreatedAt = () => `2030-01-01T00:00:${String(++created).padStart(2, '0')}Z`;
 
@@ -159,13 +168,34 @@ export function installFakeGoalsApi(
     };
   }
 
-  function sessionsRoute(body: unknown) {
+  function settingsRoute(method: string, body: unknown) {
+    if (method === 'GET') return json({ pomodoro: settings });
+    const input = body as PomodoroSettings;
+    if (input.focusMinutes < 1 || input.focusMinutes > 120) {
+      return json(
+        { errors: { focusMinutes: ['Odak süresi 1 ile 120 dakika arasında olmalı.'] } },
+        400,
+      );
+    }
+    settings = { ...input };
+    return json(settings);
+  }
+
+  function sessionsRoute(method: string, id: string | undefined, body: unknown) {
+    if (method === 'GET' && id === 'tags') {
+      const used = sessions.flatMap((x) => x.tags);
+      return json([...new Set([...used, ...(options.tags ?? [])])]);
+    }
     if (options.failSessions) return json({ title: 'Server error' }, 500);
     const input = body as SessionInput;
     if (!goals.some((g) => g.id === input.goalId)) {
       return json({ errors: { goalId: ['Hedef bulunamadı.'] } }, 400);
     }
-    const session: Session = { id: `session-${sessions.length + 1}`, tags: [], ...input };
+    const session: Session = {
+      id: `session-${sessions.length + 1}`,
+      ...input,
+      tags: input.tags.map((t) => t.replace(/^#+/, '').toLowerCase()),
+    };
     sessions.push(session);
     return json(session, 201);
   }
@@ -177,7 +207,8 @@ export function installFakeGoalsApi(
     const [, , resource, rawId, action] = pathname.split('/');
     const id = rawId === undefined ? undefined : decodeURIComponent(rawId);
     const includeArchived = searchParams.get('includeArchived') === 'true';
-    if (resource === 'sessions') return Promise.resolve(sessionsRoute(body));
+    if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
+    if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
     const route = resource === 'projects' ? projectsRoute : goalsRoute;
     return Promise.resolve(route(method, id, action, body, includeArchived));
   });
@@ -188,7 +219,7 @@ export function installFakeGoalsApi(
     openExternal,
   });
   vi.stubGlobal('fetch', fetchFn);
-  return { goals, projects, sessions, fetchFn, openExternal };
+  return { goals, projects, sessions, fetchFn, openExternal, settings: () => settings };
 }
 
 export function goal(overrides: Partial<Goal> & Pick<Goal, 'id' | 'title'>): Goal {
