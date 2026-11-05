@@ -72,4 +72,27 @@ public class NotesEndpointTests
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/notes/missing/content")).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync($"/api/notes/{folderId}/content")).StatusCode);
     }
+
+    [Fact]
+    public async Task Searches_pages()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+        var folderId = (await Json(await client.PostAsJsonAsync("/api/notes", new { kind = "folder", title = "ASP.NET" }))).GetProperty("id").GetString();
+        var pageId = (await Json(await client.PostAsJsonAsync("/api/notes", new { parentId = folderId, kind = "page", title = "DI" }))).GetProperty("id").GetString();
+        await client.PutAsJsonAsync($"/api/notes/{pageId}/content", new
+        {
+            blocks = new[] { new { type = "paragraph", content = new[] { new { type = "text", text = "Ömür boyu servis" } } } },
+        });
+
+        var results = await Json(await client.GetAsync("/api/notes/search?q=omur"));
+
+        var result = results[0];
+        Assert.Equal(pageId, result.GetProperty("id").GetString());
+        Assert.Equal("ASP.NET", result.GetProperty("path")[0].GetString());
+        Assert.Equal("Ömür boyu servis", result.GetProperty("snippet").GetString());
+        Assert.Equal(0, result.GetProperty("highlights")[0].GetProperty("start").GetInt32());
+        Assert.Equal(4, result.GetProperty("highlights")[0].GetProperty("length").GetInt32());
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync("/api/notes/search?q=a")).StatusCode);
+    }
 }

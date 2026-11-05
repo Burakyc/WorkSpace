@@ -4,10 +4,14 @@ namespace DevPath.Api.Modules.Notes;
 
 [ApiController]
 [Route("api/notes")]
-public sealed class NotesController(NoteService notes) : ControllerBase
+public sealed class NotesController(NoteService notes, NoteSearchService search) : ControllerBase
 {
     [HttpGet]
     public Task<IReadOnlyList<NoteNode>> List(CancellationToken cancellationToken) => notes.ListAsync(cancellationToken);
+
+    [HttpGet("search")]
+    public Task<IReadOnlyList<NoteSearchResult>> Search([FromQuery] string? q, CancellationToken cancellationToken) =>
+        search.SearchAsync(q, cancellationToken);
 
     [HttpPost]
     public async Task<ActionResult<NoteNode>> Create(NoteCreateInput input, CancellationToken cancellationToken)

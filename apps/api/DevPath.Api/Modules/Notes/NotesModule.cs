@@ -18,6 +18,7 @@ public static class NotesModule
         services.AddSingleton<IRepository<NoteNode>>(provider =>
             new JsonRepository<NoteNode>(provider.GetRequiredService<JsonFileStore>(), IndexFileName, IndexSchema));
         services.AddSingleton<NoteService>();
+        services.AddSingleton<NoteSearchService>();
         return services;
     }
 }
