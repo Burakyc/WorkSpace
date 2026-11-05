@@ -454,4 +454,4 @@ Implement the spec in specs/2026-11-06-notes-search/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 4.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `NoteText` (plain text from BlockNote blocks), `SearchText` (Turkish-insensitive folding) and `NoteSearchService` with `GET /api/notes/search` (every word, title matches first, snippet and highlights); the search box above the tree with results, marks and clear; tech-stack and specs updated; phase 4.3 done.

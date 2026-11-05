@@ -135,10 +135,10 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Pending save is flushed when switching page or closing the app.
 - [x] Tests: debounce and flush behavior (Vitest).
 
-#### 4.3 Notes search — `todo`
-- [ ] Search box over page titles and text content; results open the page.
-- [ ] API extracts plain text from BlockNote JSON for search.
-- [ ] Tests: text extraction and search ranking (title matches first).
+#### 4.3 Notes search — `done`
+- [x] Search box over page titles and text content; results open the page.
+- [x] API extracts plain text from BlockNote JSON for search.
+- [x] Tests: text extraction and search ranking (title matches first).
 
 ### Milestone 5 — Content modules with import
 

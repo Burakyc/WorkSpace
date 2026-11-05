@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 4.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Search box over page titles and text content; results open the page.
-- [ ] API extracts plain text from BlockNote JSON for search.
-- [ ] Matching ignores case and Turkish letter differences; every word must match.
-- [ ] Results show title, location and a snippet with marked matches.
-- [ ] Tests: text extraction and search ranking (title matches first).
-- [ ] `tech-stack.md` is updated.
+- [x] Search box over page titles and text content; results open the page.
+- [x] API extracts plain text from BlockNote JSON for search.
+- [x] Matching ignores case and Turkish letter differences; every word must match.
+- [x] Results show title, location and a snippet with marked matches.
+- [x] Tests: text extraction and search ranking (title matches first).
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -51,7 +51,7 @@ Run `npm run dev` and create: folder "ASP.NET" with page "Dependency Injection" 
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M5 done with the expected results
-- [ ] `roadmap.md` phase 4.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M5 done with the expected results
+- [x] `roadmap.md` phase 4.3 ticked and set to `done`
