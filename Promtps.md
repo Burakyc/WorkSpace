@@ -330,3 +330,17 @@ Implement the spec in specs/2026-11-05-tags-timer-settings/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 2.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** tag normalization and suggestions, `settings.json` with pomodoro durations and the Ayarlar form, configurable focus length, short and long breaks with their own notification; tech-stack and specs updated; phase 2.3 done.
+
+## 2026-11-05 – Plan phase 3.1 month view
+**Phase:** 3.1 Month view
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 3.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-month-view/` (`requirements.md`, `plan.md`, `validation.md`).
