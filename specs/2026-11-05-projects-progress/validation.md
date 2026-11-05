@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 1.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] API: create, list, update, archive and restore projects linked to a goal (`projects.json`); the goal must exist and not be archived; `goalId` never changes.
-- [ ] Optional https project URL, opened in the default browser through `openExternal` (https only, checked in main).
-- [ ] UI: projects shown under their goal; adding a project from the goal takes two clicks plus typing.
-- [ ] Goal card shows progress: completed sessions ÷ `targetPomodoros` (capped at 100%, rounded down), or session count and total time without a target; 0 until sessions exist.
-- [ ] Tests: progress calculation with and without a target, plus the tests below.
-- [ ] `tech-stack.md` updated and the roadmap's progress question closed.
+- [x] API: create, list, update, archive and restore projects linked to a goal (`projects.json`); the goal must exist and not be archived; `goalId` never changes.
+- [x] Optional https project URL, opened in the default browser through `openExternal` (https only, checked in main).
+- [x] UI: projects shown under their goal; adding a project from the goal takes two clicks plus typing.
+- [x] Goal card shows progress: completed sessions ÷ `targetPomodoros` (capped at 100%, rounded down), or session count and total time without a target; 0 until sessions exist.
+- [x] Tests: progress calculation with and without a target, plus the tests below.
+- [x] `tech-stack.md` updated and the roadmap's progress question closed.
 
 ## Automated tests
 
@@ -80,7 +80,7 @@ Run `npm run dev` from the repo root.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M8 done with the expected results
-- [ ] `roadmap.md` phase 1.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M8 done with the expected results
+- [x] `roadmap.md` phase 1.2 ticked and set to `done`

@@ -79,11 +79,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Optional `targetPomodoros` per goal.
 - [x] Tests: `GoalService` (xUnit), create-goal flow (RTL).
 
-#### 1.2 Projects and progress — `todo`
-- [ ] API: create, list, update, archive projects linked to a goal (`projects.json`); a project's goal must exist.
-- [ ] UI: projects shown under their goal; add a project from the goal in at most two clicks.
-- [ ] Goal card shows progress: completed sessions ÷ `targetPomodoros` (capped at 100%), or session count and total time when there is no target. Shows 0 until sessions exist.
-- [ ] Tests: progress calculation with and without a target.
+#### 1.2 Projects and progress — `done`
+- [x] API: create, list, update, archive projects linked to a goal (`projects.json`); a project's goal must exist.
+- [x] UI: projects shown under their goal; add a project from the goal in at most two clicks.
+- [x] Goal card shows progress: completed sessions ÷ `targetPomodoros` (capped at 100%), or session count and total time when there is no target. Shows 0 until sessions exist.
+- [x] Tests: progress calculation with and without a target.
 
 ### Milestone 2 — Pomodoro
 

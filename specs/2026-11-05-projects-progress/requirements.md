@@ -30,6 +30,9 @@ Goals get projects and visible progress. Projects (e.g. "Todo API" under "Learn 
 | Progress endpoint | `GET /api/goals/progress` returns progress for every goal in one call; goal and project data stay plain entities. The page loads goals, projects and progress together. |
 | Rounding | The percentage is rounded **down** (19 of 20 is 95%, never 100% before the target is reached). |
 | Session model now | `Session` is defined now with the fields from `tech-stack.md` and read through `IRepository<Session>`; phase 2.2 adds writing. A missing `sessions.json` means no sessions. |
+| Shared form styles | `GoalForm.module.css` moved to `src/shared/ui/form.module.css`; the goal and project forms both use it (decided during task 8). |
+| Project tests | The renderer project tests live in `src/modules/projects/ProjectList.test.tsx` (rendering the Hedefler page) instead of `GoalsPage.test.tsx`, to keep files small. |
+| IPC arguments | The `handle()` helper in Electron main now passes the call's arguments to the listener (untyped, checked by the listener); needed by `openExternal(url)`. |
 
 ## User stories
 

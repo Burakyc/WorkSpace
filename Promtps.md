@@ -244,3 +244,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-05-projects-progress/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-05 – Implement phase 1.2 projects and progress
+**Phase:** 1.2 Projects and progress
+**Prompt:**
+Implement the spec in specs/2026-11-05-projects-progress/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 1.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** session model, goal progress endpoint, Projects module (model, validator, service, endpoints), `openExternal` bridge, progress and projects on goal cards; tech-stack, roadmap and specs updated; phase 1.2 done.
