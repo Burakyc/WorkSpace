@@ -20,13 +20,13 @@ ASP.NET Core Web API on .NET 10 that answers a health check.
 - [x] An xUnit test with `WebApplicationFactory` covers the health endpoint.
 - [x] `.gitignore` covers `data/`, `backups/`, `.env*`, `bin/`, `obj/`, `node_modules/`, `dist/`.
 
-#### 0.2 Desktop skeleton — `todo`
+#### 0.2 Desktop skeleton — `done`
 Electron + Vite + React + TypeScript window with the security baseline.
-- [ ] `apps/desktop` with Vite React TS, `strict` and `noUncheckedIndexedAccess` on, ESLint + Prettier.
-- [ ] `BrowserWindow` uses `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`; navigation and `window.open` blocked; CSP set.
-- [ ] Root `package.json` with npm workspaces; `npm run dev` opens the window with hot reload.
-- [ ] One Vitest + React Testing Library test renders the app.
-- [ ] `npm run check` runs `dotnet build`, `dotnet test`, `tsc --noEmit`, `eslint`, `vitest run`, `vite build`.
+- [x] `apps/desktop` with Vite React TS, `strict` and `noUncheckedIndexedAccess` on, ESLint + Prettier.
+- [x] `BrowserWindow` uses `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`; navigation and `window.open` blocked; CSP set.
+- [x] Root `package.json` with npm workspaces; `npm run dev` opens the window with hot reload.
+- [x] One Vitest + React Testing Library test renders the app.
+- [x] `npm run check` runs `dotnet build`, `dotnet test`, `tsc --noEmit`, `eslint`, `vitest run`, `vite build`.
 
 #### 0.3 Electron starts the API — `todo`
 The app is one process from the user's point of view.

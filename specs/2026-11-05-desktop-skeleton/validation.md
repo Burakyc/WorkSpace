@@ -6,18 +6,18 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 0.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] `apps/desktop` uses electron-vite with React + TypeScript; `strict` and `noUncheckedIndexedAccess` are on for main, preload and renderer.
-- [ ] ESLint (`no-explicit-any` as an error) and Prettier are set up; `npm run lint -w apps/desktop` reports 0 problems.
-- [ ] `BrowserWindow` uses `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, `webSecurity: true`.
-- [ ] Navigation away from the app page and `window.open` are blocked.
-- [ ] A CSP meta tag is present: strict in production, plus only the hot-reload additions in development.
-- [ ] Root `package.json` has npm workspaces and pins Node 24 (`.nvmrc`, `engines`).
-- [ ] `npm run dev` from the repo root opens the window, and React edits hot reload.
-- [ ] A second launch focuses the existing window and does not open a new one.
-- [ ] The window shows the Turkish placeholder page and follows the OS light/dark theme.
-- [ ] At least one Vitest + React Testing Library test renders the app.
-- [ ] `npm run check` runs `dotnet build`, `dotnet test`, `tsc --noEmit`, `eslint`, `vitest run` and `electron-vite build`, and fails when any of them fails.
-- [ ] README and `tech-stack.md` are updated.
+- [x] `apps/desktop` uses electron-vite with React + TypeScript; `strict` and `noUncheckedIndexedAccess` are on for main, preload and renderer.
+- [x] ESLint (`no-explicit-any` as an error) and Prettier are set up; `npm run lint -w apps/desktop` reports 0 problems.
+- [x] `BrowserWindow` uses `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, `webSecurity: true`.
+- [x] Navigation away from the app page and `window.open` are blocked.
+- [x] A CSP meta tag is present: strict in production, plus only the hot-reload additions in development.
+- [x] Root `package.json` has npm workspaces and pins Node 24 (`.nvmrc`, `engines`).
+- [x] `npm run dev` from the repo root opens the window, and React edits hot reload.
+- [x] A second launch focuses the existing window and does not open a new one.
+- [x] The window shows the Turkish placeholder page and follows the OS light/dark theme.
+- [x] At least one Vitest + React Testing Library test renders the app.
+- [x] `npm run check` runs `dotnet build`, `dotnet test`, `tsc --noEmit`, `eslint`, `vitest run` and `electron-vite build`, and fails when any of them fails.
+- [x] README and `tech-stack.md` are updated.
 
 ## Automated tests
 
@@ -63,7 +63,7 @@ Run from the repo root. Open DevTools with `Ctrl+Shift+I` and use the Console ta
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M13 done with the expected results
-- [ ] `roadmap.md` phase 0.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M13 done with the expected results
+- [x] `roadmap.md` phase 0.2 ticked and set to `done`
