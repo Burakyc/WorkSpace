@@ -18,7 +18,7 @@ export interface Pomodoro {
   state: TimerState;
   /** The clock used for the remaining time; updated every tick while running. */
   now: number;
-  start(goal: { id: string; title: string }, projectId: string | null): void;
+  start(goal: { id: string; title: string }, projectId: string | null, tags: string[]): void;
   pause(): void;
   resume(): void;
   stop(): void;
@@ -92,9 +92,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       now,
-      start(goal, projectId) {
+      start(goal, projectId, tags) {
         const t = Date.now();
-        const next = startTimer(goal, projectId, FOCUS_MINUTES * 60_000, t);
+        const next = startTimer(goal, projectId, FOCUS_MINUTES * 60_000, t, tags);
         setNow(t);
         setState(next);
         scheduleEnd(next);

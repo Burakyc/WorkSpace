@@ -6,6 +6,8 @@ interface SessionInfo {
   /** Kept with the session so it can be shown even if the goal is archived meanwhile. */
   goalTitle: string;
   projectId: string | null;
+  /** Normalized tags chosen at start. */
+  tags: string[];
   startedAt: number;
   durationMs: number;
 }
@@ -27,12 +29,14 @@ export function startTimer(
   projectId: string | null,
   durationMs: number,
   now: number,
+  tags: string[] = [],
 ): RunningTimer {
   return {
     status: 'running',
     goalId: goal.id,
     goalTitle: goal.title,
     projectId,
+    tags,
     startedAt: now,
     durationMs,
     endsAt: now + durationMs,
@@ -94,6 +98,10 @@ export function parseStoredTimer(value: unknown): TimerState {
     typeof v['goalId'] !== 'string' ||
     typeof v['goalTitle'] !== 'string' ||
     !(v['projectId'] === null || typeof v['projectId'] === 'string') ||
+    !(
+      v['tags'] === undefined ||
+      (Array.isArray(v['tags']) && v['tags'].every((t) => typeof t === 'string'))
+    ) ||
     !isNumber(v['startedAt']) ||
     !isNumber(v['durationMs']) ||
     v['durationMs'] <= 0
@@ -104,6 +112,8 @@ export function parseStoredTimer(value: unknown): TimerState {
     goalId: v['goalId'],
     goalTitle: v['goalTitle'],
     projectId: v['projectId'],
+    // Timers stored before tags existed have none.
+    tags: (v['tags'] as string[] | undefined) ?? [],
     startedAt: v['startedAt'],
     durationMs: v['durationMs'],
   };

@@ -26,6 +26,7 @@ describe('timer', () => {
       goalId: 'g',
       goalTitle: 'Learn ASP.NET Core',
       projectId: 'p',
+      tags: [],
       startedAt: T0,
       durationMs: 25 * MIN,
       endsAt: T0 + 25 * MIN,
@@ -88,6 +89,7 @@ describe('timer', () => {
     ['a missing goal', { ...start(), goalId: undefined }],
     ['a wrong type', { ...start(), endsAt: '1800' }],
     ['a zero duration', { ...start(), durationMs: 0 }],
+    ['tags that are not strings', { ...start(), tags: [1] }],
     ['a negative remainder', { ...pauseTimer(start(), T0), remainingMs: -1 }],
   ])('reads %s from storage as idle', (_name, value) => {
     expect(parseStoredTimer(value)).toEqual(IDLE);
@@ -100,5 +102,12 @@ describe('timer', () => {
     { ...start(), projectId: null },
   ])('round-trips %o through JSON', (state) => {
     expect(parseStoredTimer(JSON.parse(JSON.stringify(state)))).toEqual(state);
+  });
+
+  it('loads a timer stored before tags existed with no tags', () => {
+    const stored: Record<string, unknown> = { ...start() };
+    delete stored['tags'];
+
+    expect(parseStoredTimer(stored)).toEqual(start());
   });
 });

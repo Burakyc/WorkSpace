@@ -281,3 +281,57 @@ describe('PomodoroPage stopping early', () => {
     expect(screen.getByRole('button', { name: 'Duraklat' })).toBeInTheDocument();
   });
 });
+
+describe('PomodoroPage tags', () => {
+  const aspnet20 = goal({ id: 'a', title: 'Learn ASP.NET Core', targetPomodoros: 20 });
+
+  async function startWithTags() {
+    const api = installFakeGoalsApi([aspnet20], { tags: ['efcore'] });
+    renderPage();
+    await screen.findByRole('button', { name: 'Başlat' });
+    fireEvent.change(goalSelect(), { target: { value: 'a' } });
+    const tagField = screen.getByLabelText('Etiketler (isteğe bağlı)');
+    fireEvent.change(tagField, { target: { value: '#DI' } });
+    fireEvent.keyDown(tagField, { key: 'Enter' });
+    fireEvent.change(tagField, { target: { value: 'API' } });
+    fireEvent.keyDown(tagField, { key: 'Enter' });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+    return { api };
+  }
+
+  it('suggests earlier tags, locks chosen tags while running and saves them', async () => {
+    const { api } = await startWithTags();
+
+    expect(screen.queryByLabelText('Etiketler (isteğe bağlı)')).toBeNull();
+    expect(screen.queryByRole('button', { name: '#di etiketini kaldır' })).toBeNull();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({ tags: ['di', 'api'] });
+
+    act(() => vi.advanceTimersByTime(25 * MIN));
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    await screen.findByText(/^Kaydedildi/);
+    expect(api.sessions[0]?.tags).toEqual(['di', 'api']);
+  });
+
+  it('lets the save form change the tags', async () => {
+    const { api } = await startWithTags();
+    act(() => vi.advanceTimersByTime(25 * MIN));
+
+    fireEvent.click(screen.getByRole('button', { name: '#api etiketini kaldır' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    await screen.findByText(/^Kaydedildi/);
+    expect(api.sessions[0]?.tags).toEqual(['di']);
+  });
+
+  it('offers earlier tags while idle', async () => {
+    installFakeGoalsApi([aspnet20], { tags: ['efcore', 'di'] });
+    const { container } = renderPage();
+    await screen.findByRole('button', { name: 'Başlat' });
+
+    expect(
+      [...container.querySelectorAll('datalist option')].map((o) => o.getAttribute('value')),
+    ).toEqual(['#efcore', '#di']);
+  });
+});

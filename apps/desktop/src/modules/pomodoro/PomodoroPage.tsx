@@ -10,6 +10,7 @@ import form from '../../shared/ui/form.module.css';
 import { progressText } from '../goals/progressText';
 import { usePomodoro } from './PomodoroContext';
 import styles from './PomodoroPage.module.css';
+import { TagInput } from './TagInput';
 import { FOCUS_MINUTES, focusedMs, formatClock, remainingMs } from './timer';
 
 export function PomodoroPage() {
@@ -21,6 +22,9 @@ export function PomodoroPage() {
   const [error, setError] = useState<string | null>(null);
   const [goalId, setGoalId] = useState('');
   const [projectId, setProjectId] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [savedTags, setSavedTags] = useState<string[] | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -30,11 +34,18 @@ export function PomodoroPage() {
   useEffect(() => {
     let active = true;
     getApiClient()
-      .then((client) => Promise.all([client.listGoals(false), client.listProjects(false)]))
-      .then(([activeGoals, activeProjects]) => {
+      .then((client) =>
+        Promise.all([
+          client.listGoals(false),
+          client.listProjects(false),
+          client.listTags().catch(() => []),
+        ]),
+      )
+      .then(([activeGoals, activeProjects, usedTags]) => {
         if (!active) return;
         setGoals(activeGoals);
         setProjects(activeProjects);
+        setSuggestions(usedTags);
       })
       .catch(() => {
         if (active) setError('Hedefler yüklenemedi.');
@@ -48,6 +59,9 @@ export function PomodoroPage() {
   // While a session exists, the pickers show (and lock) its goal and project.
   const shownGoalId = idle ? goalId : state.goalId;
   const shownProjectId = idle ? projectId : (state.projectId ?? '');
+  const shownTags = idle ? tags : state.tags;
+  // The save form starts with the session's tags; edits there are kept in savedTags.
+  const tagsToSave = savedTags ?? (idle ? [] : state.tags);
   const goalOptions =
     !idle && goals && !goals.some((g) => g.id === state.goalId)
       ? [{ id: state.goalId, title: state.goalTitle }, ...goals]
@@ -60,6 +74,7 @@ export function PomodoroPage() {
     if (state.status === 'idle') return;
     setGoalId(goals?.some((g) => g.id === state.goalId) ? state.goalId : '');
     setProjectId(state.projectId ?? '');
+    setTags(state.tags);
   }
 
   /** Saves the focused minutes as a stopped session (not under 1 minute), then stops; a failed save keeps the timer. */
@@ -77,7 +92,7 @@ export function PomodoroPage() {
           durationMinutes: Math.floor(focused / 60_000),
           completed: false,
           note: null,
-          tags: [],
+          tags: state.tags,
         },
         state.goalTitle,
       );
@@ -98,6 +113,7 @@ export function PomodoroPage() {
       const client = await getApiClient();
       await client.createSession(input);
       try {
+        setSuggestions((known) => [...known, ...input.tags.filter((t) => !known.includes(t))]);
         const progress = (await client.getGoalProgress()).find((p) => p.goalId === input.goalId);
         const target = goals?.find((g) => g.id === input.goalId)?.targetPomodoros ?? null;
         setFeedback(`Kaydedildi · ${goalTitle}: ${progressText(progress, target)}`);
@@ -128,13 +144,14 @@ export function PomodoroPage() {
         durationMinutes: Math.round(state.durationMs / 60_000),
         completed: true,
         note: note.trim() === '' ? null : note,
-        tags: [],
+        tags: tagsToSave,
       },
       state.goalTitle,
     );
     if (saved) {
       keepSessionSelection();
       setNote('');
+      setSavedTags(null);
       pomodoro.reset();
     }
   }
@@ -143,7 +160,7 @@ export function PomodoroPage() {
     if (!selectedGoal) return;
     setFeedback(null);
     setSaveError(null);
-    pomodoro.start(selectedGoal, projectId || null);
+    pomodoro.start(selectedGoal, projectId || null, tags);
   }
 
   if (goals === null) {
@@ -224,6 +241,15 @@ export function PomodoroPage() {
             </select>
           </div>
         </div>
+        <div className={styles.tags}>
+          <TagInput
+            label="Etiketler (isteğe bağlı)"
+            tags={shownTags}
+            onChange={setTags}
+            suggestions={suggestions}
+            disabled={!idle}
+          />
+        </div>
 
         <p role="timer" aria-label="Kalan süre" className={styles.clock}>
           {clock}
@@ -292,6 +318,12 @@ export function PomodoroPage() {
                 </p>
               )}
             </div>
+            <TagInput
+              label="Oturumun etiketleri"
+              tags={tagsToSave}
+              onChange={setSavedTags}
+              suggestions={suggestions}
+            />
             <div>
               <button type="submit" className={buttons.primary} disabled={saving}>
                 Kaydet
