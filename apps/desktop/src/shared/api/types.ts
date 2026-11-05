@@ -116,6 +116,40 @@ export interface CalendarMonth {
   days: CalendarDay[];
 }
 
+/** One session on the day page; titles are null when the goal or project no longer exists. */
+export interface DaySession {
+  id: string;
+  startedAt: string;
+  endedAt: string;
+  durationMinutes: number;
+  completed: boolean;
+  goalId: string;
+  goalTitle: string | null;
+  projectId: string | null;
+  projectTitle: string | null;
+  tags: string[];
+  note: string | null;
+}
+
+/** A goal worked on that day; counts are completed sessions only. */
+export interface DayGoal {
+  goalId: string;
+  title: string | null;
+  completedSessions: number;
+  totalMinutes: number;
+}
+
+/** GET /api/days/{date}: sessions oldest first, goals most worked first, and the daily log text. */
+export interface DayDetail {
+  date: string;
+  timeZone: string;
+  completedSessions: number;
+  totalMinutes: number;
+  sessions: DaySession[];
+  goals: DayGoal[];
+  log: string;
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 

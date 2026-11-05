@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildMonthGrid, monthOf, shiftMonth, todayLocal } from './monthGrid';
+import {
+  buildMonthGrid,
+  isValidDate,
+  monthOf,
+  shiftDay,
+  shiftMonth,
+  todayLocal,
+} from './monthGrid';
 
 describe('buildMonthGrid', () => {
   it.each([
@@ -40,5 +47,22 @@ describe('monthOf and todayLocal', () => {
 
     expect(todayLocal(lateEvening)).toBe('2026-11-05');
     expect(monthOf(todayLocal(lateEvening))).toBe('2026-11');
+  });
+});
+
+describe('shiftDay and isValidDate', () => {
+  it('crosses month and year boundaries', () => {
+    expect(shiftDay('2026-12-31', 1)).toBe('2027-01-01');
+    expect(shiftDay('2026-03-01', -1)).toBe('2026-02-28');
+    expect(shiftDay('2028-03-01', -1)).toBe('2028-02-29');
+  });
+
+  it('accepts only real dates in the API range', () => {
+    expect(isValidDate('2026-11-05')).toBe(true);
+    expect(isValidDate('2028-02-29')).toBe(true);
+    expect(isValidDate('2026-02-30')).toBe(false);
+    expect(isValidDate('2026-11-5')).toBe(false);
+    expect(isValidDate('1999-12-31')).toBe(false);
+    expect(isValidDate('abcd')).toBe(false);
   });
 });

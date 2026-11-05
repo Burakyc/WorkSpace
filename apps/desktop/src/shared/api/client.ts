@@ -2,6 +2,7 @@ import type {
   ApiConfig,
   AppSettings,
   CalendarMonth,
+  DayDetail,
   Goal,
   GoalInput,
   GoalProgress,
@@ -47,6 +48,9 @@ export interface ApiClient {
   savePomodoroSettings(settings: PomodoroSettings): Promise<PomodoroSettings>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
+  getDay(date: string, timeZone: string): Promise<DayDetail>;
+  /** Saves the free-text daily log; returns the stored (end-trimmed) text. */
+  saveDayLog(date: string, text: string): Promise<{ text: string }>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT';
@@ -99,6 +103,13 @@ export function createApiClient(
         'GET',
         `/api/calendar?month=${encodeURIComponent(month)}&timeZone=${encodeURIComponent(timeZone)}`,
       ),
+    getDay: (date, timeZone) =>
+      request<DayDetail>(
+        'GET',
+        `/api/days/${encodeURIComponent(date)}?timeZone=${encodeURIComponent(timeZone)}`,
+      ),
+    saveDayLog: (date, text) =>
+      request<{ text: string }>('PUT', `/api/days/${encodeURIComponent(date)}/log`, { text }),
   };
 }
 

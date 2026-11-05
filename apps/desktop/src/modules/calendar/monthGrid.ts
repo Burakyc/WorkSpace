@@ -44,6 +44,19 @@ export function shiftMonth(month: string, delta: number): string {
   return isoDate(new Date(Date.UTC(year, mon - 1 + delta, 1))).slice(0, 7);
 }
 
+/** The date `delta` days away, YYYY-MM-DD. */
+export function shiftDay(date: string, delta: number): string {
+  const [year, mon] = parseMonth(date);
+  return isoDate(new Date(Date.UTC(year, mon - 1, Number(date.slice(8, 10)) + delta)));
+}
+
+/** True for a real YYYY-MM-DD date in the years 2000–2100 (the API's rule). */
+export function isValidDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const year = Number(value.slice(0, 4));
+  return year >= 2000 && year <= 2100 && shiftDay(value, 0) === value;
+}
+
 /** The YYYY-MM part of a YYYY-MM-DD date. */
 export const monthOf = (date: string) => date.slice(0, 7);
 

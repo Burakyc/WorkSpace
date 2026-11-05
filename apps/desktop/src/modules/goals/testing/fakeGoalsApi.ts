@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 import type {
+  DayDetail,
   Goal,
   GoalInput,
   GoalProgress,
@@ -35,6 +36,10 @@ export function installFakeGoalsApi(
     /** Completed pomodoros per local date (YYYY-MM-DD) for GET /api/calendar; 25 minutes each. */
     calendar?: Record<string, number>;
     failCalendar?: boolean;
+    /** GET /api/days/{date} answers; days not listed are empty. Logs are kept per date. */
+    days?: Record<string, Omit<DayDetail, 'date' | 'timeZone' | 'log'>>;
+    logs?: Record<string, string>;
+    failDays?: boolean;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -215,6 +220,22 @@ export function installFakeGoalsApi(
     return json({ month, timeZone, days });
   }
 
+  const logs: Record<string, string> = { ...options.logs };
+
+  function daysRoute(method: string, date: string, timeZone: string, body: unknown) {
+    if (options.failDays) return json({ title: 'Server error' }, 500);
+    if (method === 'PUT') {
+      const text = ((body as { text: string | null }).text ?? '').trimEnd();
+      if (text.length > 10_000) {
+        return json({ errors: { text: ['Günlük en fazla 10.000 karakter olabilir.'] } }, 400);
+      }
+      logs[date] = text;
+      return json({ text });
+    }
+    const empty = { completedSessions: 0, totalMinutes: 0, sessions: [], goals: [] };
+    return json({ date, timeZone, ...(options.days?.[date] ?? empty), log: logs[date] ?? '' });
+  }
+
   const fetchFn = vi.fn<typeof fetch>((url, init) => {
     const { pathname, searchParams } = new URL(String(url));
     const method = init?.method ?? 'GET';
@@ -224,6 +245,9 @@ export function installFakeGoalsApi(
     const includeArchived = searchParams.get('includeArchived') === 'true';
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
     if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
+    if (resource === 'days' && id !== undefined) {
+      return Promise.resolve(daysRoute(method, id, searchParams.get('timeZone') ?? '', body));
+    }
     if (resource === 'calendar') {
       return Promise.resolve(
         calendarRoute(searchParams.get('month') ?? '', searchParams.get('timeZone') ?? ''),
@@ -239,7 +263,7 @@ export function installFakeGoalsApi(
     openExternal,
   });
   vi.stubGlobal('fetch', fetchFn);
-  return { goals, projects, sessions, fetchFn, openExternal, settings: () => settings };
+  return { goals, projects, sessions, logs, fetchFn, openExternal, settings: () => settings };
 }
 
 export function goal(overrides: Partial<Goal> & Pick<Goal, 'id' | 'title'>): Goal {

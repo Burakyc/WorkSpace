@@ -192,4 +192,22 @@ describe('createApiClient', () => {
       { method: 'GET', headers: { [TOKEN_HEADER]: 'secret' } },
     );
   });
+
+  it('reads a day and saves its log', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockImplementation(() => Promise.resolve(json({})));
+    const client = createApiClient(config, fetchFn);
+
+    await client.getDay('2026-11-05', 'Europe/Istanbul');
+    await client.saveDayLog('2026-11-05', 'Read the DI chapter.');
+
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      ['GET http://127.0.0.1:4321/api/days/2026-11-05?timeZone=Europe%2FIstanbul', undefined],
+      [
+        'PUT http://127.0.0.1:4321/api/days/2026-11-05/log',
+        JSON.stringify({ text: 'Read the DI chapter.' }),
+      ],
+    ]);
+  });
 });
