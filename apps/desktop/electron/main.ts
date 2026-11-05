@@ -40,9 +40,25 @@ function createWindow(): BrowserWindow {
   return window;
 }
 
-void app.whenReady().then(() => {
-  createWindow();
-});
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  let mainWindow: BrowserWindow | undefined;
+
+  app.on('second-instance', () => {
+    if (!mainWindow) {
+      return;
+    }
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+    mainWindow.focus();
+  });
+
+  void app.whenReady().then(() => {
+    mainWindow = createWindow();
+  });
+}
 
 app.on('window-all-closed', () => {
   app.quit();
