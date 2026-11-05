@@ -50,6 +50,12 @@ public sealed class SessionService(
             errors["note"] = [$"Not en fazla {NoteMaxLength} karakter olabilir."];
         }
 
+        var tags = Pomodoro.Tags.NormalizeAll(input.Tags, out var tagError);
+        if (tagError is not null)
+        {
+            errors["tags"] = [tagError];
+        }
+
         if (errors.Count > 0)
         {
             throw new ValidationException(errors);
@@ -59,7 +65,7 @@ public sealed class SessionService(
             Guid.NewGuid().ToString(),
             input.GoalId!,
             string.IsNullOrWhiteSpace(input.ProjectId) ? null : input.ProjectId,
-            [],
+            tags,
             input.StartedAt!.Value.ToUniversalTime(),
             input.EndedAt!.Value.ToUniversalTime(),
             input.DurationMinutes!.Value,

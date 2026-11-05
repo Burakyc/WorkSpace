@@ -157,4 +157,15 @@ public sealed class SessionServiceTests : IDisposable
         var progress = Assert.Single(await _goals.ListProgressAsync(CancellationToken.None));
         Assert.Equal(new GoalProgress(goal.Id, 1, 25, 5), progress);
     }
+
+    [Fact]
+    public async Task Stores_normalized_tags_and_rejects_invalid_ones()
+    {
+        var goal = await NewGoal();
+
+        var session = await _sessions.CreateAsync(Input(goal.Id) with { Tags = ["#DI", "di", "EF Core"] }, CancellationToken.None);
+
+        Assert.Equal(["di", "ef-core"], session.Tags);
+        Assert.Equal([Tags.InvalidMessage], (await Invalid(Input(goal.Id) with { Tags = ["a/b"] })).Errors["tags"]);
+    }
 }
