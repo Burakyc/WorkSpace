@@ -1,6 +1,8 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { STORAGE_KEY } from '../modules/pomodoro/PomodoroContext';
+import { startTimer } from '../modules/pomodoro/timer';
 import { AppRoutes } from './AppRoutes';
 import { navigation } from './navigation';
 
@@ -94,5 +96,40 @@ describe('AppLayout', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: entry.label })).toBeInTheDocument();
     expect(screen.getByText(entry.emptyState!.next)).toBeInTheDocument();
+  });
+
+  it('shows the remaining time next to Pomodoro while a session runs', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(startTimer({ id: 'g', title: 'G' }, null, 25 * 60_000, Date.now())),
+    );
+    renderAt('/');
+
+    const link = screen.getByRole('link', { name: /Pomodoro/ });
+    expect(within(link).getByLabelText(/^Kalan süre (25:00|24:59)$/)).toBeInTheDocument();
+    localStorage.clear();
+  });
+
+  it('shows nothing next to Pomodoro when idle', () => {
+    localStorage.clear();
+    renderAt('/');
+
+    expect(screen.getByRole('link', { name: 'Pomodoro' })).toBeInTheDocument();
+  });
+
+  it('opens the page main asks for', async () => {
+    let openPage: (path: string) => void = () => {};
+    vi.stubGlobal('devpath', {
+      getApiConfig: () => new Promise(() => {}),
+      onOpenPage: (callback: (path: string) => void) => {
+        openPage = callback;
+        return () => {};
+      },
+    });
+    renderAt('/');
+
+    act(() => openPage('/calendar'));
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Takvim' })).toBeInTheDocument();
   });
 });
