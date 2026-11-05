@@ -10,6 +10,7 @@ builder.WebHost.ConfigureKestrel(options => options.Listen(IPAddress.Loopback, p
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddCors();
+builder.Services.AddHostedService<ParentProcessWatcher>();
 
 var app = builder.Build();
 
