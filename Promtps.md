@@ -280,3 +280,17 @@ Implement the spec in specs/2026-11-05-pomodoro-timer/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 2.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** timer state machine, `PomodoroProvider` with localStorage persistence, Pomodoro page with goal/project pickers and controls, sidebar timer, session-end notification in main with `onOpenPage`; tech-stack and specs updated; phase 2.1 done.
+
+## 2026-11-05 – Plan phase 2.2 session log
+**Phase:** 2.2 Session log
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 2.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-session-log/` (`requirements.md`, `plan.md`, `validation.md`).
