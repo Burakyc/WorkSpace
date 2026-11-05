@@ -85,3 +85,38 @@
   gap: var(--space-5);
   max-width: var(--content-max-width);
 }
+
+/* Narrow window: icons only (labels stay for screen readers and in the tooltip), content in one column. */
+@media (max-width: 899px) {
+  .shell {
+    grid-template-columns: var(--sidebar-width-collapsed) 1fr;
+  }
+
+  .sidebar {
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .link {
+    justify-content: center;
+    padding: var(--space-2);
+  }
+
+  .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .content {
+    padding: var(--space-5);
+  }
+}
