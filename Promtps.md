@@ -479,4 +479,4 @@ Implement the spec in specs/2026-11-06-import-engine/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 5.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** JSON Schemas for vocab, lesson and interview (JsonSchema.Net 9.6.0, embedded), `ImportValidator` with Turkish messages and line numbers, `ImportService` merging into `content/<module>/<slug>.json` with `POST /api/import/validate` and `POST /api/import`, prompt templates in `prompts/`, the import panel and "Promptu kopyala" on the İngilizce, Öğrenme and Mülakat pages; Docker builds from the repo root; tech-stack and specs updated; phase 5.1 done.

@@ -142,13 +142,13 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 5 — Content modules with import
 
-#### 5.1 Import engine and validator — `todo`
-- [ ] `schemas/vocab.schema.json`, `lesson.schema.json`, `interview.schema.json` with the shared envelope (`schemaVersion`, `type`, `topic`, `level`, `tags`, `items`).
-- [ ] API: `POST /api/import/validate` returns `{ path, line, message }` errors; `POST /api/import` validates, then merges by topic slug and item merge key, and reports added/skipped counts.
-- [ ] Rejects non-JSON, files over 2 MB and unknown properties.
-- [ ] Shared import UI: paste box or file picker, line-by-line error list, success summary.
-- [ ] Prompt templates in `prompts/` and a "Promptu kopyala" button.
-- [ ] Tests: validation errors with line numbers, merge never overwrites, duplicates skipped.
+#### 5.1 Import engine and validator — `done`
+- [x] `schemas/vocab.schema.json`, `lesson.schema.json`, `interview.schema.json` with the shared envelope (`schemaVersion`, `type`, `topic`, `level`, `tags`, `items`).
+- [x] API: `POST /api/import/validate` returns `{ path, line, message }` errors; `POST /api/import` validates, then merges by topic slug and item merge key, and reports added/skipped counts.
+- [x] Rejects non-JSON, files over 2 MB and unknown properties.
+- [x] Shared import UI: paste box or file picker, line-by-line error list, success summary.
+- [x] Prompt templates in `prompts/` and a "Promptu kopyala" button.
+- [x] Tests: validation errors with line numbers, merge never overwrites, duplicates skipped.
 
 #### 5.2 English module — `todo`
 - [ ] Empty state: "Copy the prompt to add your first content" (in Turkish) with the copy button.

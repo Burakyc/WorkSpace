@@ -6,14 +6,14 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 5.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] `schemas/vocab.schema.json`, `lesson.schema.json`, `interview.schema.json` with the shared envelope (`schemaVersion`, `type`, `topic`, `level`, `tags`, `items`).
-- [ ] `POST /api/import/validate` returns `{ path, line, message }` errors; `POST /api/import` validates, then merges by topic slug and item merge key, and reports added/skipped counts.
-- [ ] Rejects non-JSON, files over 2 MB and unknown properties.
-- [ ] Shared import UI: paste box or file picker, line-by-line error list, success summary.
-- [ ] Prompt templates in `prompts/` and a "Promptu kopyala" button.
-- [ ] Error messages are Turkish; the existing level is kept on merge.
-- [ ] Tests: validation errors with line numbers, merge never overwrites, duplicates skipped.
-- [ ] `tech-stack.md` is updated; the Docker image still builds.
+- [x] `schemas/vocab.schema.json`, `lesson.schema.json`, `interview.schema.json` with the shared envelope (`schemaVersion`, `type`, `topic`, `level`, `tags`, `items`).
+- [x] `POST /api/import/validate` returns `{ path, line, message }` errors; `POST /api/import` validates, then merges by topic slug and item merge key, and reports added/skipped counts.
+- [x] Rejects non-JSON, files over 2 MB and unknown properties.
+- [x] Shared import UI: paste box or file picker, line-by-line error list, success summary.
+- [x] Prompt templates in `prompts/` and a "Promptu kopyala" button.
+- [x] Error messages are Turkish; the existing level is kept on merge.
+- [x] Tests: validation errors with line numbers, merge never overwrites, duplicates skipped.
+- [x] `tech-stack.md` is updated; the Docker image still builds.
 
 ## Automated tests
 
@@ -58,7 +58,7 @@ Run `npm run dev`.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 5.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 5.1 ticked and set to `done`

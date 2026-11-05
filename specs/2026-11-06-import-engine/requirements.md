@@ -29,6 +29,11 @@ One import engine for the three content modules. The user copies a prompt templa
 | Interview tags | **Both.** Topic `tags` in the envelope and optional `tags` per question; the 5.3 filter uses both. |
 | Different level on merge | **The existing level stays.** The report says so (`levelKept: true`). |
 | Renderer fake API | Content pages get their own small fake (`modules/content/testing/fakeContentApi.ts`); the shared goals fake is not touched (another branch is changing it). |
+| Deviation: schema error messages | JsonSchema.Net's evaluation paths did not resolve back into the schema JSON (the `items` property and keyword share a name), so the rule behind a message is found from the value's instance path instead, and the library's `ErrorMessages` are not changed (no global state). |
+| Deviation: file input label | "Ya da bir JSON dosyası seç" (a native file input with its own button) instead of "Dosya seç". |
+| Deviation: prompt lines | The templates also have a third line for the number of cards, questions or parts. |
+| Deviation: tag union | The union of a topic's tags is not capped at 10 (each import still is). |
+| Fix found in manual testing | The three module routes render the same component, so the panel kept its text when switching modules; it now has a key per type (`fix(content): give each module page its own import state`). |
 
 ## User stories
 
