@@ -6,13 +6,13 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 2.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] When a focus session ends, an optional note field appears; "Kaydet" writes the session to `sessions.json`.
-- [ ] The API rejects sessions without an existing `goalId` (and projects of another goal, bad times, bad durations, long notes).
-- [ ] Stopped-early sessions are saved with their real focused minutes and `completed: false`; under 1 minute nothing is saved; only completed sessions count toward progress.
-- [ ] Goal progress from 1.2 updates after a session, and the Pomodoro page shows it.
-- [ ] A failed save keeps the timer and shows an error.
-- [ ] Tests: `SessionService` validation and progress update, plus the tests below.
-- [ ] `tech-stack.md` is updated.
+- [x] When a focus session ends, an optional note field appears; "Kaydet" writes the session to `sessions.json`.
+- [x] The API rejects sessions without an existing `goalId` (and projects of another goal, bad times, bad durations, long notes).
+- [x] Stopped-early sessions are saved with their real focused minutes and `completed: false`; under 1 minute nothing is saved; only completed sessions count toward progress.
+- [x] Goal progress from 1.2 updates after a session, and the Pomodoro page shows it.
+- [x] A failed save keeps the timer and shows an error.
+- [x] Tests: `SessionService` validation and progress update, plus the tests below.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -51,7 +51,7 @@ Run `npm run dev` with at least one goal (target 20) and a project. To save time
 
 | ID | Step | Expected |
 |---|---|---|
-| M1 | Start a session; in DevTools set the stored timer's `endsAt` to 3 s from now and reload: `const t = JSON.parse(localStorage.getItem('devpath.pomodoro')); t.endsAt = Date.now() + 3000; localStorage.setItem('devpath.pomodoro', JSON.stringify(t)); location.reload()` | After ~3 s: "Süre doldu.", the note field and "Kaydet" |
+| M1 | Start a session; in DevTools move the stored timer so it ends 3 s from now and reload: `const t = JSON.parse(localStorage.getItem('devpath.pomodoro')); t.startedAt = Date.now() + 3000 - t.durationMs; t.endsAt = Date.now() + 3000; localStorage.setItem('devpath.pomodoro', JSON.stringify(t)); location.reload()` (both times move, so the 25-minute span stays valid for the API) | After ~3 s: "Süre doldu.", the note field and "Kaydet" |
 | M2 | Type a note, "Kaydet" | Back to idle; "Kaydedildi · <goal>: 1 / 20 pomodoro · %5"; `sessions.json` has the session with the note and `completed: true` |
 | M3 | Open Hedefler | The goal card shows "1 / 20 pomodoro · %5" |
 | M4 | Start, wait just over 1 minute, "Durdur" | Saved with `completed: false` and 1 minute; the goal's progress unchanged |
@@ -60,7 +60,7 @@ Run `npm run dev` with at least one goal (target 20) and a project. To save time
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M6 done with the expected results
-- [ ] `roadmap.md` phase 2.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M6 done with the expected results
+- [x] `roadmap.md` phase 2.2 ticked and set to `done`

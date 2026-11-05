@@ -93,12 +93,12 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Main process shows an OS notification when the session ends.
 - [x] Tests: timer math (Vitest), start disabled without a goal (RTL).
 
-#### 2.2 Session log — `todo`
-- [ ] When a focus session ends, a short optional note field appears; saving writes the session to `sessions.json`.
-- [ ] API rejects sessions without an existing `goalId`.
-- [ ] Stopped-early sessions are saved with their real duration and marked `completed: false`; only completed ones count toward progress.
-- [ ] Goal progress from 1.2 updates after a session.
-- [ ] Tests: `SessionService` validation and progress update.
+#### 2.2 Session log — `done`
+- [x] When a focus session ends, a short optional note field appears; saving writes the session to `sessions.json`.
+- [x] API rejects sessions without an existing `goalId`.
+- [x] Stopped-early sessions are saved with their real duration and marked `completed: false`; only completed ones count toward progress.
+- [x] Goal progress from 1.2 updates after a session.
+- [x] Tests: `SessionService` validation and progress update.
 
 #### 2.3 Tags and timer settings — `todo`
 - [ ] Optional tags on a session (e.g. `#di`), with autocomplete from previously used tags.

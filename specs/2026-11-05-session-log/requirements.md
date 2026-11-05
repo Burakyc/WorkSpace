@@ -26,6 +26,8 @@ Focus sessions are written to `sessions.json`. A finished session is saved with 
 | Archived goal | A session may be saved for a goal that was archived while it ran (the goal still exists). |
 | Tags | Always `[]` in this phase; phase 2.3 adds them. |
 | Session ids | Set by the API (GUID), like goals and projects. |
+| Removed "Yeni oturum" | The finished state from phase 2.1 no longer has "Yeni oturum": a finished session is saved with "Kaydet" and then the page is idle again, so a completed session cannot be skipped by accident. |
+| Goal selection after leaving the page | The pickers keep the session's goal after a save while the page stays open; leaving the Pomodoro page resets them (seen during M4). Remembering the last goal across pages is not in this phase. |
 
 ## User stories
 
