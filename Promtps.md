@@ -480,3 +480,17 @@ Implement the spec in specs/2026-11-06-home-dashboard/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 6.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `FeedValidator` (rules of the new `schemas/feed.schema.json`, no package) and `FeedService` with `GET /api/home/feed` (`ok` / `missing` / `invalid`, 10 newest items, never writes the file); Ana Sayfa as a card grid with Bugün (today's pomodoros, active goals, goal select + "Başlat"), Hatırlatmalar (09:00 / 20:00 defaults) and Akış (summaries with "Aç", error cards); tech-stack and specs updated; phase 6.1 done.
+
+## 2026-11-06 – Plan phase 6.2 YouTube RSS
+**Phase:** 6.2 YouTube RSS
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 6.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-06-youtube-rss/` (`requirements.md`, `plan.md`, `validation.md`).
