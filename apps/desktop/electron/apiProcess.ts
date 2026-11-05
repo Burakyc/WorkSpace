@@ -15,6 +15,8 @@ export interface StartApiOptions {
   exePath: string;
   /** The renderer's origin for CORS: the Vite dev server origin, or 'null' for file://. */
   origin: string;
+  /** Absolute data folder, passed as DEVPATH_DATA_DIR. */
+  dataDir: string;
   development: boolean;
   timeoutMs?: number;
 }
@@ -91,6 +93,7 @@ export async function waitForHealth(
 export async function startApi({
   exePath,
   origin,
+  dataDir,
   development,
   timeoutMs = 10_000,
 }: StartApiOptions): Promise<ApiHandle> {
@@ -107,6 +110,7 @@ export async function startApi({
       DEVPATH_PORT: String(port),
       DEVPATH_TOKEN: token,
       DEVPATH_ORIGIN: origin,
+      DEVPATH_DATA_DIR: dataDir,
       DEVPATH_PARENT_PID: String(process.pid),
     },
     stdio: 'inherit',

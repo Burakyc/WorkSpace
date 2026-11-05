@@ -1,9 +1,10 @@
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import type { ApiConfig } from '../src/shared/api/types';
 import { startApi, type ApiHandle } from './apiProcess';
+import { readAppConfig, resolveDataDir } from './appConfig';
 import { isAllowedNavigation } from './navigation';
 
 const devServerUrl = process.env['ELECTRON_RENDERER_URL'];
@@ -19,13 +20,30 @@ const apiExePath = resolve(
 
 let api: ApiHandle | undefined;
 
+function prepareDataDir(): string {
+  const config = readAppConfig(join(app.getPath('userData'), 'app-config.json'));
+  const dataDir = resolveDataDir(config, app.getPath('appData'), app.isPackaged);
+  try {
+    mkdirSync(dataDir, { recursive: true });
+  } catch (error) {
+    throw new Error(`Veri klasörü oluşturulamadı: ${dataDir}`, { cause: error });
+  }
+  return dataDir;
+}
+
 async function launchApi(): Promise<ApiHandle> {
+  const dataDir = prepareDataDir();
   if (!existsSync(apiExePath)) {
     throw new Error(
       `API bulunamadı: ${apiExePath}\nÖnce "dotnet build apps/api/DevPath.slnx" komutunu çalıştırın.`,
     );
   }
-  return startApi({ exePath: apiExePath, origin: appOrigin, development: !app.isPackaged });
+  return startApi({
+    exePath: apiExePath,
+    origin: appOrigin,
+    dataDir,
+    development: !app.isPackaged,
+  });
 }
 
 app.on('web-contents-created', (_event, contents) => {
