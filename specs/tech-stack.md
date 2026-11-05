@@ -80,7 +80,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 
 ### Data folder
 
-- Path is configurable in settings. Default: `%APPDATA%\DevPath\data`.
+- Path is configurable in settings (`dataDir` in `app-config.json`). Default: `%APPDATA%\DevPath\data` for the installed app, `%APPDATA%\DevPath\dev-data` for unpackaged Electron and for the API run on its own in Development, so development never touches real data.
+- The API takes the path from `DEVPATH_DATA_DIR` (absolute only); outside Development it refuses to start without it. Electron main creates the folder before starting the API (so its error window can name the folder) and the API creates it again at startup (so `dotnet run` and Docker work alone). An invalid `app-config.json` or an uncreatable folder is an error window, never a silent fallback to another folder.
 - The repo also gitignores `data/` in case it is pointed there, but the default avoids the OneDrive-synced repo, where sync can lock files during writes.
 - Post-MVP backups go to a sibling folder: `%APPDATA%\DevPath\backups\YYYY-MM-DD\`, last 14 days kept.
 
@@ -120,10 +121,12 @@ Pomodoros for a day are read from `sessions.json` by date; notes for a day are r
   { "schemaVersion": 1, "items": [ ... ] }
   ```
 
-- **Atomic writes:** serialize to `<file>.tmp` in the same folder, flush to disk, then `File.Move(tmp, file, overwrite: true)`. A crash leaves either the old or the new file, never a half-written one. One `SemaphoreSlim` per file path serializes writes inside the process.
-- **Migrations:** each file type has an ordered list of `IMigration` steps (`from → to`). On read, if `schemaVersion` is lower than current, the steps run and the file is saved back. A higher version than the app knows is an error (no silent data loss).
+- **Atomic writes:** serialize to `<file>.tmp` in the same folder, flush to disk, then `File.Move(tmp, file, overwrite: true)`. A crash leaves either the old or the new file, never a half-written one. If a write fails before the move, the `.tmp` is deleted; a stale `.tmp` from a crash is ignored and replaced by the next write.
+- **One lock per file:** a `SemaphoreSlim` per full path serializes reads, writes and read-modify-write updates inside the process. Reads take it too, because on Windows an open reader makes `File.Move(..., overwrite: true)` fail. The single-instance lock means one API per data folder, so there is no cross-process lock.
+- **Paths:** `JsonFileStore` takes paths relative to the data folder and rejects anything that resolves outside it (`..`, absolute paths).
+- **Migrations:** each file type has a `DocumentSchema(CurrentVersion, Migrations)`; a step is a `Migration(FromVersion, Func<JsonObject, JsonObject>)` record, so it works on raw JSON and old C# types never need to be kept. A missing `schemaVersion` counts as `0`. On read, if `schemaVersion` is lower than current, the steps run in order and the file is saved back (no copy of the old file is kept). A higher version than the app knows raises `UnsupportedSchemaVersionException` and the file is left untouched, also on write (no silent data loss).
 - IDs are GUIDs (`Guid.NewGuid()`, string form). Timestamps are ISO 8601 UTC.
-- `IRepository<T>` exposes `GetAllAsync`, `GetAsync(id)`, `UpsertAsync`, `DeleteAsync`. The JSON implementation is the only one; the interface exists because the README names SQLite as the likely next store.
+- `IRepository<T>` exposes `GetAllAsync`, `GetAsync(id)`, `UpsertAsync`, `DeleteAsync`. The JSON implementation (`JsonRepository<T>`, one `{ schemaVersion, items }` file per repository) is the only one; the interface exists because the README names SQLite as the likely next store.
 
 ### Core entities (MVP)
 

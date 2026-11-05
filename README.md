@@ -144,6 +144,24 @@ $env:DEVPATH_TOKEN = 'dev-token'; dotnet run --project apps/api/DevPath.Api
 curl.exe -H "X-DevPath-Token: dev-token" http://127.0.0.1:5180/api/health
 ```
 
+### Data folder
+
+All data is JSON in one folder, which the API takes from `DEVPATH_DATA_DIR` and creates on start (the log shows `Data folder: <path>`).
+
+| Run | Default data folder |
+|---|---|
+| Installed app | `%APPDATA%\DevPath\data` |
+| `npm run dev`, `npm run start`, `dotnet run` (Development) | `%APPDATA%\DevPath\dev-data`, so development never touches real data |
+| API outside Development | none: it refuses to start without `DEVPATH_DATA_DIR` |
+
+To use another folder with the desktop app, put an absolute path in `app-config.json` in Electron's `userData` folder (`%APPDATA%\@devpath\desktop` while unpackaged):
+
+```json
+{ "dataDir": "D:\\DevPathData" }
+```
+
+If that file is not valid JSON, `dataDir` is not an absolute path, or the folder cannot be created, the app shows an error and quits.
+
 ## Commit conventions
 
 Conventional Commits are used: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
