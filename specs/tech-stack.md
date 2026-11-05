@@ -45,19 +45,19 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 ### Process lifecycle
 
 1. Electron main reads `app-config.json` from Electron's `userData` folder (non-secret settings such as `dataDir`).
-2. It picks a free port, creates a random 32-byte token, and starts the API with environment variables `DEVPATH_PORT`, `DEVPATH_TOKEN`, `DEVPATH_DATA_DIR` and decrypted secrets (e.g. `DEVPATH_GITHUB_TOKEN`). Secrets live only in that process's memory.
-   - Dev: `dotnet run --project apps/api/DevPath.Api`.
+2. It picks a free port, creates a random 32-byte token, and starts the API with environment variables `DEVPATH_PORT`, `DEVPATH_TOKEN`, `DEVPATH_ORIGIN` (the renderer's origin for CORS), `DEVPATH_PARENT_PID` (main's PID), `DEVPATH_DATA_DIR` and decrypted secrets (e.g. `DEVPATH_GITHUB_TOKEN`). Secrets live only in that process's memory. The API's working directory is the exe's folder, so it finds `appsettings.json`.
+   - Dev: root `npm run dev` runs `dotnet build apps/api/DevPath.slnx` first; main then spawns `apps/api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe` directly. Not `dotnet run`: it is too slow for the 10 s timeout, and killing it on Windows leaves the real API process running.
    - Packaged: `resources/api/DevPath.Api.exe`.
-3. Main polls `GET /api/health` until it answers (timeout 10 s, then shows an error window), then opens the main window.
+3. Main polls `GET /api/health` (with the token) until it answers `200` (timeout 10 s, or earlier if the API process exits). On failure it shows `dialog.showErrorBox` with a Turkish message and quits; the main window is never opened.
 4. When a secret or the data folder changes, main restarts the API.
-5. On quit, main stops the API process.
+5. On quit, main stops the API process. If main dies without quitting, the API notices that `DEVPATH_PARENT_PID` exited and stops itself.
 
 ### API rules
 
 - Kestrel binds to `127.0.0.1` only. Nothing listens on `0.0.0.0` or `localhost` (which can resolve to IPv6/other interfaces).
-- Every request must carry `X-DevPath-Token: <per-launch token>`; requests without it get `401`. This stops other local processes and web pages from using the API.
-- The `Host` header must be `127.0.0.1:<port>` (blocks DNS rebinding).
-- CORS allows only the Vite dev server origin in development and the packaged app origin in production.
+- Every request must carry `X-DevPath-Token: <per-launch token>`; requests without it get `401`. This stops other local processes and web pages from using the API. When `DEVPATH_TOKEN` is not set, the check is off in Development only (with a warning, for running the API on its own); any other environment refuses to start.
+- The `Host` must be `127.0.0.1` (built-in host filtering, `AllowedHosts: "127.0.0.1"`, `400` otherwise). This blocks DNS rebinding. The port is not compared: a rebinding attack always changes the host name.
+- CORS allows only the origin in `DEVPATH_ORIGIN`: the Vite dev server origin in development, `null` for the `file://` page in a build. Without it, no cross-origin request is allowed. CORS runs before the token check so browser preflights are answered.
 - Errors are returned as RFC 7807 `ProblemDetails`.
 - The built-in OpenAPI document (`/openapi/v1.json`) is served in Development only.
 - Without `DEVPATH_PORT` (running the API on its own), the API falls back to port `5180`.
@@ -68,7 +68,7 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 ### Frontend rules
 
 - Function components and hooks only. State is React state plus a few contexts (theme, active pomodoro). No global state library.
-- One typed API client (`shared/api/`) wraps `fetch`, adds the token and base URL from `window.devpath.getApiConfig()`, and returns typed results. No `any`.
+- One typed API client (`shared/api/`) wraps `fetch`, adds the token and base URL from `await window.devpath.getApiConfig()` (async: the preload asks main over IPC, and main answers only the app's own page), and returns typed results. No `any`.
 - Design tokens live in one file (`shared/ui/tokens.css`) as CSS variables; light/dark switch on `prefers-color-scheme`. Components use CSS Modules.
 - Layout: sidebar + content area. Below 900 px the sidebar collapses to icons and content goes to one column. Icons are SVG (lucide-react).
 - Imported or user text is always rendered as text. No `dangerouslySetInnerHTML`.

@@ -121,9 +121,11 @@ Prerequisites: Node 24 (see `.nvmrc`), npm 11 and the [.NET 10 SDK](https://dotn
 
 ```bash
 npm install      # install desktop dependencies
-npm run dev      # open the desktop app with hot reload
+npm run dev      # build the API, then open the desktop app with hot reload
 npm run check    # build and test everything (API + desktop)
 ```
+
+`npm run dev` builds the API first; Electron then starts `DevPath.Api.exe` on a free port with a new token for each launch and stops it when the app quits. The page shows "API: bağlı" when the connection works.
 
 API only:
 
@@ -133,7 +135,14 @@ dotnet test apps/api/DevPath.slnx
 dotnet run --project apps/api/DevPath.Api
 ```
 
-The API listens on `127.0.0.1` only. The default URL is http://127.0.0.1:5180/api/health. Set `DEVPATH_PORT` to use another port. In Development, the OpenAPI document is at http://127.0.0.1:5180/openapi/v1.json.
+The API listens on `127.0.0.1` only and accepts only `127.0.0.1` as the `Host`. The default URL is http://127.0.0.1:5180/api/health. Set `DEVPATH_PORT` to use another port. In Development, the OpenAPI document is at http://127.0.0.1:5180/openapi/v1.json.
+
+Every request needs the `X-DevPath-Token` header with the value of `DEVPATH_TOKEN`. When `DEVPATH_TOKEN` is not set, the API runs without the check in Development only (and logs a warning); in any other environment it refuses to start. With a token:
+
+```powershell
+$env:DEVPATH_TOKEN = 'dev-token'; dotnet run --project apps/api/DevPath.Api
+curl.exe -H "X-DevPath-Token: dev-token" http://127.0.0.1:5180/api/health
+```
 
 ## Commit conventions
 
