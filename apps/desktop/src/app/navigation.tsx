@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { GoalsPage } from '../modules/goals/GoalsPage';
+import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
 import { SettingsPage } from '../modules/settings/SettingsPage';
 import { EmptyState } from '../shared/ui/EmptyState';
 
@@ -35,15 +36,7 @@ export const navigation: readonly NavEntry[] = [
     },
   },
   { path: '/goals', label: 'Hedefler', icon: Target, element: <GoalsPage /> },
-  {
-    path: '/pomodoro',
-    label: 'Pomodoro',
-    icon: Timer,
-    emptyState: {
-      description: 'Bir hedef seçip odak oturumu başlatacağın yer.',
-      next: 'Önce bir hedef oluşturman gerekecek.',
-    },
-  },
+  { path: '/pomodoro', label: 'Pomodoro', icon: Timer, element: <PomodoroPage /> },
   {
     path: '/calendar',
     label: 'Takvim',
