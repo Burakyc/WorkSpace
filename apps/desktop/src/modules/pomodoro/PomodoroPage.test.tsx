@@ -111,3 +111,55 @@ describe('PomodoroPage start', () => {
     expect(goalSelect()).toBeDisabled();
   });
 });
+
+describe('PomodoroPage controls', () => {
+  async function startSession() {
+    installFakeGoalsApi([aspnet], { projects: [todo] });
+    renderPage();
+    await screen.findByRole('button', { name: 'Başlat' });
+    vi.useFakeTimers({ shouldAdvanceTime: false });
+    fireEvent.change(goalSelect(), { target: { value: 'a' } });
+    fireEvent.change(projectSelect(), { target: { value: 'p1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+  }
+
+  it('pauses and resumes', async () => {
+    await startSession();
+    act(() => vi.advanceTimersByTime(5 * MIN));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Duraklat' }));
+    act(() => vi.advanceTimersByTime(10 * MIN));
+    expect(screen.getByText('Duraklatıldı')).toBeInTheDocument();
+    expect(clock()).toHaveTextContent('20:00');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Devam et' }));
+    act(() => vi.advanceTimersByTime(MIN));
+    expect(clock()).toHaveTextContent('19:00');
+    expect(screen.queryByText('Duraklatıldı')).not.toBeInTheDocument();
+  });
+
+  it('stops back to idle and keeps the goal and project', async () => {
+    await startSession();
+    act(() => vi.advanceTimersByTime(3 * MIN));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Durdur' }));
+
+    expect(clock()).toHaveTextContent('25:00');
+    expect(goalSelect()).toBeEnabled();
+    expect(goalSelect()).toHaveValue('a');
+    expect(projectSelect()).toHaveValue('p1');
+    expect(screen.getByRole('button', { name: 'Başlat' })).toBeEnabled();
+  });
+
+  it('finishes after 25 minutes and starts over with "Yeni oturum"', async () => {
+    await startSession();
+
+    act(() => vi.advanceTimersByTime(25 * MIN));
+
+    expect(screen.getByText('Süre doldu.')).toBeInTheDocument();
+    expect(clock()).toHaveTextContent('00:00');
+    fireEvent.click(screen.getByRole('button', { name: 'Yeni oturum' }));
+    expect(clock()).toHaveTextContent('25:00');
+    expect(goalSelect()).toHaveValue('a');
+  });
+});

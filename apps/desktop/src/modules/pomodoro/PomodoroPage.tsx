@@ -48,6 +48,23 @@ export function PomodoroPage() {
   const projectOptions = projects.filter((p) => p.goalId === shownGoalId);
   const selectedGoal = goalOptions.find((g) => g.id === shownGoalId);
 
+  // After a session the pickers keep its goal and project, ready for the next one.
+  function keepSessionSelection() {
+    if (state.status === 'idle') return;
+    setGoalId(goals?.some((g) => g.id === state.goalId) ? state.goalId : '');
+    setProjectId(state.projectId ?? '');
+  }
+
+  function stop() {
+    keepSessionSelection();
+    pomodoro.stop();
+  }
+
+  function newSession() {
+    keepSessionSelection();
+    pomodoro.reset();
+  }
+
   if (goals === null) {
     return (
       <>
@@ -131,6 +148,9 @@ export function PomodoroPage() {
           {clock}
         </p>
 
+        {state.status === 'paused' && <p className={styles.state}>Duraklatıldı</p>}
+        {state.status === 'finished' && <p className={styles.state}>Süre doldu.</p>}
+
         <div className={styles.controls}>
           {idle && (
             <button
@@ -140,6 +160,26 @@ export function PomodoroPage() {
               onClick={() => selectedGoal && pomodoro.start(selectedGoal, projectId || null)}
             >
               Başlat
+            </button>
+          )}
+          {state.status === 'running' && (
+            <button type="button" className={buttons.primary} onClick={pomodoro.pause}>
+              Duraklat
+            </button>
+          )}
+          {state.status === 'paused' && (
+            <button type="button" className={buttons.primary} onClick={pomodoro.resume}>
+              Devam et
+            </button>
+          )}
+          {(state.status === 'running' || state.status === 'paused') && (
+            <button type="button" className={buttons.secondary} onClick={stop}>
+              Durdur
+            </button>
+          )}
+          {state.status === 'finished' && (
+            <button type="button" className={buttons.primary} onClick={newSession}>
+              Yeni oturum
             </button>
           )}
         </div>
