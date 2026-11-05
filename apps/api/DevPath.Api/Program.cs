@@ -1,4 +1,3 @@
-using System.Net;
 using DevPath.Api.Infrastructure.Hosting;
 using DevPath.Api.Infrastructure.Security;
 using DevPath.Api.Infrastructure.Storage;
@@ -6,7 +5,8 @@ using DevPath.Api.Infrastructure.Storage;
 var builder = WebApplication.CreateBuilder(args);
 
 var port = ApiPort.Resolve(builder.Configuration["DEVPATH_PORT"]);
-builder.WebHost.ConfigureKestrel(options => options.Listen(IPAddress.Loopback, port));
+var address = ApiBinding.Resolve(builder.Configuration["DEVPATH_IN_CONTAINER"]);
+builder.WebHost.ConfigureKestrel(options => options.Listen(address, port));
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
