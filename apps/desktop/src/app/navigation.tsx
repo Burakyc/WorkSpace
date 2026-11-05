@@ -11,6 +11,7 @@ import {
   Timer,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { CalendarPage } from '../modules/calendar/CalendarPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
 import { SettingsPage } from '../modules/settings/SettingsPage';
@@ -41,10 +42,7 @@ export const navigation: readonly NavEntry[] = [
     path: '/calendar',
     label: 'Takvim',
     icon: CalendarDays,
-    emptyState: {
-      description: 'Hangi gün ne yaptığını, pomodorolarını ve notlarını burada göreceksin.',
-      next: 'Pomodoro oturumların burada otomatik birikecek.',
-    },
+    element: <CalendarPage />,
   },
   {
     path: '/notes',
