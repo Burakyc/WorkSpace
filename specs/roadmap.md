@@ -100,11 +100,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Goal progress from 1.2 updates after a session.
 - [x] Tests: `SessionService` validation and progress update.
 
-#### 2.3 Tags and timer settings — `todo`
-- [ ] Optional tags on a session (e.g. `#di`), with autocomplete from previously used tags.
-- [ ] Settings: focus, short break and long break durations (defaults 25 / 5 / 15) and long break interval (default 4), saved in `settings.json`.
-- [ ] Break timers run after a focus session; breaks are not logged as sessions.
-- [ ] Tests: tag normalization (trim, lower case, leading `#`), settings validation.
+#### 2.3 Tags and timer settings — `done`
+- [x] Optional tags on a session (e.g. `#di`), with autocomplete from previously used tags.
+- [x] Settings: focus, short break and long break durations (defaults 25 / 5 / 15) and long break interval (default 4), saved in `settings.json`.
+- [x] Break timers run after a focus session; breaks are not logged as sessions.
+- [x] Tests: tag normalization (trim, lower case, leading `#`), settings validation.
 
 ### Milestone 3 — Calendar and daily log
 

@@ -26,6 +26,9 @@ Sessions get optional tags (e.g. `#di`) with suggestions from earlier sessions. 
 | Long break | Every `longBreakInterval`-th completed focus session (default 4) offers the long break. The count of completed focus sessions in the current cycle is kept in `localStorage` (`devpath.pomodoro.cycle`); stopped-early sessions do not count; taking or skipping a long break resets it to 0. |
 | Settings file | `settings.json` is one document, `{ "schemaVersion": 1, "pomodoro": { … } }`, read and written through `JsonFileStore` (not a repository: it is not a list). Missing file or section → defaults. Later settings (reminders, channels) get their own sections. |
 | Changing durations | Takes effect for the next timer; a running timer keeps its length. |
+| Turkish İ in C# | .NET's invariant lower-casing leaves `İ` unchanged, so `Tags.Normalize` maps `İ` → `i` before lower-casing (found by T1); JavaScript then gives the same result after dropping U+0307. |
+| Settings form validation | The Ayarlar form uses `noValidate`, so the API's Turkish field messages are always the ones shown (the browser's own range check would block the request first). |
+| Interval label | The fourth field is labelled "Uzun mola aralığı (oturum)" instead of "Uzun mola her … oturumda". |
 
 ## User stories
 

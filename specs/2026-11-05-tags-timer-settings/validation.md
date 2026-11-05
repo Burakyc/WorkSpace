@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 2.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Optional tags on a session, chosen at start and editable at save, with suggestions from previously used tags.
-- [ ] Tags are normalized (trim, lower case, leading `#` removed) and validated in the API.
-- [ ] Settings: focus, short-break and long-break durations (25 / 5 / 15) and long-break interval (4), saved in `settings.json`, edited on the Ayarlar page.
-- [ ] After a focus session, a short or long break can be started (or skipped); breaks count down, notify at the end and are not logged as sessions.
-- [ ] Tests: tag normalization and settings validation, plus the tests below.
-- [ ] `tech-stack.md` is updated.
+- [x] Optional tags on a session, chosen at start and editable at save, with suggestions from previously used tags.
+- [x] Tags are normalized (trim, lower case, leading `#` removed) and validated in the API.
+- [x] Settings: focus, short-break and long-break durations (25 / 5 / 15) and long-break interval (4), saved in `settings.json`, edited on the Ayarlar page.
+- [x] After a focus session, a short or long break can be started (or skipped); breaks count down, notify at the end and are not logged as sessions.
+- [x] Tests: tag normalization and settings validation, plus the tests below.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -67,7 +67,7 @@ Run `npm run dev` with a goal. Where a step needs a timer to end, use the DevToo
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M8 done with the expected results
-- [ ] `roadmap.md` phase 2.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M8 done with the expected results
+- [x] `roadmap.md` phase 2.3 ticked and set to `done`
