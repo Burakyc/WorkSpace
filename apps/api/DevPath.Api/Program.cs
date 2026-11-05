@@ -1,6 +1,7 @@
 using DevPath.Api.Infrastructure.Hosting;
 using DevPath.Api.Infrastructure.Security;
 using DevPath.Api.Infrastructure.Storage;
+using DevPath.Api.Infrastructure.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,7 @@ var port = ApiPort.Resolve(builder.Configuration["DEVPATH_PORT"]);
 var address = ApiBinding.Resolve(builder.Configuration["DEVPATH_IN_CONTAINER"]);
 builder.WebHost.ConfigureKestrel(options => options.Listen(address, port));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add<ValidationExceptionFilter>());
 builder.Services.AddOpenApi();
 builder.Services.AddCors();
 builder.Services.AddHostedService<ParentProcessWatcher>();
