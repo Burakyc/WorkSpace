@@ -26,6 +26,7 @@ Opening a page in Notlar shows a BlockNote editor with the `/` command menu, hea
 | Lazy editor (implementation) | `NoteEditor` is loaded with `React.lazy` on the first page open, so BlockNote (about 2 MB) stays out of the start-up bundle; the language grammars load only when a code block uses them. |
 | Slash menu filter (implementation) | BlockNote's default menu items have no `key` in their type, so the offered items are matched by their translated title. |
 | Fake API (implementation) | The content routes of the test fake landed with task 5 instead of task 4 (a script edit missed them in task 4). |
+| Editor colours (fix, found in M1) | With `theme="light"/"dark"` the editor used Mantine's own background, a different shade from the page. A theme object of token values (`var(--color-bg)` …) matches the page; BlockNote still picks the menus' light/dark scheme from the OS. Separate `fix(notes)` commit. |
 | Language of the editor UI | BlockNote 0.56.0 has no Turkish dictionary. The English dictionary is the base; the placeholders and the slash menu items used here are translated to Turkish in `editorDictionary.ts`. Untranslated tooltips stay English. |
 
 ## User stories
@@ -56,7 +57,7 @@ Opening a page in Notlar shows a BlockNote editor with the `/` command menu, hea
 
 ### Editor
 
-- `NoteEditor.tsx`: `useCreateBlockNote` with the stored blocks as `initialContent` (`undefined` for an empty page), the Turkish dictionary, and the code block spec from `@blocknote/code-block` restricted to the language list. `BlockNoteView` from `@blocknote/mantine` with `theme` following `prefers-color-scheme`.
+- `NoteEditor.tsx`: `useCreateBlockNote` with the stored blocks as `initialContent` (`undefined` for an empty page), the Turkish dictionary, and the code block spec from `@blocknote/code-block` restricted to the language list. `BlockNoteView` from `@blocknote/mantine` with a theme object whose colours are the app's tokens (light and dark follow the OS).
 - The page loads its content before showing the editor ("Yükleniyor…"; "Sayfa yüklenemedi." on failure).
 - BlockNote CSS (`@blocknote/mantine/style.css`, `@blocknote/core/fonts/inter.css` is **not** imported: the app uses the system font) is imported by `NoteEditor.tsx` only.
 - Folders keep the 4.1 view (children list, no editor).

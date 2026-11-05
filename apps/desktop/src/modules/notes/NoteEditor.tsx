@@ -13,7 +13,6 @@ import {
   SuggestionMenuController,
   useCreateBlockNote,
 } from '@blocknote/react';
-import { useSyncExternalStore } from 'react';
 import { editorDictionary, slashMenuKeys } from './editorDictionary';
 
 const languages = {
@@ -39,11 +38,20 @@ const schema = BlockNoteSchema.create({
 // Default items carry no key in their type, so they are matched by their (translated) title.
 const offered = new Set(slashMenuKeys.map((key) => editorDictionary.slash_menu[key].title));
 
-const darkQuery = () => window.matchMedia('(prefers-color-scheme: dark)');
-const subscribe = (onChange: () => void) => {
-  const dark = darkQuery();
-  dark.addEventListener('change', onChange);
-  return () => dark.removeEventListener('change', onChange);
+// Colours come from the app's tokens, so the editor matches the page in light and dark mode;
+// with a theme object BlockNote takes the light/dark scheme of its menus from the OS.
+const theme = {
+  colors: {
+    editor: { text: 'var(--color-text)', background: 'var(--color-bg)' },
+    menu: { text: 'var(--color-text)', background: 'var(--color-surface)' },
+    tooltip: { text: 'var(--color-text)', background: 'var(--color-surface-hover)' },
+    hovered: { text: 'var(--color-text)', background: 'var(--color-surface-hover)' },
+    selected: { text: 'var(--color-accent-text)', background: 'var(--color-accent)' },
+    border: 'var(--color-border)',
+    sideMenu: 'var(--color-text-muted)',
+  },
+  borderRadius: 8,
+  fontFamily: 'var(--font-sans)',
 };
 
 interface NoteEditorProps {
@@ -53,7 +61,7 @@ interface NoteEditorProps {
   onChange(blocks: unknown[]): void;
 }
 
-/** BlockNote with the Turkish slash menu, highlighted code blocks and the OS theme. */
+/** BlockNote with the Turkish slash menu, highlighted code blocks and the app's colours. */
 export function NoteEditor({ initialBlocks, onChange }: NoteEditorProps) {
   const editor = useCreateBlockNote({
     schema,
@@ -62,7 +70,6 @@ export function NoteEditor({ initialBlocks, onChange }: NoteEditorProps) {
     // The API stores what this editor produced, so the blocks match the schema.
     initialContent: initialBlocks.length > 0 ? (initialBlocks as PartialBlock[]) : undefined,
   });
-  const theme = useSyncExternalStore(subscribe, () => (darkQuery().matches ? 'dark' : 'light'));
 
   return (
     <BlockNoteView
