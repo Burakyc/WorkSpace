@@ -1,0 +1,30 @@
+# Windows installer for DevPath. Built by `npm run package` at the repo root.
+appId: com.devpath.workspace
+productName: DevPath
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+  # electron-vite bundles the renderer; main and preload use only Node and Electron.
+  - '!node_modules/**/*'
+extraResources:
+  - from: ../api/publish
+    to: api
+    filter:
+      - DevPath.Api.exe
+      - appsettings.json
+win:
+  target:
+    - target: nsis
+      arch: x64
+  icon: build/icon.png
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
