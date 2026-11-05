@@ -3,6 +3,7 @@ using DevPath.Api.Infrastructure.Security;
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Goals;
+using DevPath.Api.Modules.Pomodoro;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddSingleton(services => DataDirectory.Resolve(
     services.GetRequiredService<IHostEnvironment>().IsDevelopment()));
 builder.Services.AddSingleton<JsonFileStore>();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddPomodoro();
 builder.Services.AddGoals();
 
 var app = builder.Build();
