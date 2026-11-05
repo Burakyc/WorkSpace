@@ -15,6 +15,7 @@ builder.Services.AddHostedService<ParentProcessWatcher>();
 builder.Services.AddSingleton(services => DataDirectory.Resolve(
     services.GetRequiredService<IConfiguration>()["DEVPATH_DATA_DIR"],
     services.GetRequiredService<IHostEnvironment>().IsDevelopment()));
+builder.Services.AddSingleton<JsonFileStore>();
 
 var app = builder.Build();
 
