@@ -31,8 +31,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 │  - reads and writes app config (data folder path)        │
 │                                                          │
 │ preload (contextBridge, minimal)                         │
-│  - getApiConfig(), settings.*, secrets.*, notify(),      │
-│    openExternal()                                        │
+│  - getApiConfig(), settings.*, pomodoro.*, onOpenPage(), │
+│    secrets.*, openExternal()                             │
 │                                                          │
 │ renderer (React, sandboxed)                              │
 │  - typed fetch client ──HTTP──┐                          │
@@ -80,7 +80,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 - `app-config.json` is read and written only by Electron main, atomically, with `schemaVersion: 1`.
 - Imported or user text is always rendered as text. No `dangerouslySetInnerHTML`.
 - Notes use BlockNote; saves are debounced by 1 second and run in the background.
-- The pomodoro timer stores `startedAt` and `durationMs` and derives the remaining time from `Date.now()`, so throttled or minimized windows stay accurate. The end-of-session notification is scheduled in the main process.
+- The pomodoro timer is a small state machine (`idle` → `running` ⇄ `paused` → `finished`, `src/modules/pomodoro/timer.ts`) that stores times (`startedAt`, `endsAt` or `remainingMs`) and derives the remaining time from `Date.now()`, so throttled or minimized windows stay accurate. `PomodoroProvider` owns it for the whole app, ticks every 250 ms while running and keeps it in `localStorage` (`devpath.pomodoro`), so it survives reloads and restarts; invalid stored data loads as idle. The goal and project are locked while a session exists.
+- The end-of-session notification is scheduled in the main process (`pomodoro.scheduleEnd(endsAt, body)` / `cancelEnd()`, at most one pending, end time at most 24 h ahead): silent, title "Odak süresi bitti"; clicking it focuses the window and main sends `devpath:open-page` (`onOpenPage` in the preload). The installed app uses the AppUserModelID `com.devpath.workspace` (its Start menu shortcut has it); unpackaged runs keep Electron's default id.
 - Dates are shown with `Intl` in `tr-TR`; stored as ISO 8601 (UTC timestamps, `YYYY-MM-DD` local dates for days).
 
 ## Storage design
