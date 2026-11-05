@@ -144,4 +144,41 @@ describe('DayPage', () => {
     renderAt('/calendar/2026-11-04');
     expect(await screen.findByRole('alert')).toHaveTextContent('Gün yüklenemedi.');
   });
+
+  it('saves the daily log', async () => {
+    const { fetchFn, logs } = installFakeGoalsApi([], { logs: { '2026-11-03': 'Old text' } });
+    renderAt('/calendar/2026-11-03');
+    const field = await screen.findByLabelText('Bu gün hakkında notların');
+    const save = screen.getByRole('button', { name: 'Kaydet' });
+    expect(field).toHaveValue('Old text');
+    expect(save).toBeDisabled();
+
+    fireEvent.change(field, { target: { value: 'Read the DI chapter.\n' } });
+    expect(screen.getByRole('status')).toHaveTextContent('Kaydedilmemiş değişiklik var.');
+    fireEvent.click(save);
+
+    expect(await screen.findByText('Kaydedildi.')).toBeInTheDocument();
+    expect(field).toHaveValue('Read the DI chapter.');
+    expect(save).toBeDisabled();
+    expect(logs['2026-11-03']).toBe('Read the DI chapter.');
+    const put = fetchFn.mock.calls.find(([, init]) => init?.method === 'PUT');
+    expect(put?.[1]?.body).toBe(JSON.stringify({ text: 'Read the DI chapter.\n' }));
+  });
+
+  it('shows the field error and keeps the text', async () => {
+    installFakeGoalsApi();
+    renderAt('/calendar/2026-11-03');
+    const field = await screen.findByLabelText('Bu gün hakkında notların');
+    const tooLong = 'a'.repeat(10_001);
+
+    fireEvent.change(field, { target: { value: tooLong } });
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    expect(
+      await screen.findByText('Günlük en fazla 10.000 karakter olabilir.'),
+    ).toBeInTheDocument();
+    expect(field).toHaveAttribute('aria-invalid', 'true');
+    expect(field).toHaveValue(tooLong);
+    expect(screen.getByRole('status')).toHaveTextContent('Kaydedilmemiş değişiklik var.');
+  });
 });

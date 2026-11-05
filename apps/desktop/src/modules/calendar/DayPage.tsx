@@ -6,6 +6,7 @@ import type { DayDetail, DaySession } from '../../shared/api/types';
 import { formatDuration } from '../../shared/format/formatDuration';
 import buttons from '../../shared/ui/buttons.module.css';
 import calendar from './CalendarPage.module.css';
+import { DailyLog } from './DailyLog';
 import styles from './DayPage.module.css';
 import { isValidDate, monthOf, shiftDay } from './monthGrid';
 
@@ -128,6 +129,8 @@ function DayContent({ day }: { day: DayDetail }) {
           </ul>
         )}
       </section>
+
+      <DailyLog date={day.date} initialText={day.log} />
     </div>
   );
 }
