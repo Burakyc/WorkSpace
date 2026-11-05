@@ -6,13 +6,13 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 6.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Home page grid: one column under 900 px, multi-column on large screens.
-- [ ] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
-- [ ] Feed card reads `feed.json` (agent-written X summaries); validated against the rules of `schemas/feed.schema.json`; error card if missing or invalid.
-- [ ] Reminders card lists today's English (09:00) and tech (20:00) reminders.
-- [ ] Home renders from cached data first; nothing on it blocks on the network; one card's failure never hides another.
-- [ ] The app never writes `feed.json`.
-- [ ] `tech-stack.md` is updated.
+- [x] Home page grid: one column under 900 px, multi-column on large screens.
+- [x] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
+- [x] Feed card reads `feed.json` (agent-written X summaries); validated against the rules of `schemas/feed.schema.json`; error card if missing or invalid.
+- [x] Reminders card lists today's English (09:00) and tech (20:00) reminders.
+- [x] Home renders from cached data first; nothing on it blocks on the network; one card's failure never hides another.
+- [x] The app never writes `feed.json`.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -55,7 +55,7 @@ Run `npm run dev`. Have one active goal ("Learn ASP.NET Core") and one archived 
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M6 done with the expected results
-- [ ] `roadmap.md` phase 6.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M6 done with the expected results
+- [x] `roadmap.md` phase 6.1 ticked and set to `done`

@@ -479,4 +479,4 @@ Implement the spec in specs/2026-11-06-home-dashboard/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 6.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `FeedValidator` (rules of the new `schemas/feed.schema.json`, no package) and `FeedService` with `GET /api/home/feed` (`ok` / `missing` / `invalid`, 10 newest items, never writes the file); Ana Sayfa as a card grid with Bugün (today's pomodoros, active goals, goal select + "Başlat"), Hatırlatmalar (09:00 / 20:00 defaults) and Akış (summaries with "Aç", error cards); tech-stack and specs updated; phase 6.1 done.

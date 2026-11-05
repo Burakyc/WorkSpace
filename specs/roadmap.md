@@ -170,12 +170,12 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 6 — Home dashboard
 
-#### 6.1 Dashboard, reminders and feed — `todo`
-- [ ] Home page grid: one column under 900 px, multi-column on large screens.
-- [ ] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
-- [ ] Feed card reads `feed.json` (agent-written X summaries); validated; error card if missing or invalid.
-- [ ] Reminders card lists today's English and tech reminders (times from 7.2 settings, defaults until then).
-- [ ] Home renders from cached data first; nothing on it blocks on the network.
+#### 6.1 Dashboard, reminders and feed — `done`
+- [x] Home page grid: one column under 900 px, multi-column on large screens.
+- [x] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
+- [x] Feed card reads `feed.json` (agent-written X summaries); validated; error card if missing or invalid.
+- [x] Reminders card lists today's English and tech reminders (times from 7.2 settings, defaults until then).
+- [x] Home renders from cached data first; nothing on it blocks on the network.
 
 #### 6.2 YouTube RSS — `todo`
 - [ ] Settings: add/remove YouTube channels (channel ID or URL).
