@@ -9,14 +9,14 @@
 | Note editor | BlockNote 0.56.0 (`@blocknote/core`, `@blocknote/react`, `@blocknote/mantine` with `@mantine/core` / `@mantine/hooks` 9.7.4, `@blocknote/code-block` for syntax highlighting) |
 | Backend | ASP.NET Core Web API on **.NET 10 LTS**, controllers |
 | Storage | JSON files behind `IRepository<T>` |
-| Validation | JSON Schema files in `schemas/`, validated in the API with JsonSchema.Net |
+| Validation | JSON Schema files in `schemas/` (draft 2020-12, embedded in the API assembly), validated with JsonSchema.Net 9.6.0 |
 | External data | GitHub REST API (public, optional token), YouTube channel RSS |
 | Tests | xUnit v2 (VSTest) + `WebApplicationFactory` (backend), Vitest + React Testing Library (frontend) |
 | Packaging | electron-builder (per-user NSIS wizard, unsigned) with a self-contained, single-file API executable; `node_modules` is not packaged (electron-vite bundles the renderer) |
 | Package manager | npm workspaces |
 | Desktop build | electron-vite (main, preload and renderer); TypeScript 6.0 (typescript-eslint does not support 7.x yet) |
 | Node | 24, pinned in `.nvmrc` and `engines` |
-| Docker (optional) | API-only dev container: multi-stage `apps/api/Dockerfile` (`sdk:10.0` → `aspnet:10.0`, non-root, Production) and root `docker-compose.yml` (`127.0.0.1` port, token from `.env`, repo `data/` mounted). Never needed by the desktop app or `npm run check`. |
+| Docker (optional) | API-only dev container: multi-stage `apps/api/Dockerfile` (`sdk:10.0` → `aspnet:10.0`, non-root, Production), built with the repo root as context (it needs `schemas/`; the root `.dockerignore` lets in only the API and `schemas/`), and root `docker-compose.yml` (`127.0.0.1` port, token from `.env`, repo `data/` mounted). Never needed by the desktop app or `npm run check`. |
 
 UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 
@@ -118,7 +118,7 @@ data/
 │   ├── index.json          # folder/page tree (id, parentId, title, kind, order)
 │   └── pages/<id>.json     # BlockNote document for one page ({ schemaVersion, blocks })
 ├── content/
-│   ├── english/<topic-slug>.json
+│   ├── english/<topic-slug>.json   # { schemaVersion, type, topic, slug, level, tags, createdAt, updatedAt, items }
 │   ├── learning/<topic-slug>.json
 │   └── interview/<topic-slug>.json
 ├── cache/
@@ -183,9 +183,12 @@ All content modules use one envelope; `type` selects the schema for `items`:
 | `interview` | Interview | `schemas/interview.schema.json` | normalized `question` |
 | `link-analysis` | Post assistant (post-MVP) | `schemas/link-analysis.schema.json` | `url` |
 
-- **Validation:** the API validates the envelope and the `items` schema. Errors come back as a list of `{ path, line, message }` so the import validator can show missing fields line by line. Invalid content is never saved.
+- **Envelope:** `schemaVersion` (`1`), `type`, `topic` (1–120 characters, not only spaces), `level` (vocab `A1`–`C2`; lesson and interview `beginner` / `intermediate` / `advanced`), optional `tags` (at most 10, normalized like session tags), `items` (1–500). Items: vocab `term`, `meaning` (Turkish), `example`, `definition?` (English); lesson `title`, `summary`, `body`, `exercises?`; interview `question`, `answer`, `difficulty` (`easy` \| `medium` \| `hard`), `code?`, `tags?`. Each schema is the whole envelope with its item shape; every object has `additionalProperties: false` and every string a max length.
+- **Validation** (`ImportValidator`, steps stop at the first failure): empty text; over 2 MB (UTF-8); one surrounding Markdown code fence (```` ```json ```` … ```` ``` ````) is blanked out, keeping line numbers; parse (no comments, no trailing commas, no duplicate properties; root must be an object); the type's schema; then tag validity and a non-empty topic slug. Errors are `{ path, line, message }`: `path` is the JSON pointer of the value, `line` the 1-based line where it starts (`JsonLines` maps pointers to lines with `Utf8JsonReader.TokenStartIndex`), `message` Turkish. JsonSchema.Net's messages are replaced per keyword (`Eksik alan: meaning`, `Bilinmeyen alan: q`, `En fazla 100 karakter olabilir.`, `Şunlardan biri olmalı: …`, …), with limits read from the schema rule of the value's instance path; `properties`/`items` summaries are dropped. Errors are sorted by line. Invalid content is never saved.
 - **Rejecting executable content:** JSON only, max 2 MB, schemas use `additionalProperties: false`, strings have max lengths, and nothing is ever rendered as HTML.
-- **Merge:** the topic is found by slug of `topic`. New items are appended; items whose merge key already exists are skipped and reported ("12 added, 3 already existed"). User progress on existing items is never touched. New `tags` are unioned.
+- **Merge** (`ImportService`): the topic file is `content/<module folder>/<slug>.json` (`english`, `learning`, `interview`), shaped `{ schemaVersion, type, topic, slug, level, tags, createdAt, updatedAt, items: [{ id, addedAt, …imported fields }] }` and updated under one `JsonFileStore.UpdateAsync`. The slug (`ContentKey.Slug`): accents removed, `SearchText.Fold`, runs of anything but `a–z0–9` → `-`, at most 80 characters; a topic without letters or digits is an error. Merge keys (`ContentKey.Key`): trimmed, whitespace runs → one space, `SearchText.Fold`. New items are appended with a new `id` and `addedAt`; items whose key exists (also earlier in the same file) are skipped and reported. An existing topic keeps its name and `level` (the report says `levelKept`), tags are unioned (no cap), existing items and their progress fields are never touched, and nothing is written when nothing is new.
+- **Endpoints:** `POST /api/import/validate` and `POST /api/import` take `{ type, text }` (8 MB request limit). Validate answers `{ errors }`; import answers `{ errors, report }` with `report` `{ type, topic, slug, created, added, skipped, levelKept }` only when saved. Import problems are a normal `200` answer; an unknown `type` is a `400` validation problem.
+- **Renderer** (`modules/content/`): `ImportPanel` (paste box, file input for `.json` up to 2 MB, "Kontrol et" and "İçe aktar", errors as "Satır 14 · items[2].meaning: …", the saved summary) and `CopyPromptButton` (the template, bundled with Vite `?raw`, to `navigator.clipboard`). Until a module has its own page, `ContentEmptyPage` shows the empty state with both.
 - **New content type:** add a schema file, a `type` value, a merge key and a prompt template in `prompts/`. No other layer changes.
 - **Prompt library:** `prompts/<type>.md` holds the template with format instructions. "Copy prompt" in each module copies it to the clipboard.
 
