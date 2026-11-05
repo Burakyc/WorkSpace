@@ -28,5 +28,5 @@ public class OpenApiTests
     }
 
     private static WebApplicationFactory<Program> CreateFactory(string environment) =>
-        new WebApplicationFactory<Program>().WithWebHostBuilder(builder => builder.UseEnvironment(environment));
+        new ApiFactory().WithWebHostBuilder(builder => builder.UseEnvironment(environment));
 }
