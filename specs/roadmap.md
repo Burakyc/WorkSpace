@@ -108,11 +108,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 3 — Calendar and daily log
 
-#### 3.1 Month view — `todo`
-- [ ] Month calendar with the pomodoro count per day; today highlighted; previous/next month.
-- [ ] API: `GET /api/calendar?month=YYYY-MM` returns per-day counts from `sessions.json`.
-- [ ] Week starts on Monday; month and day names in Turkish.
-- [ ] Tests: per-day grouping across month and timezone boundaries.
+#### 3.1 Month view — `done`
+- [x] Month calendar with the pomodoro count per day; today highlighted; previous/next month.
+- [x] API: `GET /api/calendar?month=YYYY-MM` returns per-day counts from `sessions.json`.
+- [x] Week starts on Monday; month and day names in Turkish.
+- [x] Tests: per-day grouping across month and timezone boundaries.
 
 #### 3.2 Day detail and daily log — `todo`
 - [ ] Clicking a day opens its detail: sessions (time, goal, project, tags, note), goals worked on, notes created or edited that day.

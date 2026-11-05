@@ -344,3 +344,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-05-month-view/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-05 – Implement phase 3.1 month view
+**Phase:** 3.1 Month view
+**Prompt:**
+Implement the spec in specs/2026-11-05-month-view/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 3.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `CalendarGrid` and `CalendarService` (completed sessions per local day, time zone from the page) with `GET /api/calendar`; `monthGrid.ts`, `getCalendar` and the Takvim month page with counts, shading, today and month navigation; quick-click fix; tech-stack and specs updated; phase 3.1 done.

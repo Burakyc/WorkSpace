@@ -23,6 +23,10 @@ The Takvim page shows a month as a Monday-first grid with the number of complete
 | Day cell | **Number + shading**: the count, with an accent background in four steps (1, 2–3, 4–5, 6+). Days without pomodoros show only the day number. |
 | Days of other months | **Muted, with their counts**. The API therefore returns every day of the visible grid (Monday before the 1st to the Sunday after the last day), not only the month. |
 | Day of a session | The local date of its `startedAt` in the given time zone. |
+| Registration | `CalendarService` is registered in `Program.cs` like `SettingsService` (no `CalendarModule.cs`): it has no file of its own and reuses the sessions repository. |
+| Test fake | The calendar route lives in the shared fake API (`fakeGoalsApi.ts`, options `calendar` and `failCalendar`); counts are 25 minutes each. |
+| Month buttons | "Önceki ay"/"Sonraki ay" step from the latest state, so two quick clicks move two months (found in M4; fixed in a separate `fix(calendar)` commit). |
+| Loaded counts | Counts are kept by date across months (a date has the same count in every grid that shows it), so moving between months never shows wrong numbers while loading; a small "Yükleniyor…" shows until the month's request answers. |
 
 ## User stories
 

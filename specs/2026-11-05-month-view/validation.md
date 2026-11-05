@@ -6,11 +6,11 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 3.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Month calendar with the completed pomodoro count per day (number + shading); today highlighted; previous/next month and "Bugün".
-- [ ] API: `GET /api/calendar?month=YYYY-MM&timeZone=…` returns per-day counts from `sessions.json` for the visible grid, grouped by local day.
-- [ ] Week starts on Monday; month and day names in Turkish; days of other months muted with their counts.
-- [ ] Tests: per-day grouping across month and time-zone boundaries, plus the tests below.
-- [ ] `tech-stack.md` is updated.
+- [x] Month calendar with the completed pomodoro count per day (number + shading); today highlighted; previous/next month and "Bugün".
+- [x] API: `GET /api/calendar?month=YYYY-MM&timeZone=…` returns per-day counts from `sessions.json` for the visible grid, grouped by local day.
+- [x] Week starts on Monday; month and day names in Turkish; days of other months muted with their counts.
+- [x] Tests: per-day grouping across month and time-zone boundaries, plus the tests below.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -55,7 +55,7 @@ Run `npm run dev` with a goal. To get sessions on other days, add them to `sessi
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M5 done with the expected results
-- [ ] `roadmap.md` phase 3.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M5 done with the expected results
+- [x] `roadmap.md` phase 3.1 ticked and set to `done`
