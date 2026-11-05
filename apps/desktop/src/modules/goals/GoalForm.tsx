@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { ApiError } from '../../shared/api/client';
 import type { Goal, GoalInput } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
-import styles from './GoalForm.module.css';
+import styles from '../../shared/ui/form.module.css';
 
 interface GoalFormProps {
   /** The goal to edit; a new goal when absent. */

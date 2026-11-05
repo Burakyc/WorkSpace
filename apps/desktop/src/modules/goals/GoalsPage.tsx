@@ -1,7 +1,7 @@
 import { Target } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { getApiClient } from '../../shared/api/getApiClient';
-import type { Goal, GoalInput, GoalProgress } from '../../shared/api/types';
+import type { Goal, GoalInput, GoalProgress, Project } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import { GoalCard } from './GoalCard';
@@ -15,6 +15,7 @@ export function GoalsPage() {
   // All goals, archived included (active first, newest first); the toggle only filters what is shown.
   const [goals, setGoals] = useState<Goal[] | null>(null);
   const [progress, setProgress] = useState<GoalProgress[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [showArchived, setShowArchived] = useState(false);
   const [editing, setEditing] = useState<Editing>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -26,11 +27,14 @@ export function GoalsPage() {
   useEffect(() => {
     let active = true;
     getApiClient()
-      .then((client) => Promise.all([client.listGoals(true), client.getGoalProgress()]))
-      .then(([all, allProgress]) => {
+      .then((client) =>
+        Promise.all([client.listGoals(true), client.getGoalProgress(), client.listProjects(true)]),
+      )
+      .then(([all, allProgress, allProjects]) => {
         if (!active) return;
         setGoals(all);
         setProgress(allProgress);
+        setProjects(allProjects);
         setError(null);
       })
       .catch(() => {
@@ -144,7 +148,10 @@ export function GoalsPage() {
                 key={goal.id}
                 goal={goal}
                 progress={progress.find((p) => p.goalId === goal.id)}
+                projects={projects.filter((p) => p.goalId === goal.id)}
+                showArchived={showArchived}
                 busy={busyId === goal.id}
+                onProjectsChanged={reload}
                 onEdit={() => setEditing(goal.id)}
                 onArchive={() => void setArchived(goal, true)}
                 onRestore={() => void setArchived(goal, false)}

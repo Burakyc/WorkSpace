@@ -23,7 +23,7 @@ const newer = goal({ id: 'b', title: 'English every day', createdAt: '2026-11-02
 
 async function cardTitles() {
   const cards = await screen.findAllByRole('article');
-  return cards.map((card) => within(card).getByRole('heading').textContent);
+  return cards.map((card) => within(card).getByRole('heading', { level: 2 }).textContent);
 }
 
 describe('GoalsPage list', () => {

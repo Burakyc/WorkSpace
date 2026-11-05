@@ -1,18 +1,33 @@
-import type { Goal, GoalProgress } from '../../shared/api/types';
+import type { Goal, GoalProgress, Project } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
+import { ProjectList } from '../projects/ProjectList';
 import styles from './GoalCard.module.css';
 import { GoalProgressView } from './GoalProgressView';
 
 interface GoalCardProps {
   goal: Goal;
   progress: GoalProgress | undefined;
+  /** This goal's projects, archived included. */
+  projects: Project[];
+  showArchived: boolean;
   busy: boolean;
+  onProjectsChanged(): void;
   onEdit(): void;
   onArchive(): void;
   onRestore(): void;
 }
 
-export function GoalCard({ goal, progress, busy, onEdit, onArchive, onRestore }: GoalCardProps) {
+export function GoalCard({
+  goal,
+  progress,
+  projects,
+  showArchived,
+  busy,
+  onProjectsChanged,
+  onEdit,
+  onArchive,
+  onRestore,
+}: GoalCardProps) {
   return (
     <article className={styles.card} aria-label={goal.title}>
       <div className={styles.titleRow}>
@@ -40,6 +55,12 @@ export function GoalCard({ goal, progress, busy, onEdit, onArchive, onRestore }:
           </>
         )}
       </div>
+      <ProjectList
+        goal={goal}
+        projects={projects}
+        showArchived={showArchived}
+        onChanged={onProjectsChanged}
+      />
     </article>
   );
 }
