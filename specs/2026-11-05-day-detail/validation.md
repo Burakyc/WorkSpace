@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 3.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Clicking a day opens its page: sessions (time, goal, project, tags, note) and the goals worked on. (Notes of the day: phase 4.1.)
-- [ ] Free-text daily log for the day saved to `daily/YYYY-MM-DD.json` with "Kaydet".
-- [ ] The "Looking back" scenario works: click last Tuesday → see the count and the goals.
-- [ ] Previous/next day and "Takvime dön" (same month) work.
-- [ ] Tests: day detail service; open-a-day flow (RTL).
-- [ ] `tech-stack.md` is updated.
+- [x] Clicking a day opens its page: sessions (time, goal, project, tags, note) and the goals worked on. (Notes of the day: phase 4.1.)
+- [x] Free-text daily log for the day saved to `daily/YYYY-MM-DD.json` with "Kaydet".
+- [x] The "Looking back" scenario works: click last Tuesday → see the count and the goals.
+- [x] Previous/next day and "Takvime dön" (same month) work.
+- [x] Tests: day detail service; open-a-day flow (RTL).
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -57,7 +57,7 @@ Run `npm run dev` with a goal and a project. Put sessions in `sessions.json` by 
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M5 done with the expected results
-- [ ] `roadmap.md` phase 3.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M5 done with the expected results
+- [x] `roadmap.md` phase 3.2 ticked and set to `done`

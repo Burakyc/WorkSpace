@@ -24,6 +24,11 @@ Clicking a day in the month view opens that day's page: the sessions of the day 
 | Day of a session | Same as 3.1: the local date of `startedAt` in the time zone the page sends. |
 | Sessions listed | **All** sessions of the day, oldest first, stopped-early ones marked "Erken durduruldu". The day summary and the goal list count **completed** sessions and their minutes, like the calendar and goal progress. |
 | Empty log | Saving an empty (or whitespace-only) text stores `""`; the file is kept. Reading a day without a file gives `""`. |
+| Previous/next day | Links styled as icon buttons (not buttons): they navigate, so they get real URLs and the back button works. |
+| Registration | `DayService` is registered in `Program.cs` next to `CalendarService`; `DaysController` lives in `Modules/Calendar/`. |
+| Month in the URL | The month stays in component state (quick clicks step from the latest month, see 3.1) and is mirrored to `?month=` with `replace`, so "Takvime dön" and the back button land on the same month. |
+| Day cells | The 3.1 accessible label moved from the table cell to the day link; `aria-current="date"` stays on the cell. |
+| Links that look like buttons | `buttons.module.css` drops the underline, so "Takvime dön" looks like the other buttons (found in M3; separate `fix(calendar)` commit). |
 
 ## User stories
 

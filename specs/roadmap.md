@@ -114,11 +114,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Week starts on Monday; month and day names in Turkish.
 - [x] Tests: per-day grouping across month and timezone boundaries.
 
-#### 3.2 Day detail and daily log — `todo`
-- [ ] Clicking a day opens its detail: sessions (time, goal, project, tags, note), goals worked on. (Notes of the day moved to 4.1.)
-- [ ] Free-text daily log for the day saved to `daily/YYYY-MM-DD.json`.
-- [ ] The "Looking back" scenario works: click last Tuesday → see count, goals and notes.
-- [ ] Tests: day detail service; open-a-day flow (RTL).
+#### 3.2 Day detail and daily log — `done`
+- [x] Clicking a day opens its detail: sessions (time, goal, project, tags, note), goals worked on. (Notes of the day moved to 4.1.)
+- [x] Free-text daily log for the day saved to `daily/YYYY-MM-DD.json`.
+- [x] The "Looking back" scenario works: click last Tuesday → see count, goals and notes.
+- [x] Tests: day detail service; open-a-day flow (RTL).
 
 ### Milestone 4 — Notes
 

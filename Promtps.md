@@ -369,3 +369,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-05-day-detail/` (`requirements.md`, `plan.md`, `validation.md`); notes of the day moved to 4.1 in `roadmap.md`.
+
+## 2026-11-05 – Implement phase 3.2 day detail and daily log
+**Phase:** 3.2 Day detail and daily log
+**Prompt:**
+Implement the spec in specs/2026-11-05-day-detail/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 3.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `DayService` (sessions, goals worked on, daily log in `daily/YYYY-MM-DD.json`) with `GET /api/days/{date}` and `PUT /api/days/{date}/log`; day links in the month grid, month in `?month=`, the day page `/calendar/:date` with previous/next day and the "Günlük" form; link style fix; tech-stack and specs updated; phase 3.2 done.
