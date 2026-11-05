@@ -11,6 +11,7 @@ import {
   type IpcMainInvokeEvent,
 } from 'electron';
 import type { ApiConfig, ChangeDataDirResult } from '../src/shared/api/types';
+import { createCloseGuard } from './closeGuard';
 import { resolveApiExePath, startApi, type ApiHandle } from './apiProcess';
 import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
@@ -231,6 +232,13 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     mainWindow = createWindow();
+    const window = mainWindow;
+    const closeGuard = createCloseGuard({
+      requestFlush: () => window.webContents.send('devpath:before-close'),
+      close: () => window.close(),
+    });
+    window.on('close', (event) => closeGuard.onClose(event));
+    handle('devpath:close-ready', () => closeGuard.ready());
   });
 }
 

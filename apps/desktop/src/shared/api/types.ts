@@ -181,6 +181,8 @@ export interface DevPathBridge {
   openExternal(url: string): Promise<void>;
   /** Main asks the page to open a route (e.g. after a notification click). Returns an unsubscribe function. */
   onOpenPage(callback: (path: string) => void): () => void;
+  /** Runs `callback` (and waits for it, at most 3 s) before the window closes. Returns an unsubscribe function. */
+  onBeforeClose(callback: () => Promise<void>): () => void;
   pomodoro: {
     /** Schedules the end-of-timer notification; replaces any earlier one. */
     scheduleEnd(endsAt: number, title: string, body: string): Promise<void>;

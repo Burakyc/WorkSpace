@@ -1,6 +1,14 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import type { ApiConfig, ChangeDataDirResult, DevPathBridge } from '../src/shared/api/types';
 
+// Work the page must finish before the window closes (e.g. a pending note save).
+const beforeClose = new Set<() => Promise<void>>();
+ipcRenderer.on('devpath:before-close', () => {
+  void Promise.allSettled([...beforeClose].map((callback) => callback())).then(() =>
+    ipcRenderer.invoke('devpath:close-ready'),
+  );
+});
+
 const bridge: DevPathBridge = {
   getApiConfig: () => ipcRenderer.invoke('devpath:get-api-config') as Promise<ApiConfig>,
   openExternal: async (url) => {
@@ -13,6 +21,12 @@ const bridge: DevPathBridge = {
     ipcRenderer.on('devpath:open-page', listener);
     return () => {
       ipcRenderer.removeListener('devpath:open-page', listener);
+    };
+  },
+  onBeforeClose: (callback) => {
+    beforeClose.add(callback);
+    return () => {
+      beforeClose.delete(callback);
     };
   },
   pomodoro: {

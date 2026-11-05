@@ -361,10 +361,17 @@ export function installFakeGoalsApi(
   });
 
   const openExternal = vi.fn<(url: string) => Promise<void>>(() => Promise.resolve());
+  const beforeClose = new Set<() => Promise<void>>();
   vi.stubGlobal('devpath', {
     getApiConfig: () => Promise.resolve({ baseUrl: 'http://api.test', token: 't' }),
     openExternal,
+    onBeforeClose: (callback: () => Promise<void>) => {
+      beforeClose.add(callback);
+      return () => beforeClose.delete(callback);
+    },
   });
+  /** What main's close handshake does: run every registered callback. */
+  const closeApp = () => Promise.all([...beforeClose].map((callback) => callback()));
   vi.stubGlobal('fetch', fetchFn);
   return {
     goals,
@@ -373,6 +380,7 @@ export function installFakeGoalsApi(
     logs,
     notes,
     contents,
+    closeApp,
     fetchFn,
     openExternal,
     settings: () => settings,

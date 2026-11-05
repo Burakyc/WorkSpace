@@ -43,8 +43,14 @@ export function NotePage({ node, rename }: { node: NoteNode; rename: Rename }) {
     };
   }, [node.id]);
 
-  // Leaving the page (another page, another module) saves what is still waiting.
-  useEffect(() => () => void autosave.flush(), [autosave]);
+  // Leaving the page (another page, another module) or closing the app saves what is still waiting.
+  useEffect(() => {
+    const unsubscribe = window.devpath.onBeforeClose(() => autosave.flush());
+    return () => {
+      unsubscribe();
+      void autosave.flush();
+    };
+  }, [autosave]);
 
   return (
     <div className={styles.page}>

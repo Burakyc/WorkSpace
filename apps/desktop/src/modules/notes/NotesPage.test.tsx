@@ -295,4 +295,15 @@ describe('page editor', () => {
     ).toBeInTheDocument();
     expect(api.notes.find((n) => n.id === 'a')?.title).toBe('Dependency injection');
   });
+
+  it('saves a pending change when the app closes', async () => {
+    const api = renderAt('/notes/a', pages);
+
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Editör' }), {
+      target: { value: 'last words' },
+    });
+    await api.closeApp();
+
+    expect(api.contents.a).toEqual([{ type: 'paragraph', text: 'last words' }]);
+  });
 });
