@@ -5,6 +5,7 @@ backups/
 # Secrets
 .env
 .env.*
+!.env.example
 secrets.bin
 
 # .NET

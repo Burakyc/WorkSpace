@@ -1,0 +1,14 @@
+# Optional development container for the API only. Start with `npm run docker:api`.
+# The desktop app and `npm run check` never need Docker.
+services:
+  api:
+    build:
+      context: apps/api
+    environment:
+      DEVPATH_TOKEN: ${DEVPATH_TOKEN:?Set DEVPATH_TOKEN in .env (copy .env.example to .env)}
+      DEVPATH_PORT: ${DEVPATH_PORT:-5180}
+    ports:
+      # Same port inside and out, so the Host header 127.0.0.1:<port> passes the API's host check.
+      - '127.0.0.1:${DEVPATH_PORT:-5180}:${DEVPATH_PORT:-5180}'
+    volumes:
+      - ./data:/data

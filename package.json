@@ -13,6 +13,7 @@
     "check:api": "dotnet build apps/api/DevPath.slnx && dotnet test apps/api/DevPath.slnx",
     "check:desktop": "npm run typecheck -w apps/desktop && npm run lint -w apps/desktop && npm run test -w apps/desktop && npm run build -w apps/desktop",
     "publish:api": "dotnet publish apps/api/DevPath.Api -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:DebugType=None -o apps/api/publish",
-    "package": "npm run publish:api && npm run package -w apps/desktop"
+    "package": "npm run publish:api && npm run package -w apps/desktop",
+    "docker:api": "docker compose up --build"
   }
 }
