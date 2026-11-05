@@ -142,8 +142,10 @@ describe('PomodoroPage controls', () => {
     await startSession();
     act(() => vi.advanceTimersByTime(3 * MIN));
 
+    vi.useRealTimers();
     fireEvent.click(screen.getByRole('button', { name: 'Durdur' }));
 
+    expect(await screen.findByRole('button', { name: 'Başlat' })).toBeInTheDocument();
     expect(clock()).toHaveTextContent('25:00');
     expect(goalSelect()).toBeEnabled();
     expect(goalSelect()).toHaveValue('a');
@@ -223,5 +225,59 @@ describe('PomodoroPage saving', () => {
     );
     expect(screen.getByText('Süre doldu.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Kaydet' })).toBeEnabled();
+  });
+});
+
+describe('PomodoroPage stopping early', () => {
+  const aspnet20 = goal({ id: 'a', title: 'Learn ASP.NET Core', targetPomodoros: 20 });
+
+  async function runFor(ms: number, options: { failSessions?: boolean } = {}) {
+    const api = installFakeGoalsApi([aspnet20], options);
+    renderPage();
+    await screen.findByRole('button', { name: 'Başlat' });
+    // The fake clock keeps moving with real time, so the jump below stays in effect while the save is awaited.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    fireEvent.change(goalSelect(), { target: { value: 'a' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+    act(() => vi.advanceTimersByTime(ms));
+    return api;
+  }
+
+  const sessionRequests = (api: ReturnType<typeof installFakeGoalsApi>) =>
+    api.fetchFn.mock.calls.filter(([url]) => String(url).endsWith('/api/sessions'));
+
+  it('saves the focused minutes as not completed', async () => {
+    const api = await runFor(10 * MIN + 30_000);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Durdur' }));
+
+    expect(
+      await screen.findByText('Kaydedildi · Learn ASP.NET Core: 0 / 20 pomodoro · %0'),
+    ).toBeInTheDocument();
+    expect(api.sessions).toEqual([
+      expect.objectContaining({ goalId: 'a', durationMinutes: 10, completed: false, note: null }),
+    ]);
+    expect(clock()).toHaveTextContent('25:00');
+  });
+
+  it('does not save a session under one minute', async () => {
+    const api = await runFor(40_000);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Durdur' }));
+
+    expect(await screen.findByRole('button', { name: 'Başlat' })).toBeInTheDocument();
+    expect(sessionRequests(api)).toHaveLength(0);
+    expect(screen.queryByText(/^Kaydedildi/)).not.toBeInTheDocument();
+  });
+
+  it('keeps the timer running when saving fails', async () => {
+    await runFor(5 * MIN, { failSessions: true });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Durdur' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Oturum kaydedilemedi. Tekrar dene.',
+    );
+    expect(screen.getByRole('button', { name: 'Duraklat' })).toBeInTheDocument();
   });
 });

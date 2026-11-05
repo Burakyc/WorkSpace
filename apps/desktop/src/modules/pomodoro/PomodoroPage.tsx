@@ -10,7 +10,7 @@ import form from '../../shared/ui/form.module.css';
 import { progressText } from '../goals/progressText';
 import { usePomodoro } from './PomodoroContext';
 import styles from './PomodoroPage.module.css';
-import { FOCUS_MINUTES, formatClock, remainingMs } from './timer';
+import { FOCUS_MINUTES, focusedMs, formatClock, remainingMs } from './timer';
 
 export function PomodoroPage() {
   const id = useId();
@@ -62,7 +62,28 @@ export function PomodoroPage() {
     setProjectId(state.projectId ?? '');
   }
 
-  function stop() {
+  /** Saves the focused minutes as a stopped session (not under 1 minute), then stops; a failed save keeps the timer. */
+  async function stop() {
+    if (state.status !== 'running' && state.status !== 'paused') return;
+    const t = Date.now();
+    const focused = focusedMs(state, t);
+    if (focused >= 60_000) {
+      const saved = await saveSession(
+        {
+          goalId: state.goalId,
+          projectId: state.projectId,
+          startedAt: new Date(state.startedAt).toISOString(),
+          endedAt: new Date(t).toISOString(),
+          durationMinutes: Math.floor(focused / 60_000),
+          completed: false,
+          note: null,
+        },
+        state.goalTitle,
+      );
+      if (!saved) return;
+    } else {
+      setFeedback(null);
+    }
     keepSessionSelection();
     pomodoro.stop();
   }
@@ -231,7 +252,12 @@ export function PomodoroPage() {
             </button>
           )}
           {(state.status === 'running' || state.status === 'paused') && (
-            <button type="button" className={buttons.secondary} onClick={stop}>
+            <button
+              type="button"
+              className={buttons.secondary}
+              onClick={() => void stop()}
+              disabled={saving}
+            >
               Durdur
             </button>
           )}
