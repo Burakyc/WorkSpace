@@ -136,4 +136,25 @@ describe('createApiClient', () => {
       headers: { [TOKEN_HEADER]: 'secret' },
     });
   });
+
+  it('logs a session', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(json({ id: 's' }, 201));
+    const input = {
+      goalId: 'g',
+      projectId: null,
+      startedAt: '2026-11-05T09:00:00.000Z',
+      endedAt: '2026-11-05T09:25:00.000Z',
+      durationMinutes: 25,
+      completed: true,
+      note: null,
+    };
+
+    await createApiClient(config, fetchFn).createSession(input);
+
+    expect(fetchFn).toHaveBeenCalledWith('http://127.0.0.1:4321/api/sessions', {
+      method: 'POST',
+      headers: { [TOKEN_HEADER]: 'secret', 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+  });
 });

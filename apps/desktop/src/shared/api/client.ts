@@ -7,6 +7,8 @@ import type {
   Project,
   ProjectCreateInput,
   ProjectUpdateInput,
+  Session,
+  SessionInput,
 } from './types';
 
 export const TOKEN_HEADER = 'X-DevPath-Token';
@@ -36,6 +38,7 @@ export interface ApiClient {
   updateProject(id: string, input: ProjectUpdateInput): Promise<Project>;
   archiveProject(id: string): Promise<Project>;
   restoreProject(id: string): Promise<Project>;
+  createSession(input: SessionInput): Promise<Session>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT';
@@ -78,6 +81,7 @@ export function createApiClient(
     updateProject: (id, input) => request<Project>('PUT', project(id), input),
     archiveProject: (id) => request<Project>('POST', `${project(id)}/archive`),
     restoreProject: (id) => request<Project>('POST', `${project(id)}/restore`),
+    createSession: (input) => request<Session>('POST', '/api/sessions', input),
   };
 }
 

@@ -48,6 +48,30 @@ export interface ProjectUpdateInput {
   url: string | null;
 }
 
+/** A logged focus session (mirrors Session in DevPath.Api). Times are ISO 8601 UTC. */
+export interface Session {
+  id: string;
+  goalId: string;
+  projectId: string | null;
+  tags: string[];
+  startedAt: string;
+  endedAt: string;
+  durationMinutes: number;
+  completed: boolean;
+  note: string | null;
+}
+
+/** POST /api/sessions. */
+export interface SessionInput {
+  goalId: string;
+  projectId: string | null;
+  startedAt: string;
+  endedAt: string;
+  durationMinutes: number;
+  completed: boolean;
+  note: string | null;
+}
+
 /** GET /api/goals/progress. `percent` is null when the goal has no target. */
 export interface GoalProgress {
   goalId: string;
