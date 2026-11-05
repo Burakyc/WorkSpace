@@ -11,7 +11,7 @@
 | Storage | JSON files behind `IRepository<T>` |
 | Validation | JSON Schema files in `schemas/`, validated in the API with JsonSchema.Net |
 | External data | GitHub REST API (public, optional token), YouTube channel RSS |
-| Tests | xUnit + `WebApplicationFactory` (backend), Vitest + React Testing Library (frontend) |
+| Tests | xUnit v2 (VSTest) + `WebApplicationFactory` (backend), Vitest + React Testing Library (frontend) |
 | Packaging | electron-builder (NSIS installer) with a self-contained, single-file API executable |
 | Package manager | npm workspaces |
 
@@ -57,6 +57,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 - The `Host` header must be `127.0.0.1:<port>` (blocks DNS rebinding).
 - CORS allows only the Vite dev server origin in development and the packaged app origin in production.
 - Errors are returned as RFC 7807 `ProblemDetails`.
+- The built-in OpenAPI document (`/openapi/v1.json`) is served in Development only.
+- Without `DEVPATH_PORT` (running the API on its own), the API falls back to port `5180`.
 - Controllers are thin: parse input, call one service method, map the result. Business logic lives in services.
 - Everything is `async` and takes a `CancellationToken`.
 - External calls (GitHub, YouTube) go through `HttpClient` from `IHttpClientFactory`, with a timeout. Results are cached in JSON; on failure the last cache is served with an `error` field so the UI can show an error card.
@@ -268,7 +270,7 @@ devpath-workspace/
 │       │       ├── Validation/    # schema loading and validation
 │       │       └── Security/      # token + host header middleware
 │       ├── DevPath.Api.Tests/
-│       └── DevPath.sln
+│       └── DevPath.slnx
 ├── schemas/                       # *.schema.json
 ├── prompts/                       # prompt templates per content type
 ├── specs/                         # mission, tech stack, roadmap, feature specs

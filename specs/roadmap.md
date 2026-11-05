@@ -14,7 +14,7 @@
 
 #### 0.1 API skeleton — `todo`
 ASP.NET Core Web API on .NET 10 that answers a health check.
-- [ ] `apps/api/DevPath.sln` with `DevPath.Api` and `DevPath.Api.Tests`; nullable enabled, warnings as errors.
+- [ ] `apps/api/DevPath.slnx` with `DevPath.Api` and `DevPath.Api.Tests`; nullable enabled, warnings as errors.
 - [ ] `GET /api/health` returns `{ status: "ok", version }`.
 - [ ] Kestrel binds to `127.0.0.1:<DEVPATH_PORT>` only.
 - [ ] An xUnit test with `WebApplicationFactory` covers the health endpoint.

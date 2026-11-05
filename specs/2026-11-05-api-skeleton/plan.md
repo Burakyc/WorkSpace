@@ -42,7 +42,7 @@ Every task ends with `dotnet build apps/api/DevPath.slnx` (zero warnings) and `d
 
 **Commit:** `test(api): add xunit test project`
 
-- `apps/api/DevPath.Api.Tests/DevPath.Api.Tests.csproj` with `xunit.v3`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk` and `Microsoft.AspNetCore.Mvc.Testing`; a project reference to `DevPath.Api`; add it to the solution.
+- `apps/api/DevPath.Api.Tests/DevPath.Api.Tests.csproj` with `xunit` 2.9.3, `xunit.runner.visualstudio` 3.1.5, `Microsoft.NET.Test.Sdk` and `Microsoft.AspNetCore.Mvc.Testing` (xUnit v2 + VSTest; changed from xunit.v3 during implementation, which needs the Microsoft Testing Platform opt-in on the .NET 10 SDK); a project reference to `DevPath.Api`; add it to the solution.
 - If `WebApplicationFactory<Program>` cannot see `Program`, add `public partial class Program;` at the end of `Program.cs`.
 - Check: `dotnet test apps/api/DevPath.slnx` runs and exits with code 0.
 

@@ -14,7 +14,7 @@ An ASP.NET Core Web API on .NET 10 that starts on `127.0.0.1`, answers a health 
 - `global.json` pinning the .NET 10 SDK.
 - `apps/api/DevPath.slnx` with two projects:
   - `DevPath.Api` — ASP.NET Core Web API with controllers.
-  - `DevPath.Api.Tests` — xUnit v3 tests with `WebApplicationFactory`.
+  - `DevPath.Api.Tests` — xUnit v2 tests (VSTest runner) with `WebApplicationFactory`.
 - Shared build settings in `apps/api/Directory.Build.props`: `net10.0`, nullable enabled, implicit usings, warnings as errors, version `0.0.1`.
 - Kestrel listens on `127.0.0.1:<port>` only. The port comes from `DEVPATH_PORT`, with a fallback to `5180`.
 - `GET /api/health` returns `{ "status": "ok", "version": "<app version>" }`.
@@ -31,6 +31,7 @@ An ASP.NET Core Web API on .NET 10 that starts on `127.0.0.1`, answers a health 
 | Solution format | `.slnx` (.NET 10 default) |
 | OpenAPI | Built-in `Microsoft.AspNetCore.OpenApi`, Development only |
 | `Promtps.md` | Keep the current name |
+| Test framework | xUnit v2 + VSTest (decided during task 3: xunit.v3 4.x needs the Microsoft Testing Platform opt-in on the .NET 10 SDK) |
 
 ## User stories
 
