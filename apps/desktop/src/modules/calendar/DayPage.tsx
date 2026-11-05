@@ -130,6 +130,26 @@ function DayContent({ day }: { day: DayDetail }) {
         )}
       </section>
 
+      <section aria-labelledby="day-notes">
+        <h2 id="day-notes" className={styles.heading}>
+          Notlar
+        </h2>
+        {day.notes.length === 0 ? (
+          <p className={calendar.muted}>Bu gün not yok.</p>
+        ) : (
+          <ul className={styles.list}>
+            {day.notes.map((note) => (
+              <li key={note.id} className={styles.row}>
+                <Link to={`/notes/${note.id}`}>{note.title}</Link>
+                <span className={calendar.muted}>
+                  {note.created ? 'Oluşturuldu' : 'Düzenlendi'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <DailyLog date={day.date} initialText={day.log} />
     </div>
   );

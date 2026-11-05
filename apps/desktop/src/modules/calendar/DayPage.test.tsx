@@ -145,6 +145,34 @@ describe('DayPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Gün yüklenemedi.');
   });
 
+  it('lists the notes of the day', async () => {
+    installFakeGoalsApi([], {
+      days: {
+        '2026-11-03': {
+          ...tuesday,
+          notes: [
+            { id: 'n1', title: 'DI', created: true },
+            { id: 'n2', title: 'Middleware', created: false },
+          ],
+        },
+      },
+    });
+    renderAt('/calendar/2026-11-03');
+
+    const notes = within(await screen.findByRole('region', { name: 'Notlar' }));
+    expect(notes.getByRole('link', { name: 'DI' })).toHaveAttribute('href', '/notes/n1');
+    expect(notes.getByRole('link', { name: 'Middleware' }).parentElement).toHaveTextContent(
+      'Düzenlendi',
+    );
+    expect(notes.getByRole('link', { name: 'DI' }).parentElement).toHaveTextContent('Oluşturuldu');
+  });
+
+  it('says when a day has no notes', async () => {
+    installFakeGoalsApi([]);
+    renderAt('/calendar/2026-11-03');
+    expect(await screen.findByText('Bu gün not yok.')).toBeInTheDocument();
+  });
+
   it('saves the daily log', async () => {
     const { fetchFn, logs } = installFakeGoalsApi([], { logs: { '2026-11-03': 'Old text' } });
     renderAt('/calendar/2026-11-03');
