@@ -52,7 +52,7 @@ Run `npm run dev`.
 | M2 | Paste a valid vocab JSON (3 items, in a ```` ```json ```` fence) and click "Kontrol et", then "İçe aktar" | "Sorun yok, içe aktarılabilir."; then "<topic>: 3 öğe eklendi, 0 öğe zaten vardı."; `content/english/<slug>.json` exists in the data folder |
 | M3 | Paste the same topic with 1 new and 2 existing terms (one in capitals) and level `C1` | "1 öğe eklendi, 2 öğe zaten vardı." and "seviyesi değiştirilmedi"; the file has 4 items and the old level |
 | M4 | Paste JSON with a missing `meaning`, an extra property and a broken comma on separate lines | Every problem listed with its line; "İçe aktar" saves nothing |
-| M5 | Pick a `.json` file with "Dosya seç"; pick a file over 2 MB | Its text appears in the box; the large file shows "Dosya 2 MB'tan büyük olamaz." |
+| M5 | Pick a `.json` file with "Ya da bir JSON dosyası seç"; pick a file over 2 MB | Its text appears in the box; the large file shows "Dosya 2 MB'tan büyük olamaz." |
 | M6 | Öğrenme and Mülakat: paste a vocab JSON | "type" error; their own templates import into `content/learning/` and `content/interview/` |
 | M7 | Tab through the page | Copy button, box, file input and buttons are reachable with a visible focus ring |
 

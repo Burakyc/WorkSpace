@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { CalendarPage } from '../modules/calendar/CalendarPage';
+import { ContentEmptyPage } from '../modules/content/ContentEmptyPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
 import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
@@ -50,28 +51,40 @@ export const navigation: readonly NavEntry[] = [
     path: '/english',
     label: 'İngilizce',
     icon: Languages,
-    emptyState: {
-      description: 'Kendi eklediğin kelime ve ifade kartları burada olacak.',
-      next: "İçerik, prompt kopyalayıp yapay zekâdan aldığın JSON'u yapıştırarak eklenecek.",
-    },
+    element: (
+      <ContentEmptyPage
+        type="vocab"
+        icon={Languages}
+        title="İngilizce"
+        description="Kendi eklediğin kelime ve ifade kartları burada olacak."
+      />
+    ),
   },
   {
     path: '/learning',
     label: 'Öğrenme',
     icon: GraduationCap,
-    emptyState: {
-      description: 'Konulara ve parçalara bölünmüş derslerin burada olacak.',
-      next: 'Dersler JSON içe aktarma ile eklenecek.',
-    },
+    element: (
+      <ContentEmptyPage
+        type="lesson"
+        icon={GraduationCap}
+        title="Öğrenme"
+        description="Konulara ve parçalara bölünmüş derslerin burada olacak."
+      />
+    ),
   },
   {
     path: '/interview',
     label: 'Mülakat',
     icon: MessagesSquare,
-    emptyState: {
-      description: 'Mülakat soruların ve cevapların kart olarak burada olacak.',
-      next: 'Sorular JSON içe aktarma ile eklenecek.',
-    },
+    element: (
+      <ContentEmptyPage
+        type="interview"
+        icon={MessagesSquare}
+        title="Mülakat"
+        description="Mülakat soruların ve cevapların kart olarak burada olacak."
+      />
+    ),
   },
   { path: '/settings', label: 'Ayarlar', icon: Settings, element: <SettingsPage /> },
 ];

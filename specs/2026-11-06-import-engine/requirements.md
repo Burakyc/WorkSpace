@@ -99,9 +99,9 @@ Errors are sorted by line, then path. A file with errors is never saved.
 
 ### Renderer
 
-- `ImportPanel` (props: `type`, `onImported?`): a labelled textarea "İçe aktarılacak JSON", a file input "Dosya seç" (`.json`, its text replaces the box; over 2 MB → "Dosya 2 MB'tan büyük olamaz." without a request), "Kontrol et" (validate) and "İçe aktar" (import). Both are disabled while the box is empty or a request runs.
+- `ImportPanel` (props: `type`, `onImported?`): a labelled textarea "İçe aktarılacak JSON", a file input "Ya da bir JSON dosyası seç" (`.json`, its text replaces the box; over 2 MB → "Dosya 2 MB'tan büyük olamaz." without a request), "Kontrol et" (validate) and "İçe aktar" (import). Both are disabled while the box is empty or a request runs.
 - Errors: "N sorun bulundu:" and an ordered list, one row per error: "Satır 14 · items[2].meaning: Eksik alan: meaning" (pointer shown as `items[2].meaning`; no line → no "Satır" part; empty path → only the message).
-- Valid check: "Sorun yok, içe aktarılabilir." Saved: "<topic>: N öğe eklendi, M öğe zaten vardı." plus "Konu zaten vardı; seviyesi değiştirilmedi." when `levelKept`. The box is cleared after a save; `onImported(report)` is called.
+- While a request runs: "Kontrol ediliyor…". Valid check: "Sorun yok, içe aktarılabilir." Saved: "<topic>: N öğe eklendi, M öğe zaten vardı." plus "Konu zaten vardı; seviyesi değiştirilmedi." when `levelKept`. The box is cleared after a save; `onImported(report)` is called.
 - Request failure: "İçe aktarma yapılamadı.".
 - `CopyPromptButton` (prop: `type`): copies `prompts/<type>.md` (bundled with Vite `?raw`) with `navigator.clipboard.writeText`, then "Kopyalandı." or "Kopyalanamadı.".
 - The İngilizce, Öğrenme and Mülakat pages: `ContentEmptyPage` = the existing empty state with `CopyPromptButton` and `ImportPanel` under it.

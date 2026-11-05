@@ -1,0 +1,64 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.box {
+  min-height: 12rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  resize: vertical;
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.success {
+  margin: 0;
+  color: var(--color-success);
+}
+
+.success p {
+  margin: 0;
+}
+
+.error,
+.errors {
+  margin: 0;
+  color: var(--color-danger);
+}
+
+.errors p,
+.errors ol {
+  margin: 0;
+}
+
+.errors ol {
+  display: grid;
+  gap: var(--space-1);
+  padding-left: var(--space-5);
+  font-size: var(--font-size-sm);
+}
