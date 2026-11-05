@@ -36,13 +36,13 @@ The app is one process from the user's point of view.
 - [x] Quitting the app stops the API process (no orphan `dotnet` / `DevPath.Api` process).
 - [x] Tests: token middleware (xUnit), API client adds the header (Vitest).
 
-#### 0.4 Storage foundation — `todo`
+#### 0.4 Storage foundation — `done`
 Safe JSON storage every module builds on.
-- [ ] `JsonFileStore` with atomic writes (temp file + replace) and one lock per file.
-- [ ] `IRepository<T>` with a JSON implementation; every file has `schemaVersion`.
-- [ ] Migration runner: older files are upgraded on read and saved; newer-than-known files raise an error.
-- [ ] Data folder comes from `DEVPATH_DATA_DIR`; Electron main reads it from `app-config.json` in `userData`, default `%APPDATA%\DevPath\data`, created on first run.
-- [ ] Tests: round trip, interrupted write leaves the old file intact, concurrent writes, migration from v0 to v1, unknown future version.
+- [x] `JsonFileStore` with atomic writes (temp file + replace) and one lock per file.
+- [x] `IRepository<T>` with a JSON implementation; every file has `schemaVersion`.
+- [x] Migration runner: older files are upgraded on read and saved; newer-than-known files raise an error.
+- [x] Data folder comes from `DEVPATH_DATA_DIR`; Electron main reads it from `app-config.json` in `userData`, default `%APPDATA%\DevPath\data`, created on first run.
+- [x] Tests: round trip, interrupted write leaves the old file intact, concurrent writes, migration from v0 to v1, unknown future version.
 
 #### 0.5 App shell and design tokens — `todo`
 Navigable, themed, empty app in Turkish.

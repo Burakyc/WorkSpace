@@ -34,6 +34,8 @@ No module stores real data yet; phase 1.1 (Goals) is the first user. This phase 
 | Migration steps | A small record, `Migration(int FromVersion, Func<JsonObject, JsonObject> Upgrade)`, instead of an `IMigration` interface: one implementation, no second use. Steps work on `JsonObject`, so old C# types never need to be kept. |
 | Locking | Reads take the per-file lock too. On Windows, a file open for reading blocks `File.Move(..., overwrite: true)`, so unlocked reads could make writes fail. |
 | Missing `schemaVersion` | Treated as version `0`. |
+| "No change" in an update | `UpdateAsync` writes nothing when the update function returns `null` (decided during task 4, so deleting an unknown id neither rewrites nor creates the file). |
+| `dataDir` rule in Electron | Same rule as the API's `Path.IsPathFullyQualified`: a drive path (`D:\…`) or UNC path (`\\server\…`); `\data` is rejected. A UTF-8 byte order mark at the start of `app-config.json` is accepted, because Notepad and PowerShell 5.1 write one (decided during task 5). |
 
 ## User stories
 

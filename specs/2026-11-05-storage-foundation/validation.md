@@ -6,15 +6,15 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 0.4, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] `JsonFileStore` writes atomically (temp file, flush, replace) and holds one lock per file for reads, writes and updates.
-- [ ] Paths outside the data folder are rejected.
-- [ ] `IRepository<T>` has a JSON implementation; every file it writes has `schemaVersion`.
-- [ ] Older files are upgraded on read and saved; files without `schemaVersion` count as version 0; newer-than-known files raise `UnsupportedSchemaVersionException` and are not changed.
-- [ ] The API takes its data folder from `DEVPATH_DATA_DIR`, falls back to `%APPDATA%\DevPath\dev-data` only in Development, refuses to start otherwise, and creates the folder.
-- [ ] Electron main reads `dataDir` from `app-config.json` in `userData`; default `%APPDATA%\DevPath\data` when packaged and `%APPDATA%\DevPath\dev-data` when not; the folder is created on first run and passed as `DEVPATH_DATA_DIR`.
-- [ ] A broken `app-config.json` or an uncreatable folder shows a Turkish error window and quits without starting the API.
-- [ ] Tests: round trip, interrupted write leaves the old file intact, concurrent writes, migration from v0 to v1, unknown future version, plus the tests below.
-- [ ] README and `tech-stack.md` are updated.
+- [x] `JsonFileStore` writes atomically (temp file, flush, replace) and holds one lock per file for reads, writes and updates.
+- [x] Paths outside the data folder are rejected.
+- [x] `IRepository<T>` has a JSON implementation; every file it writes has `schemaVersion`.
+- [x] Older files are upgraded on read and saved; files without `schemaVersion` count as version 0; newer-than-known files raise `UnsupportedSchemaVersionException` and are not changed.
+- [x] The API takes its data folder from `DEVPATH_DATA_DIR`, falls back to `%APPDATA%\DevPath\dev-data` only in Development, refuses to start otherwise, and creates the folder.
+- [x] Electron main reads `dataDir` from `app-config.json` in `userData`; default `%APPDATA%\DevPath\data` when packaged and `%APPDATA%\DevPath\dev-data` when not; the folder is created on first run and passed as `DEVPATH_DATA_DIR`.
+- [x] A broken `app-config.json` or an uncreatable folder shows a Turkish error window and quits without starting the API.
+- [x] Tests: round trip, interrupted write leaves the old file intact, concurrent writes, migration from v0 to v1, unknown future version, plus the tests below.
+- [x] README and `tech-stack.md` are updated.
 
 ## Automated tests
 
@@ -68,7 +68,7 @@ npm run check
 | T32 | Valid config | same | `{ "dataDir": "D:\\DevPathData", "other": 1 }` → `{ dataDir: "D:\\DevPathData" }` |
 | T33 | Invalid JSON | same | Throws; message contains the file path |
 | T34 | Not an object | same | `[]` or `"x"` → throws |
-| T35 | Bad `dataDir` | same | Relative path, empty string or a number → throws; message contains the file path |
+| T35 | Bad `dataDir` | same | Relative path, `\data` (no drive), empty string or a number → throws; message contains the file path. A file starting with a byte order mark is read normally |
 | T36 | Config wins | same | `resolveDataDir({ dataDir: X }, …)` → `X` for packaged and unpackaged |
 | T37 | Defaults | same | No `dataDir` → `<appData>\DevPath\data` when packaged, `<appData>\DevPath\dev-data` when not |
 
@@ -91,7 +91,7 @@ Run from the repo root in PowerShell. `userData` while unpackaged is `%APPDATA%\
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M8 done with the expected results
-- [ ] `roadmap.md` phase 0.4 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M8 done with the expected results
+- [x] `roadmap.md` phase 0.4 ticked and set to `done`
