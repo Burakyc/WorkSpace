@@ -1,12 +1,12 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { app, BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell, type IpcMainInvokeEvent } from 'electron';
 import type { ApiConfig, ChangeDataDirResult } from '../src/shared/api/types';
 import { resolveApiExePath, startApi, type ApiHandle } from './apiProcess';
 import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
-import { isAllowedNavigation } from './navigation';
+import { isAllowedExternalUrl, isAllowedNavigation } from './navigation';
 
 const devServerUrl = process.env['ELECTRON_RENDERER_URL'];
 const rendererFile = join(__dirname, '../renderer/index.html');
@@ -69,14 +69,17 @@ function fail(error: unknown): void {
   app.quit();
 }
 
-/** Every IPC handler answers only the app's own page. */
-function handle<T>(channel: string, listener: (event: IpcMainInvokeEvent) => T): void {
-  ipcMain.handle(channel, (event) => {
+/** Every IPC handler answers only the app's own page. Arguments arrive untyped and are checked by the listener. */
+function handle<T>(
+  channel: string,
+  listener: (event: IpcMainInvokeEvent, ...args: unknown[]) => T,
+): void {
+  ipcMain.handle(channel, (event, ...args: unknown[]) => {
     const senderUrl = event.senderFrame?.url;
     if (!senderUrl || !isAllowedNavigation(senderUrl, appUrl)) {
       throw new Error(`${channel} is only available to the app page.`);
     }
-    return listener(event);
+    return listener(event, ...args);
   });
 }
 
@@ -142,6 +145,13 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     handle('devpath:get-data-dir', () => current!.dataDir);
+
+    handle('devpath:open-external', async (_event, url) => {
+      if (typeof url !== 'string' || !isAllowedExternalUrl(url)) {
+        throw new Error('Only https links can be opened.');
+      }
+      await shell.openExternal(url);
+    });
 
     handle('devpath:change-data-dir', async (): Promise<ChangeDataDirResult> => {
       const window = mainWindow!;

@@ -3,6 +3,9 @@ import type { ApiConfig, ChangeDataDirResult, DevPathBridge } from '../src/share
 
 const bridge: DevPathBridge = {
   getApiConfig: () => ipcRenderer.invoke('devpath:get-api-config') as Promise<ApiConfig>,
+  openExternal: async (url) => {
+    await ipcRenderer.invoke('devpath:open-external', url);
+  },
   settings: {
     getDataDir: () => ipcRenderer.invoke('devpath:get-data-dir') as Promise<string>,
     // Main returns the error as data, so the page gets the plain Turkish message instead of an IPC-wrapped one.

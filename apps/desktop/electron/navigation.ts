@@ -15,3 +15,13 @@ export function isAllowedNavigation(targetUrl: string, appUrl: string): boolean 
 
   return target.origin === app.origin;
 }
+
+/** True only for parseable https: URLs with a host. Anything else is never handed to the OS. */
+export function isAllowedExternalUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && parsed.hostname !== '';
+  } catch {
+    return false;
+  }
+}

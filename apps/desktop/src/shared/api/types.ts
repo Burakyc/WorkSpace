@@ -33,6 +33,8 @@ export type ChangeDataDirResult = { dataDir: string | null } | { error: string }
 /** What the preload script exposes as `window.devpath`. */
 export interface DevPathBridge {
   getApiConfig(): Promise<ApiConfig>;
+  /** Opens an https link in the default browser; main refuses anything else. */
+  openExternal(url: string): Promise<void>;
   settings: {
     getDataDir(): Promise<string>;
     /** Opens the folder dialog and switches to the chosen folder. Resolves null on cancel; rejects with a Turkish message. */

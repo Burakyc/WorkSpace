@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isAllowedNavigation } from './navigation';
+import { isAllowedExternalUrl, isAllowedNavigation } from './navigation';
 
 const devUrl = 'http://localhost:5173/';
 const fileUrl = 'file:///C:/Program%20Files/DevPath/resources/app/out/renderer/index.html';
@@ -29,5 +29,22 @@ describe('isAllowedNavigation', () => {
 
   it.each(['', 'not a url'])('blocks the invalid URL %j', (target) => {
     expect(isAllowedNavigation(target, devUrl)).toBe(false);
+  });
+});
+
+describe('isAllowedExternalUrl', () => {
+  it('allows https links', () => {
+    expect(isAllowedExternalUrl('https://github.com/x')).toBe(true);
+  });
+
+  it.each([
+    'http://github.com/x',
+    'file:///C:/Windows',
+    'javascript:alert(1)',
+    'mailto:me@example.com',
+    '',
+    'not a url',
+  ])('refuses %s', (url) => {
+    expect(isAllowedExternalUrl(url)).toBe(false);
   });
 });
