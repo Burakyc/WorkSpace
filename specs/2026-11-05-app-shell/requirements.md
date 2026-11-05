@@ -34,6 +34,8 @@ A navigable, themed, empty app in Turkish. One token file defines colors, fonts 
 | Placeholder pages | One route table drives the sidebar and the routes. Pages without a module yet render `<EmptyState>` from that table; a module replaces its entry when it is built. No empty per-module files. |
 | After a successful switch | Main starts the new API on a new port with a new token, then reloads the window. The hash route keeps the user on Ayarlar, which then shows the new folder. No stale port or token anywhere. |
 | Failed switch | Folder cannot be created → inline error, nothing changed. New API does not start → `app-config.json` is restored, the old API is started again, and the page shows an inline error. Only if the old API also fails: the startup error box, then quit. |
+| Breakpoint syntax | `@media (width < 900px)` instead of `max-width: 899px` (decided after M5: with 125% display scaling the viewport can be 899.2 px wide, which `max-width: 899px` misses). |
+| Folder dialog in tests | The native dialog is driven with Win32 messages in the manual checks; UI Automation does not see its controls. Nothing in the app depends on this. |
 
 ## User stories
 
@@ -75,7 +77,7 @@ A navigable, themed, empty app in Turkish. One token file defines colors, fonts 
 - Layout: a skip link "İçeriğe geç" (first focusable element, visible on focus) → `<nav aria-label="Ana menü">` with one `NavLink` per entry → `<main id="content" tabIndex={-1}>` with the page.
 - The active link has `aria-current="page"` (NavLink default) and the accent styling.
 - Each page has one `<h1>`.
-- **900 px:** at `max-width: 899px` the sidebar uses `--sidebar-width-collapsed`; labels are visually hidden but stay in the accessibility tree; each link has a `title` with its label for a mouse tooltip. The content area is a single column (`grid-template-columns: 1fr`). The window minimum width stays 800 px.
+- **900 px:** at `width < 900px` the sidebar uses `--sidebar-width-collapsed`; labels are visually hidden but stay in the accessibility tree; each link has a `title` with its label for a mouse tooltip. The content area is a single column (`grid-template-columns: 1fr`). The window minimum width stays 800 px.
 
 ### Empty states
 

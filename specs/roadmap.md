@@ -44,14 +44,14 @@ Safe JSON storage every module builds on.
 - [x] Data folder comes from `DEVPATH_DATA_DIR`; Electron main reads it from `app-config.json` in `userData`, default `%APPDATA%\DevPath\data`, created on first run.
 - [x] Tests: round trip, interrupted write leaves the old file intact, concurrent writes, migration from v0 to v1, unknown future version.
 
-#### 0.5 App shell and design tokens — `todo`
+#### 0.5 App shell and design tokens — `done`
 Navigable, themed, empty app in Turkish.
-- [ ] `tokens.css` with colors, fonts and spacing as CSS variables; light and dark follow the OS.
-- [ ] Sidebar + content layout with routes for Ana Sayfa, Hedefler, Pomodoro, Takvim, Notlar, İngilizce, Öğrenme, Mülakat, Ayarlar.
-- [ ] Below 900 px the sidebar collapses to icons and content is one column.
-- [ ] Each page shows an empty state that says what to do next.
-- [ ] Settings page shows the data folder and lets the user change it (API restarts with the new path).
-- [ ] Sidebar is fully keyboard navigable with visible focus.
+- [x] `tokens.css` with colors, fonts and spacing as CSS variables; light and dark follow the OS.
+- [x] Sidebar + content layout with routes for Ana Sayfa, Hedefler, Pomodoro, Takvim, Notlar, İngilizce, Öğrenme, Mülakat, Ayarlar.
+- [x] Below 900 px the sidebar collapses to icons and content is one column.
+- [x] Each page shows an empty state that says what to do next.
+- [x] Settings page shows the data folder and lets the user change it (API restarts with the new path).
+- [x] Sidebar is fully keyboard navigable with visible focus.
 
 #### 0.6 Windows installer — `todo`
 Prove packaging early so every later phase can ship.

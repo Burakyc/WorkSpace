@@ -6,15 +6,15 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 0.5, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] `tokens.css` defines colors, fonts and spacing as CSS variables; light and dark follow the OS; components use only tokens.
-- [ ] Sidebar + content layout with routes for Ana Sayfa, Hedefler, Pomodoro, Takvim, Notlar, İngilizce, Öğrenme, Mülakat, Ayarlar.
-- [ ] Below 900 px the sidebar collapses to icons and content is one column.
-- [ ] Each page except Ayarlar shows an empty state that says what to do next.
-- [ ] Ayarlar shows the data folder and changes it with the native folder picker; the API restarts with the new path; a failed restart returns to the old folder.
-- [ ] `app-config.json` is written atomically with `schemaVersion: 1`.
-- [ ] The sidebar is fully keyboard navigable with visible focus; a skip link leads to the content.
-- [ ] The API status is in the sidebar footer.
-- [ ] README and `tech-stack.md` are updated.
+- [x] `tokens.css` defines colors, fonts and spacing as CSS variables; light and dark follow the OS; components use only tokens.
+- [x] Sidebar + content layout with routes for Ana Sayfa, Hedefler, Pomodoro, Takvim, Notlar, İngilizce, Öğrenme, Mülakat, Ayarlar.
+- [x] Below 900 px the sidebar collapses to icons and content is one column.
+- [x] Each page except Ayarlar shows an empty state that says what to do next.
+- [x] Ayarlar shows the data folder and changes it with the native folder picker; the API restarts with the new path; a failed restart returns to the old folder.
+- [x] `app-config.json` is written atomically with `schemaVersion: 1`.
+- [x] The sidebar is fully keyboard navigable with visible focus; a skip link leads to the content.
+- [x] The API status is in the sidebar footer.
+- [x] README and `tech-stack.md` are updated.
 
 ## Automated tests
 
@@ -76,7 +76,7 @@ Run `npm run dev` from the repo root unless a step says otherwise.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M10 done with the expected results
-- [ ] `roadmap.md` phase 0.5 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M10 done with the expected results
+- [x] `roadmap.md` phase 0.5 ticked and set to `done`
