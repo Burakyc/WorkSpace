@@ -8,4 +8,10 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: 'DevPath Workspace' })).toBeInTheDocument();
   });
+
+  it('shows the Turkish placeholder text', () => {
+    render(<App />);
+
+    expect(screen.getByText('Kurulum devam ediyor.')).toBeInTheDocument();
+  });
 });
