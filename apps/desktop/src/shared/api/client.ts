@@ -9,6 +9,7 @@ import type {
   HealthResponse,
   NoteKind,
   NoteNode,
+  NoteSearchResult,
   PomodoroSettings,
   Project,
   ProjectCreateInput,
@@ -66,6 +67,8 @@ export interface ApiClient {
   getNoteContent(id: string): Promise<{ blocks: unknown[] }>;
   /** Replaces a page's blocks; returns the node with its new `updatedAt`. */
   saveNoteContent(id: string, blocks: unknown[]): Promise<NoteNode>;
+  /** Pages whose title or text holds every word; title matches first. */
+  searchNotes(query: string): Promise<NoteSearchResult[]>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -136,6 +139,8 @@ export function createApiClient(
     deleteNote: (id) => request<void>('DELETE', note(id)),
     getNoteContent: (id) => request<{ blocks: unknown[] }>('GET', `${note(id)}/content`),
     saveNoteContent: (id, blocks) => request<NoteNode>('PUT', `${note(id)}/content`, { blocks }),
+    searchNotes: (query) =>
+      request<NoteSearchResult[]>('GET', `/api/notes/search?q=${encodeURIComponent(query)}`),
   };
 }
 

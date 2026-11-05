@@ -226,6 +226,7 @@ describe('createApiClient', () => {
     await expect(client.deleteNote('n 1')).resolves.toBeUndefined();
     await client.getNoteContent('n 1');
     await client.saveNoteContent('n 1', [{ type: 'paragraph' }]);
+    await client.searchNotes('di ömür');
 
     const base = 'http://127.0.0.1:4321/api/notes';
     expect(
@@ -239,6 +240,7 @@ describe('createApiClient', () => {
       [`DELETE ${base}/n%201`, undefined],
       [`GET ${base}/n%201/content`, undefined],
       [`PUT ${base}/n%201/content`, JSON.stringify({ blocks: [{ type: 'paragraph' }] })],
+      [`GET ${base}/search?q=di%20%C3%B6m%C3%BCr`, undefined],
     ]);
   });
 });

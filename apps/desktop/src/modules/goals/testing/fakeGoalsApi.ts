@@ -7,6 +7,7 @@ import type {
   GoalProgress,
   NoteKind,
   NoteNode,
+  NoteSearchResult,
   PomodoroSettings,
   Project,
   ProjectCreateInput,
@@ -53,6 +54,9 @@ export function installFakeGoalsApi(
     /** Page blocks by note id; pages not listed are empty. */
     contents?: Record<string, unknown[]>;
     failContentSave?: boolean;
+    /** GET /api/notes/search answers by query; queries not listed find nothing. */
+    search?: Record<string, NoteSearchResult[]>;
+    failSearch?: boolean;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -266,10 +270,15 @@ export function installFakeGoalsApi(
     id: string | undefined,
     action: string | undefined,
     body: unknown,
+    query: string,
   ) {
     if (options.failNotes) return json({ title: 'Server error' }, 500);
     if (method === 'GET' && id === undefined) {
       return json([...notes].sort((a, b) => a.order - b.order));
+    }
+    if (method === 'GET' && id === 'search') {
+      if (options.failSearch) return json({ title: 'Server error' }, 500);
+      return json(options.search?.[query] ?? []);
     }
     if (method === 'POST' && id === undefined) {
       const input = body as { parentId: string | null; kind: NoteKind; title: string };
@@ -347,7 +356,9 @@ export function installFakeGoalsApi(
     const includeArchived = searchParams.get('includeArchived') === 'true';
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
     if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
-    if (resource === 'notes') return Promise.resolve(notesRoute(method, id, action, body));
+    if (resource === 'notes') {
+      return Promise.resolve(notesRoute(method, id, action, body, searchParams.get('q') ?? ''));
+    }
     if (resource === 'days' && id !== undefined) {
       return Promise.resolve(daysRoute(method, id, searchParams.get('timeZone') ?? '', body));
     }

@@ -160,6 +160,21 @@ export interface DayDetail {
 
 export type NoteKind = 'folder' | 'page';
 
+/** A marked part of a search snippet (positions in `snippet`). */
+export interface Highlight {
+  start: number;
+  length: number;
+}
+
+/** GET /api/notes/search: a page with its ancestors' titles (top first) and a text piece. */
+export interface NoteSearchResult {
+  id: string;
+  title: string;
+  path: string[];
+  snippet: string;
+  highlights: Highlight[];
+}
+
 /** A folder or page of the notes tree (mirrors NoteNode). Siblings are sorted by `order`; any node can have children. */
 export interface NoteNode {
   id: string;
