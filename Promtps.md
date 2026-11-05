@@ -205,3 +205,17 @@ Implement the spec in specs/2026-11-05-docker-api/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 0.7 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `0.0.0.0` binding only with `DEVPATH_IN_CONTAINER=1`, multi-stage Dockerfile, docker-compose.yml with `.env` token and repo `data/` mount, `npm run docker:api`; README, tech-stack and specs updated; phase 0.7 done.
+
+## 2026-11-05 – Plan phase 1.1 goals
+**Phase:** 1.1 Goals
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 1.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-goals/` (`requirements.md`, `plan.md`, `validation.md`).
