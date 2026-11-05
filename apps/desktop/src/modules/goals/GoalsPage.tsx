@@ -1,7 +1,7 @@
 import { Target } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { getApiClient } from '../../shared/api/getApiClient';
-import type { Goal, GoalInput } from '../../shared/api/types';
+import type { Goal, GoalInput, GoalProgress } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import { GoalCard } from './GoalCard';
@@ -14,6 +14,7 @@ type Editing = 'new' | string | null;
 export function GoalsPage() {
   // All goals, archived included (active first, newest first); the toggle only filters what is shown.
   const [goals, setGoals] = useState<Goal[] | null>(null);
+  const [progress, setProgress] = useState<GoalProgress[]>([]);
   const [showArchived, setShowArchived] = useState(false);
   const [editing, setEditing] = useState<Editing>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -25,10 +26,11 @@ export function GoalsPage() {
   useEffect(() => {
     let active = true;
     getApiClient()
-      .then((client) => client.listGoals(true))
-      .then((all) => {
+      .then((client) => Promise.all([client.listGoals(true), client.getGoalProgress()]))
+      .then(([all, allProgress]) => {
         if (!active) return;
         setGoals(all);
+        setProgress(allProgress);
         setError(null);
       })
       .catch(() => {
@@ -141,6 +143,7 @@ export function GoalsPage() {
               <GoalCard
                 key={goal.id}
                 goal={goal}
+                progress={progress.find((p) => p.goalId === goal.id)}
                 busy={busyId === goal.id}
                 onEdit={() => setEditing(goal.id)}
                 onArchive={() => void setArchived(goal, true)}

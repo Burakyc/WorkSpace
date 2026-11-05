@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { Goal, GoalInput } from '../../../shared/api/types';
+import type { Goal, GoalInput, GoalProgress } from '../../../shared/api/types';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -11,7 +11,10 @@ const json = (body: unknown, status = 200) =>
  * An in-memory stand-in for the goal endpoints: stubs window.devpath and fetch.
  * Mirrors the API's rules that the UI relies on (order, title required, archive/restore).
  */
-export function installFakeGoalsApi(initial: Goal[] = []) {
+export function installFakeGoalsApi(
+  initial: Goal[] = [],
+  options: { progress?: GoalProgress[] } = {},
+) {
   const goals = initial.map((goal) => ({ ...goal }));
   let created = 0;
 
@@ -31,6 +34,21 @@ export function installFakeGoalsApi(initial: Goal[] = []) {
     const id = rawId === undefined ? undefined : decodeURIComponent(rawId);
     const goal = goals.find((g) => g.id === id);
 
+    if (method === 'GET' && pathname === '/api/goals/progress') {
+      return Promise.resolve(
+        json(
+          list().map(
+            (g) =>
+              options.progress?.find((p) => p.goalId === g.id) ?? {
+                goalId: g.id,
+                completedSessions: 0,
+                totalMinutes: 0,
+                percent: g.targetPomodoros === null ? null : 0,
+              },
+          ),
+        ),
+      );
+    }
     if (method === 'GET' && pathname === '/api/goals') {
       const all = list();
       return Promise.resolve(

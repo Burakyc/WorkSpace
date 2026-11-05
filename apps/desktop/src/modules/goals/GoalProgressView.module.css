@@ -1,0 +1,28 @@
+.progress {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.text {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.bar {
+  width: 100%;
+  height: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+  appearance: none;
+}
+
+.bar::-webkit-progress-bar {
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+}
+
+.bar::-webkit-progress-value {
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+}

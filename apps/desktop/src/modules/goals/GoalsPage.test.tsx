@@ -174,3 +174,41 @@ describe('GoalsPage form', () => {
     expect(api.fetchFn.mock.calls.length).toBe(requestsBefore);
   });
 });
+
+describe('GoalsPage progress', () => {
+  it('shows progress against the target with a bar', async () => {
+    installFakeGoalsApi([older], {
+      progress: [{ goalId: 'a', completedSessions: 7, totalMinutes: 175, percent: 35 }],
+    });
+    render(<GoalsPage />);
+
+    const card = await screen.findByRole('article', { name: 'Learn ASP.NET Core' });
+
+    expect(await within(card).findByText('7 / 20 pomodoro · %35')).toBeInTheDocument();
+    expect(within(card).getByRole('progressbar', { name: 'İlerleme' })).toHaveAttribute(
+      'value',
+      '35',
+    );
+  });
+
+  it('shows session count and time without a target', async () => {
+    installFakeGoalsApi([newer], {
+      progress: [{ goalId: 'b', completedSessions: 3, totalMinutes: 60, percent: null }],
+    });
+    render(<GoalsPage />);
+
+    const card = await screen.findByRole('article', { name: 'English every day' });
+
+    expect(await within(card).findByText('3 pomodoro · 1 sa')).toBeInTheDocument();
+    expect(within(card).queryByRole('progressbar')).not.toBeInTheDocument();
+  });
+
+  it('shows zero before any session', async () => {
+    installFakeGoalsApi([older]);
+    render(<GoalsPage />);
+
+    const card = await screen.findByRole('article', { name: 'Learn ASP.NET Core' });
+
+    expect(await within(card).findByText('0 / 20 pomodoro · %0')).toBeInTheDocument();
+  });
+});

@@ -1,16 +1,18 @@
-import type { Goal } from '../../shared/api/types';
+import type { Goal, GoalProgress } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import styles from './GoalCard.module.css';
+import { GoalProgressView } from './GoalProgressView';
 
 interface GoalCardProps {
   goal: Goal;
+  progress: GoalProgress | undefined;
   busy: boolean;
   onEdit(): void;
   onArchive(): void;
   onRestore(): void;
 }
 
-export function GoalCard({ goal, busy, onEdit, onArchive, onRestore }: GoalCardProps) {
+export function GoalCard({ goal, progress, busy, onEdit, onArchive, onRestore }: GoalCardProps) {
   return (
     <article className={styles.card} aria-label={goal.title}>
       <div className={styles.titleRow}>
@@ -21,6 +23,7 @@ export function GoalCard({ goal, busy, onEdit, onArchive, onRestore }: GoalCardP
       <p className={styles.meta}>
         {goal.targetPomodoros === null ? 'Hedef yok' : `Hedef: ${goal.targetPomodoros} pomodoro`}
       </p>
+      <GoalProgressView progress={progress} targetPomodoros={goal.targetPomodoros} />
       <div className={styles.actions}>
         {goal.archived ? (
           <button type="button" className={buttons.secondary} onClick={onRestore} disabled={busy}>
