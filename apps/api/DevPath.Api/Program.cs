@@ -5,6 +5,7 @@ using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Goals;
 using DevPath.Api.Modules.Pomodoro;
 using DevPath.Api.Modules.Projects;
+using DevPath.Api.Modules.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddPomodoro();
 builder.Services.AddGoals();
 builder.Services.AddProjects();
+builder.Services.AddSingleton<SettingsService>();
 
 var app = builder.Build();
 
