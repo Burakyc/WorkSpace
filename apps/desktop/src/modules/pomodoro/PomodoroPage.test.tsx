@@ -335,3 +335,28 @@ describe('PomodoroPage tags', () => {
     ).toEqual(['#efcore', '#di']);
   });
 });
+
+describe('PomodoroPage focus length', () => {
+  it('uses the configured focus length', async () => {
+    installFakeGoalsApi([goal({ id: 'a', title: 'Learn ASP.NET Core' })], {
+      settings: {
+        focusMinutes: 50,
+        shortBreakMinutes: 5,
+        longBreakMinutes: 15,
+        longBreakInterval: 4,
+      },
+    });
+    renderPage();
+    await screen.findByRole('button', { name: 'Başlat' });
+    expect(clock()).toHaveTextContent('50:00');
+    vi.useFakeTimers({ shouldAdvanceTime: false });
+    fireEvent.change(goalSelect(), { target: { value: 'a' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+    act(() => vi.advanceTimersByTime(49 * MIN));
+    expect(clock()).toHaveTextContent('01:00');
+    act(() => vi.advanceTimersByTime(MIN));
+
+    expect(screen.getByText('Süre doldu.')).toBeInTheDocument();
+  });
+});

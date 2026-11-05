@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { DevPathBridge } from '../../shared/api/types';
 import {
   advance,
-  FOCUS_MINUTES,
   IDLE,
   parseStoredTimer,
   pauseTimer,
@@ -18,7 +17,12 @@ export interface Pomodoro {
   state: TimerState;
   /** The clock used for the remaining time; updated every tick while running. */
   now: number;
-  start(goal: { id: string; title: string }, projectId: string | null, tags: string[]): void;
+  start(
+    goal: { id: string; title: string },
+    projectId: string | null,
+    tags: string[],
+    durationMs: number,
+  ): void;
   pause(): void;
   resume(): void;
   stop(): void;
@@ -92,9 +96,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       now,
-      start(goal, projectId, tags) {
+      start(goal, projectId, tags, durationMs) {
         const t = Date.now();
-        const next = startTimer(goal, projectId, FOCUS_MINUTES * 60_000, t, tags);
+        const next = startTimer(goal, projectId, durationMs, t, tags);
         setNow(t);
         setState(next);
         scheduleEnd(next);

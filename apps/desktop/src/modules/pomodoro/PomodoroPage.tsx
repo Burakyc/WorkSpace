@@ -3,7 +3,13 @@ import { useEffect, useId, useState } from 'react';
 import { Link } from 'react-router';
 import { ApiError } from '../../shared/api/client';
 import { getApiClient } from '../../shared/api/getApiClient';
-import type { Goal, Project, SessionInput } from '../../shared/api/types';
+import {
+  DEFAULT_POMODORO_SETTINGS,
+  type Goal,
+  type PomodoroSettings,
+  type Project,
+  type SessionInput,
+} from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import form from '../../shared/ui/form.module.css';
@@ -11,7 +17,7 @@ import { progressText } from '../goals/progressText';
 import { usePomodoro } from './PomodoroContext';
 import styles from './PomodoroPage.module.css';
 import { TagInput } from './TagInput';
-import { FOCUS_MINUTES, focusedMs, formatClock, remainingMs } from './timer';
+import { focusedMs, formatClock, remainingMs } from './timer';
 
 export function PomodoroPage() {
   const id = useId();
@@ -25,6 +31,7 @@ export function PomodoroPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [savedTags, setSavedTags] = useState<string[] | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [settings, setSettings] = useState<PomodoroSettings>(DEFAULT_POMODORO_SETTINGS);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -39,10 +46,15 @@ export function PomodoroPage() {
           client.listGoals(false),
           client.listProjects(false),
           client.listTags().catch(() => []),
+          client
+            .getSettings()
+            .then((s) => s.pomodoro)
+            .catch(() => DEFAULT_POMODORO_SETTINGS),
         ]),
       )
-      .then(([activeGoals, activeProjects, usedTags]) => {
+      .then(([activeGoals, activeProjects, usedTags, pomodoroSettings]) => {
         if (!active) return;
+        setSettings(pomodoroSettings);
         setGoals(activeGoals);
         setProjects(activeProjects);
         setSuggestions(usedTags);
@@ -160,7 +172,7 @@ export function PomodoroPage() {
     if (!selectedGoal) return;
     setFeedback(null);
     setSaveError(null);
-    pomodoro.start(selectedGoal, projectId || null, tags);
+    pomodoro.start(selectedGoal, projectId || null, tags, settings.focusMinutes * 60_000);
   }
 
   if (goals === null) {
@@ -195,7 +207,9 @@ export function PomodoroPage() {
     );
   }
 
-  const clock = idle ? formatClock(FOCUS_MINUTES * 60_000) : formatClock(remainingMs(state, now));
+  const clock = idle
+    ? formatClock(settings.focusMinutes * 60_000)
+    : formatClock(remainingMs(state, now));
 
   return (
     <>

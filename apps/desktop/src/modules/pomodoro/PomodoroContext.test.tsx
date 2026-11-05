@@ -12,7 +12,7 @@ function Probe() {
     <>
       <p data-testid="status">{state.status}</p>
       <p data-testid="clock">{formatClock(remainingMs(state, now))}</p>
-      <button onClick={() => start(goal, null, [])}>start</button>
+      <button onClick={() => start(goal, null, [], 25 * MIN)}>start</button>
       <button onClick={pause}>pause</button>
       <button onClick={resume}>resume</button>
       <button onClick={stop}>stop</button>

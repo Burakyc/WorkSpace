@@ -1,6 +1,3 @@
-/** Focus length until phase 2.3 makes it a setting. */
-export const FOCUS_MINUTES = 25;
-
 interface SessionInfo {
   goalId: string;
   /** Kept with the session so it can be shown even if the goal is archived meanwhile. */
