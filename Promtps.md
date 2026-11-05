@@ -67,3 +67,16 @@ Implement the spec in specs/2026-11-05-desktop-skeleton/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 0.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** apps/desktop (electron-vite, React, ESLint, Prettier, Vitest), root package.json and .nvmrc, README.md, specs updated; phase 0.2 done.
+
+## 2026-11-05 – Add phase 0.7 Docker for the API
+**Phase:** 0.7 Docker for the API
+**Prompt:**
+Add a new phase "0.7 Docker for the API" to the end of Milestone 0 in specs/roadmap.md. Do not renumber other phases or write any code.
+
+- Docker is for development only; the desktop app must still work without Docker.
+- Containerize only apps/api with a multi-stage Dockerfile and a docker-compose.yml.
+- Port published on 127.0.0.1 only, token check stays on, data in a mounted volume.
+- Add short checkbox acceptance criteria like the other phases.
+
+Ask me with AskUserQuestion if anything is unclear before writing.
+**Result:** added phase 0.7 to `specs/roadmap.md`.
