@@ -2,6 +2,7 @@ using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Calendar;
 using DevPath.Api.Modules.Goals;
+using DevPath.Api.Modules.Notes;
 using DevPath.Api.Modules.Pomodoro;
 using DevPath.Api.Modules.Projects;
 using DevPath.Api.Tests.Infrastructure.Storage;
@@ -17,6 +18,7 @@ public sealed class DayServiceTests : IDisposable
     private readonly JsonRepository<Session> _sessions;
     private readonly JsonRepository<Goal> _goals;
     private readonly JsonRepository<Project> _projects;
+    private readonly JsonRepository<NoteNode> _notes;
     private readonly JsonFileStore _store;
     private readonly DayService _days;
 
@@ -26,7 +28,8 @@ public sealed class DayServiceTests : IDisposable
         _sessions = new JsonRepository<Session>(store, PomodoroModule.SessionsFileName, PomodoroModule.SessionsSchema);
         _goals = new JsonRepository<Goal>(store, GoalsModule.FileName, GoalsModule.Schema);
         _projects = new JsonRepository<Project>(store, ProjectsModule.FileName, ProjectsModule.Schema);
-        _days = new DayService(_sessions, _goals, _projects, store);
+        _notes = new JsonRepository<NoteNode>(store, NotesModule.IndexFileName, NotesModule.IndexSchema);
+        _days = new DayService(_sessions, _goals, _projects, _notes, store);
     }
 
     public void Dispose() => _folder.Dispose();
@@ -169,5 +172,26 @@ public sealed class DayServiceTests : IDisposable
     {
         Assert.Equal("", (await Get("2026-11-05")).Log);
         Assert.False(Directory.Exists(Path.Combine(_folder.Path, "daily")));
+    }
+
+    private Task AddNote(string id, string created, string updated, string kind = NoteNode.Page) =>
+        _notes.UpsertAsync(
+            new NoteNode(id, null, kind, id, 0, DateTimeOffset.Parse(created), DateTimeOffset.Parse(updated)),
+            CancellationToken.None);
+
+    [Fact]
+    public async Task Lists_the_pages_created_or_edited_that_day()
+    {
+        await AddNote("edited", "2026-10-01T09:00:00Z", "2026-11-03T12:00:00Z");
+        await AddNote("created", "2026-11-03T08:00:00Z", "2026-11-03T08:00:00Z");
+        await AddNote("folder", "2026-11-03T08:00:00Z", "2026-11-03T08:00:00Z", NoteNode.Folder);
+        await AddNote("other", "2026-11-02T08:00:00Z", "2026-11-04T08:00:00Z");
+        await AddNote("late", "2026-11-03T21:30:00Z", "2026-11-03T21:30:00Z");
+
+        var istanbul = await Get("2026-11-03");
+        var utc = await Get("2026-11-03", "UTC");
+
+        Assert.Equal([new DayNote("created", "created", true), new DayNote("edited", "edited", false)], istanbul.Notes);
+        Assert.Equal(["created", "edited", "late"], utc.Notes.Select(n => n.Id));
     }
 }
