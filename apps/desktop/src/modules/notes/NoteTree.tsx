@@ -2,6 +2,7 @@ import { FilePlus, FolderPlus } from 'lucide-react';
 import { useState } from 'react';
 import type { NoteKind, NoteNode } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
+import { NoteSearch } from './NoteSearch';
 import { NoteTreeItem } from './NoteTreeItem';
 import { childrenOf } from './treeHelpers';
 import styles from './NotesPage.module.css';
@@ -108,28 +109,30 @@ export function NoteTree({ nodes, openId, renamingId, actions }: NoteTreeProps) 
           <FolderPlus size={16} aria-hidden="true" />
         </button>
       </div>
-      {dragging !== null && (
-        <div
-          className={`${styles.dropRoot} ${overRoot ? styles.dropTarget : ''}`}
-          onDragOver={(event) => {
-            event.preventDefault();
-            setOverRoot(true);
-          }}
-          onDragLeave={() => setOverRoot(false)}
-          onDrop={(event) => {
-            event.preventDefault();
-            void tree.actions.move(dragging, null);
-            tree.setDragging(null);
-          }}
-        >
-          En üste
-        </div>
-      )}
-      <ul className={styles.items}>
-        {childrenOf(nodes, null).map((node) => (
-          <NoteTreeItem key={node.id} node={node} tree={tree} />
-        ))}
-      </ul>
+      <NoteSearch>
+        {dragging !== null && (
+          <div
+            className={`${styles.dropRoot} ${overRoot ? styles.dropTarget : ''}`}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setOverRoot(true);
+            }}
+            onDragLeave={() => setOverRoot(false)}
+            onDrop={(event) => {
+              event.preventDefault();
+              void tree.actions.move(dragging, null);
+              tree.setDragging(null);
+            }}
+          >
+            En üste
+          </div>
+        )}
+        <ul className={styles.items}>
+          {childrenOf(nodes, null).map((node) => (
+            <NoteTreeItem key={node.id} node={node} tree={tree} />
+          ))}
+        </ul>
+      </NoteSearch>
     </nav>
   );
 }

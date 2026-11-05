@@ -237,3 +237,34 @@
 .page :global(.bn-editor) {
   padding-inline: 0;
 }
+
+.results {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.resultTitle {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.snippet {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.snippet mark {
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-soft-text);
+}

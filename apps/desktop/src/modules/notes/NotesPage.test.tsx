@@ -195,6 +195,12 @@ describe('NotesPage', () => {
     fireEvent.dragOver(await row('ASP.NET'));
     fireEvent.drop(await row('ASP.NET'));
     await waitFor(() => expect(api.notes.find((n) => n.id === 'p')?.parentId).toBe('f'));
+    // Wait for the reloaded tree, so the next drag starts on the moved row.
+    await waitFor(() =>
+      expect(
+        within(tree()).getByRole('link', { name: 'Loose page' }).closest('ul')?.closest('li'),
+      ).not.toBeNull(),
+    );
 
     fireEvent.dragStart(await row('Loose page'));
     fireEvent.drop(screen.getByText('En üste'));
@@ -305,5 +311,85 @@ describe('page editor', () => {
     await api.closeApp();
 
     expect(api.contents.a).toEqual([{ type: 'paragraph', text: 'last words' }]);
+  });
+});
+
+describe('notes search', () => {
+  const pages = [
+    noteNode({ id: 'f', title: 'ASP.NET', kind: 'folder' }),
+    noteNode({ id: 'di', title: 'Dependency Injection', parentId: 'f' }),
+    noteNode({ id: 'start', title: 'Başlangıç', order: 1 }),
+  ];
+  const results = [
+    {
+      id: 'di',
+      title: 'Dependency Injection',
+      path: ['ASP.NET'],
+      snippet: 'Servisler',
+      highlights: [],
+    },
+    {
+      id: 'start',
+      title: 'Başlangıç',
+      path: [],
+      snippet: '…dependency injection notlarına bak',
+      highlights: [{ start: 1, length: 10 }],
+    },
+  ];
+
+  const searchFor = async (text: string) => {
+    const box = await screen.findByRole('searchbox', { name: 'Notlarda ara' });
+    fireEvent.change(box, { target: { value: text } });
+    fireEvent.submit(box);
+    return box;
+  };
+
+  it('shows the results with location and marked matches', async () => {
+    renderAt('/notes', pages, { search: { dependency: results } });
+
+    await searchFor('dependency');
+
+    const list = await screen.findByRole('region', { name: 'Arama sonuçları' });
+    expect(within(list).getByText('2 sonuç')).toBeInTheDocument();
+    expect(
+      within(list)
+        .getAllByRole('link')
+        .map((l) => l.textContent),
+    ).toEqual(['Dependency Injection', 'Başlangıç']);
+    expect(within(list).getByText('ASP.NET')).toBeInTheDocument();
+    expect(list.querySelector('mark')?.textContent).toBe('dependency');
+    expect(within(list).getByText(/notlarına bak/)).toHaveTextContent(
+      '…dependency injection notlarına bak',
+    );
+  });
+
+  it('opens a result, keeps the results and shows the tree again when cleared', async () => {
+    renderAt('/notes', pages, { search: { dependency: results } });
+    const box = await searchFor('dependency');
+
+    fireEvent.click(await screen.findByRole('link', { name: 'Başlangıç' }));
+    expect(await screen.findByRole('textbox', { name: 'Sayfa başlığı' })).toHaveValue('Başlangıç');
+    expect(screen.getByRole('region', { name: 'Arama sonuçları' })).toBeInTheDocument();
+
+    fireEvent.change(box, { target: { value: '' } });
+    expect(within(tree()).getByRole('link', { name: 'ASP.NET' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Arama sonuçları' })).not.toBeInTheDocument();
+  });
+
+  it('asks for two characters and says when nothing is found', async () => {
+    const api = renderAt('/notes', pages);
+
+    await searchFor('a');
+    expect(screen.getByText('En az 2 karakter yaz.')).toBeInTheDocument();
+    expect(api.fetchFn.mock.calls.some(([url]) => String(url).includes('search'))).toBe(false);
+
+    await searchFor('yokyok');
+    expect(await screen.findByText('Sonuç yok.')).toBeInTheDocument();
+  });
+
+  it('shows a search error', async () => {
+    renderAt('/notes', pages, { failSearch: true });
+    await searchFor('dependency');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Arama yapılamadı.');
   });
 });
