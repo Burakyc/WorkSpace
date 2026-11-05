@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createApiClient } from '../shared/api/client';
+import { getApiClient } from '../shared/api/getApiClient';
 import styles from './ApiStatus.module.css';
 
 type Status = 'connecting' | 'connected' | 'disconnected';
@@ -15,10 +15,8 @@ export function ApiStatus() {
 
   useEffect(() => {
     let active = true;
-    // Starting from Promise.resolve() turns a missing bridge into a rejection instead of a crash.
-    Promise.resolve()
-      .then(() => window.devpath.getApiConfig())
-      .then((config) => createApiClient(config).getHealth())
+    getApiClient()
+      .then((client) => client.getHealth())
       .then((health) => {
         if (active) setStatus(health.status === 'ok' ? 'connected' : 'disconnected');
       })

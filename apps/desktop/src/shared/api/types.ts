@@ -10,6 +10,23 @@ export interface HealthResponse {
   version: string;
 }
 
+/** A goal (mirrors Goal in DevPath.Api). `createdAt` is ISO 8601 UTC. */
+export interface Goal {
+  id: string;
+  title: string;
+  description: string | null;
+  targetPomodoros: number | null;
+  archived: boolean;
+  createdAt: string;
+}
+
+/** What the user can set on a goal (mirrors GoalInput). */
+export interface GoalInput {
+  title: string;
+  description: string | null;
+  targetPomodoros: number | null;
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 
