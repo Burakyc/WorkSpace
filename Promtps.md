@@ -404,4 +404,4 @@ Implement the spec in specs/2026-11-05-page-tree/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 4.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `NoteService` (tree in `notes/index.json`, empty page files, move/shift/delete rules) with the `/api/notes` endpoints and notes of the day in `DayService`; the Notlar page with the tree, rename, reorder, delete confirmation, "Taşı…" and drag and drop; "Notlar" on the day page; tech-stack and specs updated; phase 4.1 done.

@@ -122,12 +122,12 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 4 — Notes
 
-#### 4.1 Page tree — `todo`
-- [ ] Folders and pages in a tree (`notes/index.json`); create, rename, move (drag or "move to"), delete with confirmation.
-- [ ] Subpages: a page can have child pages.
-- [ ] Empty pages stored as `notes/pages/<id>.json`.
-- [ ] The day page (3.2) lists the notes created or edited that day.
-- [ ] Tests: tree operations (move into own child is rejected, delete removes children).
+#### 4.1 Page tree — `done`
+- [x] Folders and pages in a tree (`notes/index.json`); create, rename, move (drag or "move to"), delete with confirmation.
+- [x] Subpages: a page can have child pages.
+- [x] Empty pages stored as `notes/pages/<id>.json`.
+- [x] The day page (3.2) lists the notes created or edited that day.
+- [x] Tests: tree operations (move into own child is rejected, delete removes children).
 
 #### 4.2 BlockNote editor — `todo`
 - [ ] Opening a page shows BlockNote with `/` command menu, headings, lists, toggle lists, code blocks with syntax highlight.

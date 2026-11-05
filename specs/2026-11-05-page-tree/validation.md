@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 4.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Folders and pages in a tree (`notes/index.json`); create, rename, move (drag or "Taşı…"), reorder, delete with confirmation.
-- [ ] Subpages: any item can have child items.
-- [ ] Each new page is stored as an empty `notes/pages/<id>.json`.
-- [ ] The day page lists the pages created or edited that day.
-- [ ] Tests: tree operations (move into own child is rejected, delete removes children).
-- [ ] `tech-stack.md` is updated.
+- [x] Folders and pages in a tree (`notes/index.json`); create, rename, move (drag or "Taşı…"), reorder, delete with confirmation.
+- [x] Subpages: any item can have child items.
+- [x] Each new page is stored as an empty `notes/pages/<id>.json`.
+- [x] The day page lists the pages created or edited that day.
+- [x] Tests: tree operations (move into own child is rejected, delete removes children).
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -60,7 +60,7 @@ Run `npm run dev` with an empty `notes/` folder.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 4.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 4.1 ticked and set to `done`
