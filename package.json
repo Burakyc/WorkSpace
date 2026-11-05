@@ -11,6 +11,7 @@
     "dev": "dotnet build apps/api/DevPath.slnx && npm run dev -w apps/desktop",
     "check": "npm run check:api && npm run check:desktop",
     "check:api": "dotnet build apps/api/DevPath.slnx && dotnet test apps/api/DevPath.slnx",
-    "check:desktop": "npm run typecheck -w apps/desktop && npm run lint -w apps/desktop && npm run test -w apps/desktop && npm run build -w apps/desktop"
+    "check:desktop": "npm run typecheck -w apps/desktop && npm run lint -w apps/desktop && npm run test -w apps/desktop && npm run build -w apps/desktop",
+    "publish:api": "dotnet publish apps/api/DevPath.Api -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:DebugType=None -o apps/api/publish"
   }
 }

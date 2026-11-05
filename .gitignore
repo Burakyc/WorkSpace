@@ -22,3 +22,6 @@ release/
 
 # Local tool settings
 .claude/settings.local.json
+
+# API publish output
+apps/api/publish/
