@@ -13,6 +13,7 @@ import {
 import type { ReactNode } from 'react';
 import { CalendarPage } from '../modules/calendar/CalendarPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
+import { HomePage } from '../modules/home/HomePage';
 import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
 import { SettingsPage } from '../modules/settings/SettingsPage';
@@ -28,15 +29,7 @@ export interface NavEntry {
 }
 
 export const navigation: readonly NavEntry[] = [
-  {
-    path: '/',
-    label: 'Ana Sayfa',
-    icon: House,
-    emptyState: {
-      description: 'Bugünün özeti, hatırlatmalar ve son değişiklikler burada görünecek.',
-      next: 'Başlamak için soldan bir bölüm seç.',
-    },
-  },
+  { path: '/', label: 'Ana Sayfa', icon: House, element: <HomePage /> },
   { path: '/goals', label: 'Hedefler', icon: Target, element: <GoalsPage /> },
   { path: '/pomodoro', label: 'Pomodoro', icon: Timer, element: <PomodoroPage /> },
   {
