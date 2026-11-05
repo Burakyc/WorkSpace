@@ -80,3 +80,17 @@ Add a new phase "0.7 Docker for the API" to the end of Milestone 0 in specs/road
 
 Ask me with AskUserQuestion if anything is unclear before writing.
 **Result:** added phase 0.7 to `specs/roadmap.md`.
+
+## 2026-11-05 – Plan phase 0.3 Electron starts the API
+**Phase:** 0.3 Electron starts the API
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 0.3 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-05-electron-starts-api/` (`requirements.md`, `plan.md`, `validation.md`).
