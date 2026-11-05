@@ -61,7 +61,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 - Every request must carry `X-DevPath-Token: <per-launch token>`; requests without it get `401`. This stops other local processes and web pages from using the API. When `DEVPATH_TOKEN` is not set, the check is off in Development only (with a warning, for running the API on its own); any other environment refuses to start.
 - The `Host` must be `127.0.0.1` (built-in host filtering, `AllowedHosts: "127.0.0.1"`, `400` otherwise). This blocks DNS rebinding. The port is not compared: a rebinding attack always changes the host name.
 - CORS allows only the origin in `DEVPATH_ORIGIN`: the Vite dev server origin in development, `null` for the `file://` page in a build. Without it, no cross-origin request is allowed. CORS runs before the token check so browser preflights are answered.
-- Errors are returned as RFC 7807 `ProblemDetails`.
+- Errors are returned as RFC 7807 `ProblemDetails`. Invalid input: services throw `ValidationException(errors)` and one global `ValidationExceptionFilter` returns `400` `ValidationProblemDetails` with `errors: { camelCaseField: [message] }`. Messages are Turkish because the UI shows them as they are; controllers never validate.
+- Each module registers its own storage in an `Add<Module>()` extension: `IRepository<T>` → `JsonRepository<T>` with the module's file name and `DocumentSchema`, plus its service as a concrete class. Services get the time from `TimeProvider` so tests can fix it.
 - The built-in OpenAPI document (`/openapi/v1.json`) is served in Development only.
 - Without `DEVPATH_PORT` (running the API on its own), the API falls back to port `5180`.
 - Controllers are thin: parse input, call one service method, map the result. Business logic lives in services.
@@ -71,7 +72,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 ### Frontend rules
 
 - Function components and hooks only. State is React state plus a few contexts (theme, active pomodoro). No global state library.
-- One typed API client (`shared/api/`) wraps `fetch`, adds the token and base URL from `await window.devpath.getApiConfig()` (async: the preload asks main over IPC, and main answers only the app's own page), and returns typed results. No `any`.
+- One typed API client (`shared/api/`) wraps `fetch`, adds the token and base URL from `await window.devpath.getApiConfig()` (async: the preload asks main over IPC, and main answers only the app's own page), and returns typed results. No `any`. Pages get it through `getApiClient()`, cached for the page load (the window reloads when the API restarts). A `400` validation problem becomes `ApiError.errors`, shown next to the form fields.
+- Pages reload their list from the API after every change (no client-side cache or optimistic updates); effects load data with a promise chain and an `active` flag.
 - Design tokens live in one file (`shared/ui/tokens.css`) as CSS variables (`--color-*`, `--font-*`, `--space-*`, `--radius-*`, sidebar widths); light/dark switch on `prefers-color-scheme`. Accent is indigo. Fonts are the system stack (Segoe UI Variable, Cascadia Code); no bundled web fonts. Components use CSS Modules and only token values.
 - Routing: `HashRouter` (the production page is a `file://` URL). One route table (`src/app/navigation.tsx`) drives the sidebar and the routes; paths are English, labels Turkish. A module replaces its empty state entry with its page.
 - Layout: sidebar + content area, with a skip link and a visible `:focus-visible` ring. Below 900 px (`width < 900px`, so fractional widths on scaled displays are covered) the sidebar collapses to icons and content goes to one column. Icons are SVG (lucide-react). The API status sits in the sidebar footer.
