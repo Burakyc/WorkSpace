@@ -117,7 +117,15 @@ devpath-workspace/
 
 ## Development
 
-Prerequisite: [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+Prerequisites: Node 24 (see `.nvmrc`), npm 11 and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+
+```bash
+npm install      # install desktop dependencies
+npm run dev      # open the desktop app with hot reload
+npm run check    # build and test everything (API + desktop)
+```
+
+API only:
 
 ```bash
 dotnet build apps/api/DevPath.slnx
