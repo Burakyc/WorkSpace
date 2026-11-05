@@ -210,4 +210,31 @@ describe('createApiClient', () => {
       ],
     ]);
   });
+  it('sends the notes requests', async () => {
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockImplementation((_url, init) =>
+        Promise.resolve(init?.method === 'DELETE' ? new Response(null, { status: 204 }) : json({})),
+      );
+    const client = createApiClient(config, fetchFn);
+
+    await client.listNotes();
+    await client.createNote('p 1', 'page', 'DI');
+    await client.renameNote('n 1', 'Dependency injection');
+    await client.moveNote('n 1', null);
+    await client.shiftNote('n 1', -1);
+    await expect(client.deleteNote('n 1')).resolves.toBeUndefined();
+
+    const base = 'http://127.0.0.1:4321/api/notes';
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      [`GET ${base}`, undefined],
+      [`POST ${base}`, JSON.stringify({ parentId: 'p 1', kind: 'page', title: 'DI' })],
+      [`PUT ${base}/n%201`, JSON.stringify({ title: 'Dependency injection' })],
+      [`POST ${base}/n%201/move`, JSON.stringify({ parentId: null })],
+      [`POST ${base}/n%201/shift`, JSON.stringify({ offset: -1 })],
+      [`DELETE ${base}/n%201`, undefined],
+    ]);
+  });
 });

@@ -1,9 +1,12 @@
 import { vi } from 'vitest';
 import type {
   DayDetail,
+  DayNote,
   Goal,
   GoalInput,
   GoalProgress,
+  NoteKind,
+  NoteNode,
   PomodoroSettings,
   Project,
   ProjectCreateInput,
@@ -12,6 +15,7 @@ import type {
 } from '../../../shared/api/types';
 import { DEFAULT_POMODORO_SETTINGS } from '../../../shared/api/types';
 import { buildMonthGrid } from '../../calendar/monthGrid';
+import { descendantIds } from '../../notes/noteTree';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -37,9 +41,15 @@ export function installFakeGoalsApi(
     calendar?: Record<string, number>;
     failCalendar?: boolean;
     /** GET /api/days/{date} answers; days not listed are empty. Logs are kept per date. */
-    days?: Record<string, Omit<DayDetail, 'date' | 'timeZone' | 'log'>>;
+    days?: Record<
+      string,
+      Omit<DayDetail, 'date' | 'timeZone' | 'log' | 'notes'> & { notes?: DayNote[] }
+    >;
     logs?: Record<string, string>;
     failDays?: boolean;
+    /** The notes tree; mutated by the notes routes. */
+    notes?: NoteNode[];
+    failNotes?: boolean;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -233,7 +243,89 @@ export function installFakeGoalsApi(
       return json({ text });
     }
     const empty = { completedSessions: 0, totalMinutes: 0, sessions: [], goals: [] };
-    return json({ date, timeZone, ...(options.days?.[date] ?? empty), log: logs[date] ?? '' });
+    return json({
+      date,
+      timeZone,
+      notes: [],
+      ...(options.days?.[date] ?? empty),
+      log: logs[date] ?? '',
+    });
+  }
+
+  const notes = (options.notes ?? []).map((n) => ({ ...n }));
+
+  const lastOrder = (parentId: string | null) =>
+    Math.max(-1, ...notes.filter((n) => n.parentId === parentId).map((n) => n.order)) + 1;
+
+  function notesRoute(
+    method: string,
+    id: string | undefined,
+    action: string | undefined,
+    body: unknown,
+  ) {
+    if (options.failNotes) return json({ title: 'Server error' }, 500);
+    if (method === 'GET') {
+      return json([...notes].sort((a, b) => a.order - b.order));
+    }
+    if (method === 'POST' && id === undefined) {
+      const input = body as { parentId: string | null; kind: NoteKind; title: string };
+      const invalid = problem(titleError(input.title));
+      if (invalid) return invalid;
+      const node: NoteNode = {
+        id: `note-${notes.length + 1}-${created + 1}`,
+        parentId: input.parentId,
+        kind: input.kind,
+        title: input.title.trim(),
+        order: lastOrder(input.parentId),
+        createdAt: nextCreatedAt(),
+        updatedAt: '',
+      };
+      node.updatedAt = node.createdAt;
+      notes.push(node);
+      return json(node, 201);
+    }
+    const node = notes.find((n) => n.id === id);
+    if (!node || id === undefined) return notFound();
+    if (method === 'DELETE') {
+      const doomed = descendantIds(notes, id).add(id);
+      notes.splice(0, notes.length, ...notes.filter((n) => !doomed.has(n.id)));
+      return new Response(null, { status: 204 });
+    }
+    if (method === 'PUT') {
+      const { title } = body as { title: string };
+      const invalid = problem(titleError(title));
+      if (invalid) return invalid;
+      node.title = title.trim();
+      return json(node);
+    }
+    if (action === 'move') {
+      const { parentId } = body as { parentId: string | null };
+      if (parentId !== null && (parentId === id || descendantIds(notes, id).has(parentId))) {
+        return json(
+          { errors: { parentId: ['Bir öğe kendi içine veya alt öğelerinden birine taşınamaz.'] } },
+          400,
+        );
+      }
+      if (node.parentId !== parentId) {
+        node.order = lastOrder(parentId);
+        node.parentId = parentId;
+      }
+      return json(node);
+    }
+    if (action === 'shift') {
+      const { offset } = body as { offset: number };
+      const siblings = notes
+        .filter((n) => n.parentId === node.parentId)
+        .sort((a, b) => a.order - b.order);
+      const index = siblings.indexOf(node) + offset;
+      const neighbour = siblings[index];
+      if (neighbour) {
+        [siblings[index], siblings[index - offset]] = [node, neighbour];
+        siblings.forEach((n, i) => (n.order = i));
+      }
+      return json(node);
+    }
+    return json({ title: 'Unexpected request' }, 500);
   }
 
   const fetchFn = vi.fn<typeof fetch>((url, init) => {
@@ -245,6 +337,7 @@ export function installFakeGoalsApi(
     const includeArchived = searchParams.get('includeArchived') === 'true';
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
     if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
+    if (resource === 'notes') return Promise.resolve(notesRoute(method, id, action, body));
     if (resource === 'days' && id !== undefined) {
       return Promise.resolve(daysRoute(method, id, searchParams.get('timeZone') ?? '', body));
     }
@@ -263,7 +356,16 @@ export function installFakeGoalsApi(
     openExternal,
   });
   vi.stubGlobal('fetch', fetchFn);
-  return { goals, projects, sessions, logs, fetchFn, openExternal, settings: () => settings };
+  return {
+    goals,
+    projects,
+    sessions,
+    logs,
+    notes,
+    fetchFn,
+    openExternal,
+    settings: () => settings,
+  };
 }
 
 export function goal(overrides: Partial<Goal> & Pick<Goal, 'id' | 'title'>): Goal {

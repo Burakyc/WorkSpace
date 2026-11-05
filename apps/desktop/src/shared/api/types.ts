@@ -139,7 +139,14 @@ export interface DayGoal {
   totalMinutes: number;
 }
 
-/** GET /api/days/{date}: sessions oldest first, goals most worked first, and the daily log text. */
+/** A page created (`created: true`) or edited on the day. */
+export interface DayNote {
+  id: string;
+  title: string;
+  created: boolean;
+}
+
+/** GET /api/days/{date}: sessions oldest first, goals most worked first, notes by edit time, and the daily log text. */
 export interface DayDetail {
   date: string;
   timeZone: string;
@@ -147,7 +154,21 @@ export interface DayDetail {
   totalMinutes: number;
   sessions: DaySession[];
   goals: DayGoal[];
+  notes: DayNote[];
   log: string;
+}
+
+export type NoteKind = 'folder' | 'page';
+
+/** A folder or page of the notes tree (mirrors NoteNode). Siblings are sorted by `order`; any node can have children. */
+export interface NoteNode {
+  id: string;
+  parentId: string | null;
+  kind: NoteKind;
+  title: string;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */

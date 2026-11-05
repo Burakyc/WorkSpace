@@ -7,6 +7,8 @@ import type {
   GoalInput,
   GoalProgress,
   HealthResponse,
+  NoteKind,
+  NoteNode,
   PomodoroSettings,
   Project,
   ProjectCreateInput,
@@ -51,9 +53,18 @@ export interface ApiClient {
   getDay(date: string, timeZone: string): Promise<DayDetail>;
   /** Saves the free-text daily log; returns the stored (end-trimmed) text. */
   saveDayLog(date: string, text: string): Promise<{ text: string }>;
+  listNotes(): Promise<NoteNode[]>;
+  createNote(parentId: string | null, kind: NoteKind, title: string): Promise<NoteNode>;
+  renameNote(id: string, title: string): Promise<NoteNode>;
+  /** Makes the node the last child of `parentId` (null = top level). */
+  moveNote(id: string, parentId: string | null): Promise<NoteNode>;
+  /** Swaps the node with its previous (-1) or next (1) sibling. */
+  shiftNote(id: string, offset: -1 | 1): Promise<NoteNode>;
+  /** Deletes the node and everything under it. */
+  deleteNote(id: string): Promise<void>;
 }
 
-type Method = 'GET' | 'POST' | 'PUT';
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 // The default reads the global fetch on every call, so a cached client still sees a fetch stubbed later in tests.
 export function createApiClient(
@@ -72,11 +83,13 @@ export function createApiClient(
     if (!response.ok) {
       throw new ApiError(response.status, path, await readFieldErrors(response));
     }
-    return (await response.json()) as T;
+    // 204 No Content has no body; only callers typed `void` get it.
+    return (response.status === 204 ? undefined : await response.json()) as T;
   }
 
   const goal = (id: string) => `/api/goals/${encodeURIComponent(id)}`;
   const project = (id: string) => `/api/projects/${encodeURIComponent(id)}`;
+  const note = (id: string) => `/api/notes/${encodeURIComponent(id)}`;
 
   return {
     getHealth: () => request<HealthResponse>('GET', '/api/health'),
@@ -110,6 +123,13 @@ export function createApiClient(
       ),
     saveDayLog: (date, text) =>
       request<{ text: string }>('PUT', `/api/days/${encodeURIComponent(date)}/log`, { text }),
+    listNotes: () => request<NoteNode[]>('GET', '/api/notes'),
+    createNote: (parentId, kind, title) =>
+      request<NoteNode>('POST', '/api/notes', { parentId, kind, title }),
+    renameNote: (id, title) => request<NoteNode>('PUT', note(id), { title }),
+    moveNote: (id, parentId) => request<NoteNode>('POST', `${note(id)}/move`, { parentId }),
+    shiftNote: (id, offset) => request<NoteNode>('POST', `${note(id)}/shift`, { offset }),
+    deleteNote: (id) => request<void>('DELETE', note(id)),
   };
 }
 
