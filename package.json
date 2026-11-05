@@ -8,7 +8,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "npm run dev -w apps/desktop",
+    "dev": "dotnet build apps/api/DevPath.slnx && npm run dev -w apps/desktop",
     "check": "npm run check:api && npm run check:desktop",
     "check:api": "dotnet build apps/api/DevPath.slnx && dotnet test apps/api/DevPath.slnx",
     "check:desktop": "npm run typecheck -w apps/desktop && npm run lint -w apps/desktop && npm run test -w apps/desktop && npm run build -w apps/desktop"
