@@ -11,6 +11,7 @@ import {
   Timer,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { SettingsPage } from '../modules/settings/SettingsPage';
 import { EmptyState } from '../shared/ui/EmptyState';
 
 /** One sidebar item and its page. A module sets `element` when it is built; until then the empty state shows. */
@@ -95,7 +96,7 @@ export const navigation: readonly NavEntry[] = [
       next: 'Sorular JSON içe aktarma ile eklenecek.',
     },
   },
-  { path: '/settings', label: 'Ayarlar', icon: Settings },
+  { path: '/settings', label: 'Ayarlar', icon: Settings, element: <SettingsPage /> },
 ];
 
 export function pageFor(entry: NavEntry): ReactNode {

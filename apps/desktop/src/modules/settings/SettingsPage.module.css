@@ -1,0 +1,51 @@
+.title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  line-height: 1.2;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.path {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.button {
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+}
