@@ -1,7 +1,8 @@
 import { once } from 'node:events';
 import { createServer } from 'node:net';
 import { describe, expect, it, vi } from 'vitest';
-import { createToken, findFreePort, TOKEN_HEADER, waitForHealth } from './apiProcess';
+import { TOKEN_HEADER } from '../src/shared/api/client';
+import { createToken, findFreePort, waitForHealth } from './apiProcess';
 
 const baseUrl = 'http://127.0.0.1:1234';
 

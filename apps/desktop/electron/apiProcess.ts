@@ -3,8 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { once } from 'node:events';
 import { createServer } from 'node:net';
 import { dirname } from 'node:path';
-
-export const TOKEN_HEADER = 'X-DevPath-Token';
+import { TOKEN_HEADER } from '../src/shared/api/client';
 
 export interface ApiHandle {
   baseUrl: string;
