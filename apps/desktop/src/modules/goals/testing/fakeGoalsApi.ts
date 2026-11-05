@@ -14,6 +14,8 @@ import type {
   ProjectCreateInput,
   Session,
   SessionInput,
+  YouTubeChannel,
+  YouTubeVideos,
 } from '../../../shared/api/types';
 import { DEFAULT_POMODORO_SETTINGS } from '../../../shared/api/types';
 import { buildMonthGrid } from '../../calendar/monthGrid';
@@ -61,6 +63,14 @@ export function installFakeGoalsApi(
     /** GET /api/home/feed answer; missing by default. */
     feed?: FeedResponse;
     failFeed?: boolean;
+    /** Followed channels; mutated by add/remove. Adding `UC…` succeeds with the title from `youTubeTitles`. */
+    youTubeChannels?: YouTubeChannel[];
+    youTubeTitles?: Record<string, string>;
+    /** GET /api/youtube/videos answer, and what POST /api/youtube/refresh answers (default: the same). */
+    youTubeVideos?: YouTubeVideos;
+    refreshedVideos?: YouTubeVideos;
+    failYouTube?: boolean;
+    failRefresh?: boolean;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -351,6 +361,47 @@ export function installFakeGoalsApi(
     return json({ title: 'Unexpected request' }, 500);
   }
 
+  const youTubeChannels = (options.youTubeChannels ?? []).map((c) => ({ ...c }));
+  const noVideos: YouTubeVideos = { videos: [], lastRefreshAt: null, error: null };
+
+  function youTubeRoute(
+    method: string,
+    id: string | undefined,
+    action: string | undefined,
+    body: unknown,
+  ) {
+    if (options.failYouTube) return json({ title: 'Server error' }, 500);
+    if (id === 'videos') return json(options.youTubeVideos ?? noVideos);
+    if (id === 'refresh') {
+      if (options.failRefresh) return json({ title: 'Server error' }, 500);
+      return json(options.refreshedVideos ?? options.youTubeVideos ?? noVideos);
+    }
+    if (method === 'GET') return json(youTubeChannels);
+    if (method === 'DELETE') {
+      const index = youTubeChannels.findIndex((c) => c.id === action);
+      if (index < 0) return notFound();
+      youTubeChannels.splice(index, 1);
+      return new Response(null, { status: 204 });
+    }
+    const input = (body as { input: string }).input.trim();
+    if (!input.startsWith('UC')) {
+      return json(
+        {
+          errors: {
+            input: ["Kanal ID'si (UC ile başlar) ya da youtube.com/channel/… adresi gir."],
+          },
+        },
+        400,
+      );
+    }
+    if (youTubeChannels.some((c) => c.id === input)) {
+      return json({ errors: { input: ['Bu kanal zaten ekli.'] } }, 400);
+    }
+    const channel = { id: input, title: options.youTubeTitles?.[input] ?? input };
+    youTubeChannels.push(channel);
+    return json(channel, 201);
+  }
+
   const fetchFn = vi.fn<typeof fetch>((url, init) => {
     const { pathname, searchParams } = new URL(String(url));
     const method = init?.method ?? 'GET';
@@ -363,6 +414,9 @@ export function installFakeGoalsApi(
       return Promise.resolve(
         json(options.feed ?? { status: 'missing', generatedAt: null, items: [], errors: [] }),
       );
+    }
+    if (resource === 'youtube') {
+      return Promise.resolve(youTubeRoute(method, id, action, body));
     }
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
     if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
@@ -401,6 +455,7 @@ export function installFakeGoalsApi(
     logs,
     notes,
     contents,
+    youTubeChannels,
     closeApp,
     fetchFn,
     openExternal,

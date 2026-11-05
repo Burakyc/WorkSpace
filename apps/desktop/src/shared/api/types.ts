@@ -203,6 +203,30 @@ export interface FeedResponse {
   errors: string[];
 }
 
+/** A followed YouTube channel (mirrors YouTubeChannel). */
+export interface YouTubeChannel {
+  id: string;
+  title: string;
+}
+
+/** A cached video; `thumbnailUrl` and `url` are built by the API from the video id. */
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  channelId: string;
+  channelTitle: string;
+  publishedAt: string;
+  thumbnailUrl: string;
+  url: string;
+}
+
+/** GET /api/youtube/videos, POST /api/youtube/refresh: the 10 newest videos and how the last refresh went. */
+export interface YouTubeVideos {
+  videos: YouTubeVideo[];
+  lastRefreshAt: string | null;
+  error: string | null;
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 

@@ -244,13 +244,30 @@ describe('createApiClient', () => {
     ]);
   });
   it('sends the home requests', async () => {
-    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(json({}));
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockImplementation((_url, init) =>
+        Promise.resolve(init?.method === 'DELETE' ? new Response(null, { status: 204 }) : json({})),
+      );
     const client = createApiClient(config, fetchFn);
 
     await client.getFeed();
+    await client.listYouTubeChannels();
+    await client.addYouTubeChannel('UC123');
+    await client.removeYouTubeChannel('UC 1');
+    await client.getYouTubeVideos();
+    await client.refreshYouTube();
 
-    expect(fetchFn.mock.calls.map(([url, init]) => `${init?.method} ${String(url)}`)).toEqual([
-      'GET http://127.0.0.1:4321/api/home/feed',
+    const base = 'http://127.0.0.1:4321/api';
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      [`GET ${base}/home/feed`, undefined],
+      [`GET ${base}/youtube/channels`, undefined],
+      [`POST ${base}/youtube/channels`, JSON.stringify({ input: 'UC123' })],
+      [`DELETE ${base}/youtube/channels/UC%201`, undefined],
+      [`GET ${base}/youtube/videos`, undefined],
+      [`POST ${base}/youtube/refresh`, undefined],
     ]);
   });
 });

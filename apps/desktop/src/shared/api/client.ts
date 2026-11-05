@@ -17,6 +17,8 @@ import type {
   ProjectUpdateInput,
   Session,
   SessionInput,
+  YouTubeChannel,
+  YouTubeVideos,
 } from './types';
 
 export const TOKEN_HEADER = 'X-DevPath-Token';
@@ -72,6 +74,14 @@ export interface ApiClient {
   searchNotes(query: string): Promise<NoteSearchResult[]>;
   /** The agent-written feed.json: `ok` with the 10 newest items, `missing`, or `invalid` with the error lines. */
   getFeed(): Promise<FeedResponse>;
+  listYouTubeChannels(): Promise<YouTubeChannel[]>;
+  /** `input` is a channel id or a youtube.com/channel/ URL; the API checks it against the channel's RSS. */
+  addYouTubeChannel(input: string): Promise<YouTubeChannel>;
+  removeYouTubeChannel(id: string): Promise<void>;
+  /** The newest cached videos; never waits on YouTube. */
+  getYouTubeVideos(): Promise<YouTubeVideos>;
+  /** Fetches every channel now, then answers like `getYouTubeVideos`. */
+  refreshYouTube(): Promise<YouTubeVideos>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -145,6 +155,13 @@ export function createApiClient(
     searchNotes: (query) =>
       request<NoteSearchResult[]>('GET', `/api/notes/search?q=${encodeURIComponent(query)}`),
     getFeed: () => request<FeedResponse>('GET', '/api/home/feed'),
+    listYouTubeChannels: () => request<YouTubeChannel[]>('GET', '/api/youtube/channels'),
+    addYouTubeChannel: (input) =>
+      request<YouTubeChannel>('POST', '/api/youtube/channels', { input }),
+    removeYouTubeChannel: (id) =>
+      request<void>('DELETE', `/api/youtube/channels/${encodeURIComponent(id)}`),
+    getYouTubeVideos: () => request<YouTubeVideos>('GET', '/api/youtube/videos'),
+    refreshYouTube: () => request<YouTubeVideos>('POST', '/api/youtube/refresh'),
   };
 }
 
