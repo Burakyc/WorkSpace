@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { noteNode } from './testing/noteNode';
-import { ancestorsOf, childrenOf, descendantIds, moveTargets } from './noteTree';
+import { ancestorsOf, childrenOf, descendantIds, moveTargets } from './treeHelpers';
 
 // top ─┬─ b (order 1)
 //      └─ a (order 0) ── deep
@@ -13,7 +13,7 @@ const nodes = [
   noteNode({ id: 'other', title: 'Other', order: 1 }),
 ];
 
-describe('noteTree', () => {
+describe('treeHelpers', () => {
   it('sorts children by order', () => {
     expect(childrenOf(nodes, 'top').map((n) => n.id)).toEqual(['a', 'b']);
     expect(childrenOf(nodes, null).map((n) => n.id)).toEqual(['top', 'other']);

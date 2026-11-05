@@ -13,6 +13,7 @@ import {
 import type { ReactNode } from 'react';
 import { CalendarPage } from '../modules/calendar/CalendarPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
+import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
 import { SettingsPage } from '../modules/settings/SettingsPage';
 import { EmptyState } from '../shared/ui/EmptyState';
@@ -44,15 +45,7 @@ export const navigation: readonly NavEntry[] = [
     icon: CalendarDays,
     element: <CalendarPage />,
   },
-  {
-    path: '/notes',
-    label: 'Notlar',
-    icon: NotebookPen,
-    emptyState: {
-      description: 'Klasörler, sayfalar ve alt sayfalarla notların burada olacak.',
-      next: 'Not düzenleyici yakında geliyor.',
-    },
-  },
+  { path: '/notes', label: 'Notlar', icon: NotebookPen, element: <NotesPage /> },
   {
     path: '/english',
     label: 'İngilizce',

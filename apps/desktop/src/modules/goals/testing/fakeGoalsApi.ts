@@ -15,7 +15,7 @@ import type {
 } from '../../../shared/api/types';
 import { DEFAULT_POMODORO_SETTINGS } from '../../../shared/api/types';
 import { buildMonthGrid } from '../../calendar/monthGrid';
-import { descendantIds } from '../../notes/noteTree';
+import { descendantIds } from '../../notes/treeHelpers';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
