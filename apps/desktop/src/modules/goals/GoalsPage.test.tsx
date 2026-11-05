@@ -90,3 +90,87 @@ describe('GoalsPage list', () => {
     expect(await screen.findByText('Aktif hedef yok.')).toBeInTheDocument();
   });
 });
+
+describe('GoalsPage form', () => {
+  it('creates a goal from the empty state in two clicks', async () => {
+    const api = installFakeGoalsApi();
+    render(<GoalsPage />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Yeni hedef' }));
+    const form = screen.getByRole('form', { name: 'Yeni hedef' });
+    expect(within(form).getByLabelText('Başlık')).toHaveFocus();
+    fireEvent.change(within(form).getByLabelText('Başlık'), {
+      target: { value: 'Learn ASP.NET Core' },
+    });
+    fireEvent.change(within(form).getByLabelText('Açıklama'), { target: { value: 'Todo API' } });
+    fireEvent.change(within(form).getByLabelText('Hedef pomodoro (isteğe bağlı)'), {
+      target: { value: '20' },
+    });
+    fireEvent.click(within(form).getByRole('button', { name: 'Kaydet' }));
+
+    const card = await screen.findByRole('article', { name: 'Learn ASP.NET Core' });
+    expect(within(card).getByText('Todo API')).toBeInTheDocument();
+    expect(within(card).getByText('Hedef: 20 pomodoro')).toBeInTheDocument();
+    expect(screen.queryByRole('form')).not.toBeInTheDocument();
+    expect(api.goals).toHaveLength(1);
+  });
+
+  it('puts a new goal at the top of the list', async () => {
+    installFakeGoalsApi([older]);
+    render(<GoalsPage />);
+    await screen.findByRole('article', { name: 'Learn ASP.NET Core' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Yeni hedef' }));
+    fireEvent.change(screen.getByLabelText('Başlık'), { target: { value: 'Newest' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    await screen.findByRole('article', { name: 'Newest' });
+    expect(await cardTitles()).toEqual(['Newest', 'Learn ASP.NET Core']);
+  });
+
+  it('edits a goal in place', async () => {
+    installFakeGoalsApi([older]);
+    render(<GoalsPage />);
+    const card = await screen.findByRole('article', { name: 'Learn ASP.NET Core' });
+
+    fireEvent.click(within(card).getByRole('button', { name: 'Düzenle' }));
+    const form = screen.getByRole('form', { name: 'Hedefi düzenle' });
+    expect(within(form).getByLabelText('Başlık')).toHaveValue('Learn ASP.NET Core');
+    expect(within(form).getByLabelText('Hedef pomodoro (isteğe bağlı)')).toHaveValue(20);
+    fireEvent.change(within(form).getByLabelText('Başlık'), { target: { value: 'Master DI' } });
+    fireEvent.click(within(form).getByRole('button', { name: 'Kaydet' }));
+
+    expect(await screen.findByRole('article', { name: 'Master DI' })).toBeInTheDocument();
+    expect(screen.queryByRole('article', { name: 'Learn ASP.NET Core' })).not.toBeInTheDocument();
+  });
+
+  it('shows validation errors next to the field and keeps the form open', async () => {
+    installFakeGoalsApi([older]);
+    render(<GoalsPage />);
+    await screen.findByRole('article', { name: 'Learn ASP.NET Core' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Yeni hedef' }));
+    fireEvent.change(screen.getByLabelText('Başlık'), { target: { value: '   ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+
+    const title = screen.getByLabelText('Başlık');
+    expect(await screen.findByText('Başlık gerekli.')).toBeInTheDocument();
+    expect(title).toHaveAttribute('aria-invalid', 'true');
+    expect(title).toHaveAccessibleDescription('Başlık gerekli.');
+    expect(screen.getByRole('button', { name: 'Kaydet' })).toBeEnabled();
+  });
+
+  it('closes the form on cancel without sending anything', async () => {
+    const api = installFakeGoalsApi([older]);
+    render(<GoalsPage />);
+    await screen.findByRole('article', { name: 'Learn ASP.NET Core' });
+    const requestsBefore = api.fetchFn.mock.calls.length;
+
+    fireEvent.click(screen.getByRole('button', { name: 'Yeni hedef' }));
+    fireEvent.change(screen.getByLabelText('Başlık'), { target: { value: 'Never saved' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Vazgeç' }));
+
+    expect(screen.queryByRole('form')).not.toBeInTheDocument();
+    expect(api.fetchFn.mock.calls.length).toBe(requestsBefore);
+  });
+});

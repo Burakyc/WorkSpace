@@ -5,11 +5,12 @@ import styles from './GoalCard.module.css';
 interface GoalCardProps {
   goal: Goal;
   busy: boolean;
+  onEdit(): void;
   onArchive(): void;
   onRestore(): void;
 }
 
-export function GoalCard({ goal, busy, onArchive, onRestore }: GoalCardProps) {
+export function GoalCard({ goal, busy, onEdit, onArchive, onRestore }: GoalCardProps) {
   return (
     <article className={styles.card} aria-label={goal.title}>
       <div className={styles.titleRow}>
@@ -26,9 +27,14 @@ export function GoalCard({ goal, busy, onArchive, onRestore }: GoalCardProps) {
             Geri al
           </button>
         ) : (
-          <button type="button" className={buttons.secondary} onClick={onArchive} disabled={busy}>
-            Arşivle
-          </button>
+          <>
+            <button type="button" className={buttons.secondary} onClick={onEdit} disabled={busy}>
+              Düzenle
+            </button>
+            <button type="button" className={buttons.secondary} onClick={onArchive} disabled={busy}>
+              Arşivle
+            </button>
+          </>
         )}
       </div>
     </article>

@@ -1,15 +1,21 @@
 import { Target } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { getApiClient } from '../../shared/api/getApiClient';
-import type { Goal } from '../../shared/api/types';
+import type { Goal, GoalInput } from '../../shared/api/types';
+import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import { GoalCard } from './GoalCard';
+import { GoalForm } from './GoalForm';
 import styles from './GoalsPage.module.css';
+
+/** `'new'` while the create form is open, a goal id while that goal is edited. */
+type Editing = 'new' | string | null;
 
 export function GoalsPage() {
   // All goals, archived included (active first, newest first); the toggle only filters what is shown.
   const [goals, setGoals] = useState<Goal[] | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [editing, setEditing] = useState<Editing>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Bumped after every change so the list reloads from the API.
@@ -33,6 +39,13 @@ export function GoalsPage() {
     };
   }, [version]);
 
+  async function save(input: GoalInput, goal?: Goal) {
+    const client = await getApiClient();
+    await (goal ? client.updateGoal(goal.id, input) : client.createGoal(input));
+    setEditing(null);
+    reload();
+  }
+
   async function setArchived(goal: Goal, archived: boolean) {
     setBusyId(goal.id);
     try {
@@ -46,23 +59,55 @@ export function GoalsPage() {
     }
   }
 
-  if (goals !== null && goals.length === 0) {
+  const newGoalButton = (
+    <div>
+      <button
+        type="button"
+        className={buttons.primary}
+        onClick={() => setEditing('new')}
+        disabled={editing === 'new'}
+      >
+        Yeni hedef
+      </button>
+    </div>
+  );
+
+  if (goals === null) {
+    // Only the heading while loading, so no control appears and then disappears.
+    return (
+      <>
+        <h1 className={styles.title}>Hedefler</h1>
+        {error ? (
+          <p role="alert" className={styles.error}>
+            {error}
+          </p>
+        ) : (
+          <p className={styles.muted}>Yükleniyor…</p>
+        )}
+      </>
+    );
+  }
+
+  if (goals.length === 0 && editing !== 'new') {
     return (
       <EmptyState
         icon={Target}
         title="Hedefler"
         description="Hedeflerin ve onlara bağlı projeler burada listelenecek."
         next="İlk hedefini oluşturarak başla."
-      />
+      >
+        {newGoalButton}
+      </EmptyState>
     );
   }
 
-  const visible = goals?.filter((goal) => showArchived || !goal.archived) ?? [];
+  const visible = goals.filter((goal) => showArchived || !goal.archived);
 
   return (
     <>
       <div className={styles.header}>
         <h1 className={styles.title}>Hedefler</h1>
+        {newGoalButton}
       </div>
       <label className={styles.toggle}>
         <input
@@ -77,21 +122,32 @@ export function GoalsPage() {
           {error}
         </p>
       )}
-      {goals === null ? (
-        <p className={styles.muted}>Yükleniyor…</p>
-      ) : visible.length === 0 ? (
-        <p className={styles.muted}>Aktif hedef yok.</p>
+      {editing === 'new' && (
+        <GoalForm onSave={(input) => save(input)} onCancel={() => setEditing(null)} />
+      )}
+      {visible.length === 0 ? (
+        editing !== 'new' && <p className={styles.muted}>Aktif hedef yok.</p>
       ) : (
         <div className={styles.list}>
-          {visible.map((goal) => (
-            <GoalCard
-              key={goal.id}
-              goal={goal}
-              busy={busyId === goal.id}
-              onArchive={() => void setArchived(goal, true)}
-              onRestore={() => void setArchived(goal, false)}
-            />
-          ))}
+          {visible.map((goal) =>
+            editing === goal.id ? (
+              <GoalForm
+                key={goal.id}
+                goal={goal}
+                onSave={(input) => save(input, goal)}
+                onCancel={() => setEditing(null)}
+              />
+            ) : (
+              <GoalCard
+                key={goal.id}
+                goal={goal}
+                busy={busyId === goal.id}
+                onEdit={() => setEditing(goal.id)}
+                onArchive={() => void setArchived(goal, true)}
+                onRestore={() => void setArchived(goal, false)}
+              />
+            ),
+          )}
         </div>
       )}
     </>
