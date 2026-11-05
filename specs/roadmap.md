@@ -28,13 +28,13 @@ Electron + Vite + React + TypeScript window with the security baseline.
 - [x] One Vitest + React Testing Library test renders the app.
 - [x] `npm run check` runs `dotnet build`, `dotnet test`, `tsc --noEmit`, `eslint`, `vitest run`, `vite build`.
 
-#### 0.3 Electron starts the API — `todo`
+#### 0.3 Electron starts the API — `done`
 The app is one process from the user's point of view.
-- [ ] Electron main picks a free port, creates a per-launch token, spawns the API and waits for `/api/health` (10 s timeout, then an error window).
-- [ ] API rejects requests without the `X-DevPath-Token` header (401) or with a wrong `Host` header.
-- [ ] Preload exposes `getApiConfig()`; the renderer's typed API client calls `/api/health` and shows "API: bağlı".
-- [ ] Quitting the app stops the API process (no orphan `dotnet` / `DevPath.Api` process).
-- [ ] Tests: token middleware (xUnit), API client adds the header (Vitest).
+- [x] Electron main picks a free port, creates a per-launch token, spawns the API and waits for `/api/health` (10 s timeout, then an error window).
+- [x] API rejects requests without the `X-DevPath-Token` header (401) or with a wrong `Host` header.
+- [x] Preload exposes `getApiConfig()`; the renderer's typed API client calls `/api/health` and shows "API: bağlı".
+- [x] Quitting the app stops the API process (no orphan `dotnet` / `DevPath.Api` process).
+- [x] Tests: token middleware (xUnit), API client adds the header (Vitest).
 
 #### 0.4 Storage foundation — `todo`
 Safe JSON storage every module builds on.

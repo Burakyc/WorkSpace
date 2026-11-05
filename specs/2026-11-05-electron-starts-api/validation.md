@@ -6,16 +6,16 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 0.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Electron main picks a free port, creates a per-launch token, spawns the API and waits for `/api/health` (10 s timeout, then an error window and quit).
-- [ ] The API rejects requests without a valid `X-DevPath-Token` header (`401`) and requests with a `Host` other than `127.0.0.1` (`400`).
-- [ ] Without `DEVPATH_TOKEN` the API runs without the check only in `Development` (with a warning) and refuses to start in any other environment.
-- [ ] CORS allows only the origin in `DEVPATH_ORIGIN`; preflight requests work without the token.
-- [ ] Preload exposes only `window.devpath.getApiConfig()`; the IPC handler answers only the app's own page.
-- [ ] The renderer's typed API client calls `/api/health` with the token and the page shows "API: bağlı", in dev and in a production build.
-- [ ] Quitting the app stops the API process; killing Electron stops it too (parent watcher). No orphan `DevPath.Api` process.
-- [ ] Root `npm run dev` builds the API first and opens the app.
-- [ ] Tests: token middleware (xUnit) and API client adds the header (Vitest), plus the tests below.
-- [ ] README and `tech-stack.md` are updated.
+- [x] Electron main picks a free port, creates a per-launch token, spawns the API and waits for `/api/health` (10 s timeout, then an error window and quit).
+- [x] The API rejects requests without a valid `X-DevPath-Token` header (`401`) and requests with a `Host` other than `127.0.0.1` (`400`).
+- [x] Without `DEVPATH_TOKEN` the API runs without the check only in `Development` (with a warning) and refuses to start in any other environment.
+- [x] CORS allows only the origin in `DEVPATH_ORIGIN`; preflight requests work without the token.
+- [x] Preload exposes only `window.devpath.getApiConfig()`; the IPC handler answers only the app's own page.
+- [x] The renderer's typed API client calls `/api/health` with the token and the page shows "API: bağlı", in dev and in a production build.
+- [x] Quitting the app stops the API process; killing Electron stops it too (parent watcher). No orphan `DevPath.Api` process.
+- [x] Root `npm run dev` builds the API first and opens the app.
+- [x] Tests: token middleware (xUnit) and API client adds the header (Vitest), plus the tests below.
+- [x] README and `tech-stack.md` are updated.
 
 ## Automated tests
 
@@ -43,7 +43,7 @@ npm run check
 | T12 | No `DEVPATH_ORIGIN` | same | No `Access-Control-Allow-Origin` for any origin |
 | T13 | Parent exits | `Infrastructure/Hosting/ParentProcessWatcherTests.cs` | After the child process exits, `StopApplication()` is called |
 | T14 | Parent not running | same | Unknown PID → `StopApplication()` called at once |
-| T15 | Invalid PID setting | same | `DEVPATH_PARENT_PID=abc` → startup error naming `DEVPATH_PARENT_PID` |
+| T15 | Invalid PID setting | same | `DEVPATH_PARENT_PID` = `abc`, `0` or `-5` → startup error naming `DEVPATH_PARENT_PID` |
 | — | Phase 0.1 tests | existing | Still pass (switched to `ApiFactory`) |
 
 ### Desktop (Vitest)
@@ -53,7 +53,7 @@ npm run check
 | T16 | Free port | `electron/apiProcess.test.ts` | `findFreePort()` returns 1–65535 and a server can listen on it at `127.0.0.1` |
 | T17 | Token | same | `createToken()` is 43 characters of base64url; two calls differ |
 | T18 | Health OK | same | `waitForHealth` resolves after a stub fetch fails twice then returns `200`; every call has `X-DevPath-Token` |
-| T19 | Health timeout | same | Stub fetch always fails → rejects after `timeoutMs` (fake timers) |
+| T19 | Health timeout | same | Stub fetch always fails → rejects after `timeoutMs` (a 50 ms real timeout) |
 | T20 | Child exited | same | `exited` resolves first → rejects at once without waiting for the timeout |
 | T21 | `401` is not healthy | same | Stub returns `401` until timeout → rejects |
 | T22 | Header and URL | `src/shared/api/client.test.ts` | `getHealth()` calls `<baseUrl>/api/health` with `X-DevPath-Token: <token>` |
@@ -87,7 +87,7 @@ Run from the repo root in PowerShell. Open DevTools with `Ctrl+Shift+I` where a 
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M12 done with the expected results
-- [ ] `roadmap.md` phase 0.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M12 done with the expected results
+- [x] `roadmap.md` phase 0.3 ticked and set to `done`

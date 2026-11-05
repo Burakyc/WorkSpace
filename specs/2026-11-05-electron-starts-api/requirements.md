@@ -36,6 +36,9 @@ The app is one process from the user's point of view. Electron main starts the A
 | `Host` check | ASP.NET Core's built-in host filtering with `AllowedHosts: "127.0.0.1"` (returns `400`). It does not compare the port; DNS rebinding always changes the host name, so the port adds nothing. `tech-stack.md` is updated to say so. |
 | Error window | `dialog.showErrorBox` with a Turkish title and message, then `app.quit()`. No retry button. |
 | `getApiConfig()` | Async (`Promise<ApiConfig>`) through `ipcRenderer.invoke`, because the sandboxed preload cannot read main's memory directly. |
+| API working directory | The spawned API runs with its exe folder as working directory (decided during task 5: the API reads `appsettings.json`, and with it `AllowedHosts`, from there; started from the repo root it would allow every host). |
+| Parent watcher registration | Always registered; it reads `DEVPATH_PARENT_PID` when it starts and does nothing when the value is unset (decided during task 4: settings from the test host are only complete after `Build()`, and this keeps an invalid value a startup error). |
+| Token header name | One constant, `TOKEN_HEADER` in `src/shared/api/client.ts`, used by the renderer client and by Electron main's health check (decided during task 8). |
 
 ## User stories
 
@@ -58,14 +61,14 @@ The app is one process from the user's point of view. Electron main starts the A
   - `DEVPATH_TOKEN` missing or blank: in `Development` the middleware is not added and one warning is logged; in any other environment startup throws an error that names `DEVPATH_TOKEN`.
 - **CORS:** one named policy. Origin = `DEVPATH_ORIGIN` (only if set). Headers: `X-DevPath-Token`, `Content-Type`. Methods: `GET`, `POST`, `PUT`, `DELETE`. No credentials.
 - **Host filtering:** `AllowedHosts` in `appsettings.json` becomes `"127.0.0.1"`. Requests with another `Host` get `400`.
-- **Parent watcher** (`Infrastructure/Hosting/`): a `BackgroundService`, registered only when `DEVPATH_PARENT_PID` is set. It waits for that process to exit, then calls `IHostApplicationLifetime.StopApplication()`. If the PID is not running at startup, the API stops at once. A value that is not a positive integer is a startup error naming `DEVPATH_PARENT_PID`.
+- **Parent watcher** (`Infrastructure/Hosting/`): a `BackgroundService` that does nothing when `DEVPATH_PARENT_PID` is unset. Otherwise it waits for that process to exit, then calls `IHostApplicationLifetime.StopApplication()`. If the PID is not running at startup, the API stops at once. A value that is not a positive integer is a startup error naming `DEVPATH_PARENT_PID`.
 - Configuration is read like `DEVPATH_PORT`: plain environment variables through `builder.Configuration`.
 
 ### Electron main
 
 - **Port:** a free port from the OS (`net` server listening on `127.0.0.1:0`, read the port, close). The short gap before the API binds is accepted; if the API then fails to bind, start-up fails and the error window shows.
 - **Token:** `crypto.randomBytes(32).toString('base64url')`, new on every launch, kept only in main's memory and passed to the API by environment variable.
-- **Spawn:** `child_process.spawn(exePath, [], { env, stdio: 'inherit', windowsHide: true })` with `env` = the current environment plus `DEVPATH_PORT`, `DEVPATH_TOKEN`, `DEVPATH_ORIGIN`, `DEVPATH_PARENT_PID` and, when not packaged, `ASPNETCORE_ENVIRONMENT=Development`.
+- **Spawn:** `child_process.spawn(exePath, [], { cwd: dirname(exePath), env, stdio: 'inherit', windowsHide: true })` with `env` = the current environment plus `DEVPATH_PORT`, `DEVPATH_TOKEN`, `DEVPATH_ORIGIN`, `DEVPATH_PARENT_PID` and, when not packaged, `ASPNETCORE_ENVIRONMENT=Development`.
 - **Exe path (unpackaged):** `apps/api/DevPath.Api/bin/Debug/net10.0/DevPath.Api.exe`, resolved from `app.getAppPath()`. If it does not exist, the error message says to run `dotnet build apps/api/DevPath.slnx`.
 - **Health wait:** poll `GET http://127.0.0.1:<port>/api/health` with the token header every 200 ms until `200`, for at most 10 s. It fails early if the child process exits.
 - **Failure:** stop the child (if any), `dialog.showErrorBox('DevPath başlatılamadı', <reason>)`, `app.quit()`. The main window is never created.
