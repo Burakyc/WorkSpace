@@ -1,12 +1,14 @@
+using System.Text.Json.Nodes;
 using Json.Schema;
 
 namespace DevPath.Api.Modules.Content;
 
 /// <summary>
 /// One importable content type: its <c>type</c> value, the module folder under content/, the item field that
-/// identifies an item when merging, and its JSON Schema (schemas/&lt;name&gt;.schema.json, embedded).
+/// identifies an item when merging, and its JSON Schema (schemas/&lt;name&gt;.schema.json, embedded), built and as raw
+/// JSON (<see cref="Definition"/>, read for the limits named in error messages).
 /// </summary>
-public sealed record ContentType(string Name, string Folder, string KeyField, JsonSchema Schema)
+public sealed record ContentType(string Name, string Folder, string KeyField, JsonSchema Schema, JsonNode Definition)
 {
     public static readonly IReadOnlyList<ContentType> All =
     [
@@ -23,6 +25,7 @@ public sealed record ContentType(string Name, string Folder, string KeyField, Js
         using var stream = typeof(ContentType).Assembly.GetManifestResourceStream(resource)
             ?? throw new InvalidOperationException($"Embedded schema '{resource}' is missing.");
         using var reader = new StreamReader(stream);
-        return new ContentType(name, folder, keyField, JsonSchema.FromText(reader.ReadToEnd()));
+        var text = reader.ReadToEnd();
+        return new ContentType(name, folder, keyField, JsonSchema.FromText(text), JsonNode.Parse(text)!);
     }
 }
