@@ -57,5 +57,6 @@ Every task ends with `npm run check` (which never uses Docker). A task is commit
 | 1 | `feat(api): bind all interfaces only inside a container` |
 | 2 | `chore(api): add a multi-stage dockerfile` |
 | 3 | `chore: run the api with docker compose` |
+| 3a | `fix(api): drop the default container port so kestrel does not warn` (found during M3) |
 | 4 | `docs: document the api container` |
 | 5 | `docs(roadmap): mark phase 0.7 done` |

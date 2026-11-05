@@ -61,15 +61,15 @@ Prove packaging early so every later phase can ship.
 - [x] `npm run package` builds the installer in one command.
 - [x] Uninstall leaves the data folder in place.
 
-#### 0.7 Docker for the API — `todo`
+#### 0.7 Docker for the API — `done`
 Optional dev container for the API only. The desktop app and `npm run check` never need Docker. Builds on 0.3 (token) and 0.4 (data folder).
-- [ ] Multi-stage `apps/api/Dockerfile`: .NET 10 SDK stage publishes, ASP.NET runtime stage runs the API as a non-root user.
-- [ ] Root `docker-compose.yml` runs only the API and publishes `127.0.0.1:<port>:<port>` (same port inside and out, so the `Host` check passes).
-- [ ] Kestrel binds `0.0.0.0` only when `DEVPATH_IN_CONTAINER=1`; otherwise it stays on `127.0.0.1`. `tech-stack.md` notes the exception.
-- [ ] `DEVPATH_TOKEN` comes from a gitignored `.env`; `.env.example` is committed. Compose stops with an error when the token is missing; requests without it get 401.
-- [ ] Repo `data/` (gitignored) is bind-mounted as `DEVPATH_DATA_DIR`; data survives `docker compose down`.
-- [ ] `npm run docker:api` builds and starts the container; README documents it.
-- [ ] Tests: binding picks `0.0.0.0` only with `DEVPATH_IN_CONTAINER=1` (xUnit).
+- [x] Multi-stage `apps/api/Dockerfile`: .NET 10 SDK stage publishes, ASP.NET runtime stage runs the API as a non-root user.
+- [x] Root `docker-compose.yml` runs only the API and publishes `127.0.0.1:<port>:<port>` (same port inside and out, so the `Host` check passes).
+- [x] Kestrel binds `0.0.0.0` only when `DEVPATH_IN_CONTAINER=1`; otherwise it stays on `127.0.0.1`. `tech-stack.md` notes the exception.
+- [x] `DEVPATH_TOKEN` comes from a gitignored `.env`; `.env.example` is committed. Compose stops with an error when the token is missing; requests without it get 401.
+- [x] Repo `data/` (gitignored) is bind-mounted as `DEVPATH_DATA_DIR`; data survives `docker compose down`.
+- [x] `npm run docker:api` builds and starts the container; README documents it.
+- [x] Tests: binding picks `0.0.0.0` only with `DEVPATH_IN_CONTAINER=1` (xUnit).
 
 ### Milestone 1 — Goals and projects
 

@@ -29,6 +29,8 @@ An optional development container for the API only. `npm run docker:api` builds 
 | Non-root user | The ASP.NET image's built-in `app` user (`USER $APP_UID`). |
 | CORS in the container | No `DEVPATH_ORIGIN`: the container is for `curl`/tools, not for the desktop renderer. |
 | Health check in compose | None: the runtime image has no `curl`, and the endpoint needs the token. |
+| Default container port | The ASP.NET image sets `ASPNETCORE_HTTP_PORTS=8080`, which made Kestrel log "Overriding address(es)". The Dockerfile clears it (found during M3; commit `fix(api): drop the default container port so kestrel does not warn`). |
+| Token command in `.env.example` | Uses `RandomNumberGenerator.Create().GetBytes(...)`, which works in Windows PowerShell 5.1 (the static `GetBytes(32)` does not exist there; found during M3). |
 
 ## User stories
 

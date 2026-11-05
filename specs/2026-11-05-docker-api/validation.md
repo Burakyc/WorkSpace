@@ -6,14 +6,14 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 0.7, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Multi-stage `apps/api/Dockerfile`: the .NET 10 SDK stage publishes, the ASP.NET runtime stage runs the API as a non-root user.
-- [ ] Root `docker-compose.yml` runs only the API and publishes `127.0.0.1:<port>:<port>`.
-- [ ] Kestrel binds `0.0.0.0` only when `DEVPATH_IN_CONTAINER=1`; otherwise `127.0.0.1`. `tech-stack.md` notes the exception.
-- [ ] `DEVPATH_TOKEN` comes from a gitignored `.env`; `.env.example` is committed. Compose stops with an error when the token is missing; requests without it get `401`.
-- [ ] Repo `data/` (gitignored) is bind-mounted as `DEVPATH_DATA_DIR`; data survives `docker compose down`.
-- [ ] `npm run docker:api` builds and starts the container; README documents it.
-- [ ] The container runs in Production (no OpenAPI document).
-- [ ] `npm run check` and the desktop app do not need Docker.
+- [x] Multi-stage `apps/api/Dockerfile`: the .NET 10 SDK stage publishes, the ASP.NET runtime stage runs the API as a non-root user.
+- [x] Root `docker-compose.yml` runs only the API and publishes `127.0.0.1:<port>:<port>`.
+- [x] Kestrel binds `0.0.0.0` only when `DEVPATH_IN_CONTAINER=1`; otherwise `127.0.0.1`. `tech-stack.md` notes the exception.
+- [x] `DEVPATH_TOKEN` comes from a gitignored `.env`; `.env.example` is committed. Compose stops with an error when the token is missing; requests without it get `401`.
+- [x] Repo `data/` (gitignored) is bind-mounted as `DEVPATH_DATA_DIR`; data survives `docker compose down`.
+- [x] `npm run docker:api` builds and starts the container; README documents it.
+- [x] The container runs in Production (no OpenAPI document).
+- [x] `npm run check` and the desktop app do not need Docker.
 
 ## Automated tests
 
@@ -49,7 +49,7 @@ Run from the repo root in PowerShell, with Docker Desktop running for M2–M8.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M9 done with the expected results
-- [ ] `roadmap.md` phase 0.7 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M9 done with the expected results
+- [x] `roadmap.md` phase 0.7 ticked and set to `done`
