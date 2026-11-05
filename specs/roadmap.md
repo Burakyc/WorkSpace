@@ -87,11 +87,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 2 — Pomodoro
 
-#### 2.1 Timer with a goal — `todo`
-- [ ] Pomodoro page: choose goal (required), project (optional, filtered by goal), then start. Start is disabled without a goal.
-- [ ] Start, pause, resume and stop; remaining time derived from `startedAt`, so it stays accurate while minimized.
-- [ ] Main process shows an OS notification when the session ends.
-- [ ] Tests: timer math (Vitest), start disabled without a goal (RTL).
+#### 2.1 Timer with a goal — `done`
+- [x] Pomodoro page: choose goal (required), project (optional, filtered by goal), then start. Start is disabled without a goal.
+- [x] Start, pause, resume and stop; remaining time derived from `startedAt`, so it stays accurate while minimized.
+- [x] Main process shows an OS notification when the session ends.
+- [x] Tests: timer math (Vitest), start disabled without a goal (RTL).
 
 #### 2.2 Session log — `todo`
 - [ ] When a focus session ends, a short optional note field appears; saving writes the session to `sessions.json`.

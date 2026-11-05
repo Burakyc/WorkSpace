@@ -28,7 +28,7 @@ The Pomodoro page runs a 25-minute focus timer that always belongs to a goal (an
 | Duration | 25 minutes, one constant (`FOCUS_MINUTES`) until phase 2.3 makes it a setting. |
 | Stop | Stopping returns to idle and cancels the notification. Saving a stopped-early session comes in phase 2.2. |
 | Finished | When the time is up, the page shows "Süre doldu." and "Yeni oturum" (back to idle with the same goal and project). Phase 2.2 adds the note field and saving here. |
-| Notification in development | `app.setAppUserModelId('com.devpath.workspace')` at start-up, so Windows shows the toast for the unpackaged app too. |
+| Notification id | `app.setAppUserModelId('com.devpath.workspace')` only when packaged (the installer's Start menu shortcut carries that id); unpackaged runs keep Electron's default id, which Windows already knows. Changed during M7: the plan set the custom id in development too; Windows' notification history showed toasts under both ids, but only the default id is backed by a registered app in development (commit `fix(desktop): keep electron's default notification id in development`). |
 
 ## User stories
 

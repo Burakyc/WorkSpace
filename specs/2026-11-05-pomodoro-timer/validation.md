@@ -6,14 +6,14 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 2.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Pomodoro page: choose a goal (required) and a project (optional, filtered by the goal), then start; Start is disabled without a goal.
-- [ ] Start, pause, resume and stop; the remaining time is derived from the stored times, so it stays accurate while minimized or hidden.
-- [ ] The timer survives a reload and an app restart; a timer that ended meanwhile shows as finished.
-- [ ] Goal and project are locked while a session runs or is paused.
-- [ ] The sidebar shows the remaining time on every page.
-- [ ] Main shows one silent OS notification when the session ends; clicking it opens the Pomodoro page.
-- [ ] Tests: timer math (Vitest) and Start disabled without a goal (RTL), plus the tests below.
-- [ ] `tech-stack.md` is updated.
+- [x] Pomodoro page: choose a goal (required) and a project (optional, filtered by the goal), then start; Start is disabled without a goal.
+- [x] Start, pause, resume and stop; the remaining time is derived from the stored times, so it stays accurate while minimized or hidden.
+- [x] The timer survives a reload and an app restart; a timer that ended meanwhile shows as finished.
+- [x] Goal and project are locked while a session runs or is paused.
+- [x] The sidebar shows the remaining time on every page.
+- [x] Main shows one silent OS notification when the session ends; clicking it opens the Pomodoro page.
+- [x] Tests: timer math (Vitest) and Start disabled without a goal (RTL), plus the tests below.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -63,12 +63,12 @@ Run `npm run dev` from the repo root with at least one goal that has a project.
 | M4 | Go to another page and back | The sidebar keeps counting; the page shows the right time |
 | M5 | Minimize the window for 2 minutes, restore | The clock is about 2 minutes lower (not paused by throttling) |
 | M6 | Pause for 30 s, resume; reload the window (Ctrl+R); close and restart the app | Remaining time unchanged across pause; running continues after reload and restart |
-| M7 | In DevTools: `await window.devpath.pomodoro.scheduleEnd(Date.now() + 5000, 'Test')`; minimize; wait; click the notification | One silent "Odak süresi bitti" notification with "Test"; clicking it restores the window on the Pomodoro page |
+| M7 | In DevTools: `await window.devpath.pomodoro.scheduleEnd(Date.now() + 5000, 'Test')`; minimize; wait; click the notification | One silent "Odak süresi bitti" notification with "Test" (checked in the Windows notification history); clicking it restores the window on the Pomodoro page (the click itself is covered by T25 and checked by hand) |
 | M8 | "Durdur" | Back to idle; no notification arrives later |
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M8 done with the expected results
-- [ ] `roadmap.md` phase 2.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M8 done with the expected results
+- [x] `roadmap.md` phase 2.1 ticked and set to `done`
