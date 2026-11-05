@@ -145,7 +145,7 @@ Pomodoros for a day are read from `sessions.json` by date; notes for a day are r
 | DailyLog | `date`, `text` |
 | NoteNode | `id`, `parentId?`, `kind` (`folder` \| `page`), `title`, `order`, `createdAt`, `updatedAt` |
 
-Goal progress = completed sessions for the goal ÷ `targetPomodoros` (capped at 100%). Without a target, the UI shows the session count and total time instead of a percentage.
+Goal progress = completed sessions for the goal ÷ `targetPomodoros`, rounded down and capped at 100% (stopped-early sessions never count). Without a target, the UI shows the completed session count and their total time instead of a percentage. `GET /api/goals/progress` returns it for every goal in one call. A project's `goalId` is set on create and never changes; projects can only be created under an existing, active goal.
 
 ### Shared import format
 
@@ -187,7 +187,7 @@ All content modules use one envelope; `type` selects the schema for `items`:
 - Secrets (GitHub token; AI API keys post-MVP) are encrypted with Electron `safeStorage` and stored in `userData/secrets.bin`. They are never written to the repo, to JSON data files, to logs or to the renderer. The renderer can only call `secrets.set(name, value)`, `secrets.has(name)` and `secrets.clear(name)`.
 - Electron `BrowserWindow`: `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, `webSecurity: true`.
 - The preload bridge exposes only the functions listed in the architecture diagram, each with typed, validated arguments.
-- Navigation and `window.open` are blocked. `openExternal(url)` accepts `https:` URLs only and opens them in the default browser.
+- Navigation and `window.open` are blocked. `openExternal(url)` accepts `https:` URLs only and opens them in the default browser; main re-checks the URL (`isAllowedExternalUrl`) before calling `shell.openExternal`, and the API stores only https project links.
 - Single instance: `app.requestSingleInstanceLock()`; a second launch focuses the existing window and quits.
 - CSP (production), built by `buildCsp(mode)` in `electron/csp.ts` and injected as a `<meta>` tag at build time:
   `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://avatars.githubusercontent.com; connect-src http://127.0.0.1:*; object-src 'none'; base-uri 'none'`

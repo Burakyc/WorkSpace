@@ -270,4 +270,4 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 ## Open questions
 
 - Should a pomodoro always need a project, or is goal-only allowed? This roadmap assumes **project is optional** (README requires a goal; the scenario uses a project).
-- Should goal progress be pomodoro-based (assumed here) or based on finished projects?
+- ~~Should goal progress be pomodoro-based (assumed here) or based on finished projects?~~ Decided in phase 1.2: pomodoro-based.
