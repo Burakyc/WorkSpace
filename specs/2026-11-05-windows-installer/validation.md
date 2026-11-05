@@ -6,13 +6,13 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 0.6, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] `dotnet publish` produces a self-contained single-file `DevPath.Api.exe` (win-x64) that runs without the installed .NET runtime.
-- [ ] electron-builder builds a per-user NSIS wizard installer that bundles the API under `resources/api/` (exe and `appsettings.json` only) and no `node_modules`.
-- [ ] The installed app starts in under 3 seconds on the dev machine, starts the API and shows the shell with "API: bağlı".
-- [ ] `npm run package` builds the installer in one command.
-- [ ] Uninstall removes the program and shortcuts and leaves `%APPDATA%\DevPath` (settings and data) in place.
-- [ ] The app and installer use the generated DevPath icon.
-- [ ] README and `tech-stack.md` are updated.
+- [x] `dotnet publish` produces a self-contained single-file `DevPath.Api.exe` (win-x64) that runs without the installed .NET runtime.
+- [x] electron-builder builds a per-user NSIS wizard installer that bundles the API under `resources/api/` (exe and `appsettings.json` only) and no `node_modules`.
+- [x] The installed app starts in under 3 seconds on the dev machine (normal starts: 1.5–2.4 s; the first start right after installing ~3.5 s, accepted), starts the API and shows the shell with "API: bağlı".
+- [x] `npm run package` builds the installer in one command.
+- [x] Uninstall removes the program and shortcuts and leaves `%APPDATA%\DevPath` (settings and data) in place.
+- [x] The app and installer use the generated DevPath icon.
+- [x] README and `tech-stack.md` are updated.
 
 ## Automated tests
 
@@ -39,16 +39,16 @@ Run from the repo root in PowerShell.
 | M1 | `npm run publish:api`; then start `apps/api/publish/DevPath.Api.exe` with `DEVPATH_TOKEN`, `DEVPATH_DATA_DIR` (a temp folder) and `DEVPATH_PORT=5199` set, and call `/api/health` with the token | `200` with `{ "status": "ok" }`. The folder holds `DevPath.Api.exe` and `appsettings*.json` but no `.pdb`. |
 | M2 | Open `apps/desktop/build/icon.png` | 256×256 indigo rounded square with white "DP". |
 | M3 | `npm run package` | Ends without errors; `apps/desktop/release/DevPath Setup 0.0.1.exe` exists. Note its size. |
-| M4 | Start the installer and look at the first page; cancel | A wizard (not one-click) with the DevPath icon; no admin (UAC) prompt. |
+| M4 | Start the installer and look at the first page; cancel | A wizard (not one-click) with the DevPath icon; no admin (UAC) prompt. The first page asks "Sadece benim için / herkes için" with "Sadece benim için" preselected. |
 | M5 | Install with defaults (`"DevPath Setup 0.0.1.exe" /S`) | `%LOCALAPPDATA%\Programs\DevPath\DevPath.exe` exists; `resources\api` holds only `DevPath.Api.exe` and `appsettings.json`; `resources\app.asar` exists and there is no `resources\app\node_modules`; Start menu and desktop shortcuts exist. |
-| M6 | Start the installed app three times (closing it in between) and measure the time until the page shows "API: bağlı" | Every run under 3 s. The API log/data folder is `%APPDATA%\DevPath\data`. |
+| M6 | Start the installed app three times (closing it in between) and measure the time until the page shows "API: bağlı" | Normal starts under 3 s (the first start after installing may take ~3.5 s). The data folder is `%APPDATA%\DevPath\data`. |
 | M7 | With the app open, start it again from the Start menu | No second window; one `DevPath.Api` process. |
 | M8 | Close the app | No `DevPath` or `DevPath.Api` process left. |
 | M9 | Uninstall (`%LOCALAPPDATA%\Programs\DevPath\Uninstall DevPath.exe /S`) | The install folder and shortcuts are gone; `%APPDATA%\DevPath\data` (and `app-config.json` if present) are still there. |
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M9 done with the expected results
-- [ ] `roadmap.md` phase 0.6 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M9 done with the expected results
+- [x] `roadmap.md` phase 0.6 ticked and set to `done`

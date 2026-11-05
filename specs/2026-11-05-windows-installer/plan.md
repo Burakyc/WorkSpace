@@ -14,7 +14,7 @@ Every task ends with `npm run check`. A task is committed only when it passes. T
 
 ### 1. Self-contained API publish
 
-**Commit:** `build(api): publish a self-contained single-file exe`
+**Commit:** `chore(api): publish a self-contained single-file exe`
 
 - Root `package.json`: `"publish:api"` script (command in requirements.md).
 - `.gitignore`: `apps/api/publish/`.
@@ -39,7 +39,7 @@ Every task ends with `npm run check`. A task is committed only when it passes. T
 
 ### 4. electron-builder and the NSIS installer
 
-**Commit:** `build(desktop): package a per-user nsis installer`
+**Commit:** `chore(desktop): package a per-user nsis installer`
 
 - `npm install -E -D electron-builder -w apps/desktop` (reason in the commit body: builds the Windows installer).
 - `apps/desktop/electron-builder.yml` as in requirements.md.
@@ -59,7 +59,7 @@ Every task ends with `npm run check`. A task is committed only when it passes. T
 **Commit:** `docs(roadmap): mark phase 0.6 done`
 
 - Run every check in validation.md (automated and manual, including install and uninstall on this machine).
-- If startup is 3 s or more: add `-p:PublishReadyToRun=true` to `publish:api`, rebuild, measure again, and record it in requirements.md (one extra commit `perf(api): publish ready-to-run`).
+- If startup is 3 s or more: add `-p:PublishReadyToRun=true` to `publish:api`, rebuild, measure again, and record it in requirements.md (one extra commit `chore(api): publish ready-to-run`).
 - Only if all pass: tick the 0.6 boxes in `specs/roadmap.md` and set its status to `done`; tick validation.md.
 - Fill in the **Result** line of the implementation prompt's entry in `Promtps.md`.
 - Ask before merging `feat/0.6-windows-installer` into `main`. Do not push.
@@ -68,9 +68,10 @@ Every task ends with `npm run check`. A task is committed only when it passes. T
 
 | # | Commit |
 |---|---|
-| 1 | `build(api): publish a self-contained single-file exe` |
+| 1 | `chore(api): publish a self-contained single-file exe` |
 | 2 | `feat(desktop): use the bundled api when packaged` |
 | 3 | `feat(desktop): add a generated app icon` |
-| 4 | `build(desktop): package a per-user nsis installer` |
+| 4 | `chore(desktop): package a per-user nsis installer` |
+| 4a | `fix(desktop): give the installed app its own userData folder` (found during M6) |
 | 5 | `docs: document packaging and the installer` |
 | 6 | `docs(roadmap): mark phase 0.6 done` |

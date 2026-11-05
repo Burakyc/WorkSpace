@@ -169,3 +169,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-05-windows-installer/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-05 – Implement phase 0.6 Windows installer
+**Phase:** 0.6 Windows installer
+**Prompt:**
+Implement the spec in specs/2026-11-05-windows-installer/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 0.6 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** self-contained API publish, bundled API path, generated icon, per-user NSIS installer via `npm run package`, installed app uses `%APPDATA%\DevPath`; README, tech-stack and specs updated; phase 0.6 done.

@@ -29,7 +29,10 @@ Prove packaging early so every later phase can ship. One command builds a Window
 | `node_modules` | Not packaged. electron-vite already bundles the renderer (React, router, icons) and main/preload use only Node and Electron, so `files` excludes `node_modules`. This keeps the installer small without moving dependencies around. |
 | `userData` | `productName: DevPath` makes the installed app's `userData` `%APPDATA%\DevPath` (with `app-config.json` there); the default data folder `%APPDATA%\DevPath\data` sits inside it. Unpackaged runs keep `%APPDATA%\@devpath\desktop` and `dev-data`. |
 | Uninstall | `deleteAppDataOnUninstall: false`: `%APPDATA%\DevPath` (settings and data) stays. A data folder chosen elsewhere is never touched either. |
-| Startup speed | Measure first. Add `PublishReadyToRun` to the API publish only if the 3-second target is missed. |
+| Startup speed | Measured: normal starts 1.5–2.4 s; the first start right after installing about 3.3–3.7 s (one-time file scanning and profile creation). `PublishReadyToRun` was tried and did not change the first start (3.70 s) while adding 14 MB, so it is not used. The 3-second criterion applies to normal starts (decided with the user after measuring). |
+| Install-mode page | electron-builder's per-user wizard always shows a first page "Sadece benim için / herkes için" (found during M4). "Sadece benim için" is preselected and needs no admin rights; hiding the page would need a custom NSIS script, so it stays. |
+| App name when packaged | `productName` in electron-builder names the exe and installer but not the running app: Electron reads its name from the packaged `package.json`. `extraMetadata.productName: DevPath` fixes that, so the installed app uses `%APPDATA%\DevPath` and no longer shares `app-config.json` with development (found during M6). |
+| Commit types | `chore(...)` instead of `build(...)`/`perf(...)`: CLAUDE.md allows only feat, fix, docs, refactor, test and chore. |
 
 ## User stories
 

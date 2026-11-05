@@ -53,13 +53,13 @@ Navigable, themed, empty app in Turkish.
 - [x] Settings page shows the data folder and lets the user change it (API restarts with the new path).
 - [x] Sidebar is fully keyboard navigable with visible focus.
 
-#### 0.6 Windows installer — `todo`
+#### 0.6 Windows installer — `done`
 Prove packaging early so every later phase can ship.
-- [ ] `dotnet publish` produces a self-contained single-file `DevPath.Api.exe` (win-x64).
-- [ ] electron-builder builds an NSIS installer that bundles the API under `resources/api/`.
-- [ ] Installed app starts in under 3 seconds on the dev machine, starts the API and shows the shell.
-- [ ] `npm run package` builds the installer in one command.
-- [ ] Uninstall leaves the data folder in place.
+- [x] `dotnet publish` produces a self-contained single-file `DevPath.Api.exe` (win-x64).
+- [x] electron-builder builds an NSIS installer that bundles the API under `resources/api/`.
+- [x] Installed app starts in under 3 seconds on the dev machine, starts the API and shows the shell.
+- [x] `npm run package` builds the installer in one command.
+- [x] Uninstall leaves the data folder in place.
 
 #### 0.7 Docker for the API — `todo`
 Optional dev container for the API only. The desktop app and `npm run check` never need Docker. Builds on 0.3 (token) and 0.4 (data folder).
