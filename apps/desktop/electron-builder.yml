@@ -1,6 +1,10 @@
 # Windows installer for DevPath. Built by `npm run package` at the repo root.
 appId: com.devpath.workspace
 productName: DevPath
+# Electron names the app (and its userData folder) from the packaged package.json, so only the
+# installed app is "DevPath" (%APPDATA%\DevPath); development keeps %APPDATA%\@devpath\desktop.
+extraMetadata:
+  productName: DevPath
 directories:
   output: release
   buildResources: build
