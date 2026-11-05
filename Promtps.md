@@ -429,4 +429,4 @@ Implement the spec in specs/2026-11-06-blocknote-editor/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 4.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** page content endpoints (`GET`/`PUT /api/notes/{id}/content`, sets `updatedAt`); BlockNote 0.56.0 with the Mantine UI, loaded lazily, with a Turkish slash menu, C#-first highlighted code blocks and token colours; editable page title; 1-second autosave with flush on page switch and before the window closes (main ↔ preload handshake); tech-stack and specs updated; phase 4.2 done.

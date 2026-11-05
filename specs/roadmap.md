@@ -129,11 +129,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] The day page (3.2) lists the notes created or edited that day.
 - [x] Tests: tree operations (move into own child is rejected, delete removes children).
 
-#### 4.2 BlockNote editor — `todo`
-- [ ] Opening a page shows BlockNote with `/` command menu, headings, lists, toggle lists, code blocks with syntax highlight.
-- [ ] Autosave with a 1-second debounce in the background; no visible typing lag on a 2,000-word page.
-- [ ] Pending save is flushed when switching page or closing the app.
-- [ ] Tests: debounce and flush behavior (Vitest).
+#### 4.2 BlockNote editor — `done`
+- [x] Opening a page shows BlockNote with `/` command menu, headings, lists, toggle lists, code blocks with syntax highlight.
+- [x] Autosave with a 1-second debounce in the background; no visible typing lag on a 2,000-word page.
+- [x] Pending save is flushed when switching page or closing the app.
+- [x] Tests: debounce and flush behavior (Vitest).
 
 #### 4.3 Notes search — `todo`
 - [ ] Search box over page titles and text content; results open the page.

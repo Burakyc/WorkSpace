@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 4.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Opening a page shows BlockNote with the `/` command menu, headings, lists, toggle lists, code blocks with syntax highlighting.
-- [ ] Autosave with a 1-second debounce in the background; no visible typing lag on a 2,000-word page.
-- [ ] A pending save is flushed when switching page or closing the app.
-- [ ] The page title is editable above the editor.
-- [ ] Tests: debounce and flush behavior (Vitest).
-- [ ] `tech-stack.md` is updated.
+- [x] Opening a page shows BlockNote with the `/` command menu, headings, lists, toggle lists, code blocks with syntax highlighting.
+- [x] Autosave with a 1-second debounce in the background; no visible typing lag on a 2,000-word page.
+- [x] A pending save is flushed when switching page or closing the app.
+- [x] The page title is editable above the editor.
+- [x] Tests: debounce and flush behavior (Vitest).
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -49,12 +49,12 @@ Run `npm run dev` with a page created in 4.1.
 | M2 | Type a sentence and wait | "Kaydedildi." after about a second; `notes/pages/<id>.json` holds the blocks; the day page lists it as "Düzenlendi" (if created earlier) |
 | M3 | Paste a 2,000-word text and type at its end | No visible lag; one save after typing stops |
 | M4 | Change the title at the top + Enter | The tree shows the new title |
-| M5 | Type and immediately open another page; type and immediately close the app | Both changes are in the files after reopening |
+| M5 | Type and immediately open another page; type and immediately close the window (X) | Both changes are in the files after reopening |
 | M6 | Switch the OS to dark mode | The editor follows the theme |
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M6 done with the expected results
-- [ ] `roadmap.md` phase 4.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M6 done with the expected results
+- [x] `roadmap.md` phase 4.2 ticked and set to `done`
