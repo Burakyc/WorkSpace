@@ -158,6 +158,38 @@ export interface DayDetail {
   log: string;
 }
 
+/** A content type of the shared import format; each module imports one. */
+export type ContentType = 'vocab' | 'lesson' | 'interview';
+
+/** One import problem: JSON pointer of the value, its 1-based line (null when unknown) and a Turkish message. */
+export interface ImportError {
+  path: string;
+  line: number | null;
+  message: string;
+}
+
+/** What a saved import did. `levelKept` is true when the topic existed and the file's level was ignored. */
+export interface ImportReport {
+  type: ContentType;
+  topic: string;
+  slug: string;
+  created: boolean;
+  added: number;
+  skipped: number;
+  levelKept: boolean;
+}
+
+/** POST /api/import/validate. */
+export interface ImportValidation {
+  errors: ImportError[];
+}
+
+/** POST /api/import: errors (nothing saved) or a report. */
+export interface ImportResult {
+  errors: ImportError[];
+  report: ImportReport | null;
+}
+
 export type NoteKind = 'folder' | 'page';
 
 /** A marked part of a search snippet (positions in `snippet`). */

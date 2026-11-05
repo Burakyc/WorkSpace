@@ -2,11 +2,14 @@ import type {
   ApiConfig,
   AppSettings,
   CalendarMonth,
+  ContentType,
   DayDetail,
   Goal,
   GoalInput,
   GoalProgress,
   HealthResponse,
+  ImportResult,
+  ImportValidation,
   NoteKind,
   NoteNode,
   NoteSearchResult,
@@ -54,6 +57,10 @@ export interface ApiClient {
   getDay(date: string, timeZone: string): Promise<DayDetail>;
   /** Saves the free-text daily log; returns the stored (end-trimmed) text. */
   saveDayLog(date: string, text: string): Promise<{ text: string }>;
+  /** Checks pasted or uploaded JSON against the type's schema; nothing is saved. */
+  validateImport(type: ContentType, text: string): Promise<ImportValidation>;
+  /** Validates, then merges into the topic (new items added, existing ones skipped). */
+  importContent(type: ContentType, text: string): Promise<ImportResult>;
   listNotes(): Promise<NoteNode[]>;
   createNote(parentId: string | null, kind: NoteKind, title: string): Promise<NoteNode>;
   renameNote(id: string, title: string): Promise<NoteNode>;
@@ -130,6 +137,9 @@ export function createApiClient(
       ),
     saveDayLog: (date, text) =>
       request<{ text: string }>('PUT', `/api/days/${encodeURIComponent(date)}/log`, { text }),
+    validateImport: (type, text) =>
+      request<ImportValidation>('POST', '/api/import/validate', { type, text }),
+    importContent: (type, text) => request<ImportResult>('POST', '/api/import', { type, text }),
     listNotes: () => request<NoteNode[]>('GET', '/api/notes'),
     createNote: (parentId, kind, title) =>
       request<NoteNode>('POST', '/api/notes', { parentId, kind, title }),

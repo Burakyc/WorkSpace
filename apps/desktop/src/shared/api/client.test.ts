@@ -243,4 +243,22 @@ describe('createApiClient', () => {
       [`GET ${base}/search?q=di%20%C3%B6m%C3%BCr`, undefined],
     ]);
   });
+
+  it('validates and imports content with the type and the text as it is', async () => {
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockImplementation(() => Promise.resolve(json({ errors: [], report: null })));
+    const client = createApiClient(config, fetchFn);
+    const text = '{\n  "type": "vocab"\n}';
+
+    await client.validateImport('vocab', text);
+    await client.importContent('interview', text);
+
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      ['POST http://127.0.0.1:4321/api/import/validate', JSON.stringify({ type: 'vocab', text })],
+      ['POST http://127.0.0.1:4321/api/import', JSON.stringify({ type: 'interview', text })],
+    ]);
+  });
 });
