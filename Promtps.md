@@ -504,4 +504,4 @@ Implement the spec in specs/2026-11-06-youtube-rss/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 6.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `YouTubeChannelId`, `YouTubeRss`, `YouTubeFeedClient` and `YouTubeService` (channels in `settings.json`, checked against their RSS; videos in `cache/youtube.json`; failed channels keep their cached videos) with `/api/youtube/channels`, `/videos` and `/refresh`, plus `YouTubeRefresher` (on start and every 6 hours); a network guard in `ApiFactory` and stub handlers; "YouTube kanalları" in Ayarlar and the "Yeni videolar" card with "Yenile" and the error inside the card; tech-stack and specs updated; phase 6.2 done.

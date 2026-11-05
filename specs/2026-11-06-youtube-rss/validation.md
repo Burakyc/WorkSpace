@@ -6,13 +6,13 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 6.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Settings: add/remove YouTube channels (channel ID or URL); a channel is checked against its RSS and saved with its name.
-- [ ] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
-- [ ] "New videos" card with thumbnail, title, date; click opens in the default browser; "Yenile" refreshes.
-- [ ] Offline or failed fetch shows the cached list plus an error.
-- [ ] Ana Sayfa never waits on the network (`GET /api/youtube/videos` reads the cache only).
-- [ ] Tests: RSS parsing, failure falls back to cache (stub HTTP handler); no API test can reach the network.
-- [ ] `tech-stack.md` is updated.
+- [x] Settings: add/remove YouTube channels (channel ID or URL); a channel is checked against its RSS and saved with its name.
+- [x] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
+- [x] "New videos" card with thumbnail, title, date; click opens in the default browser; "Yenile" refreshes.
+- [x] Offline or failed fetch shows the cached list plus an error.
+- [x] Ana Sayfa never waits on the network (`GET /api/youtube/videos` reads the cache only).
+- [x] Tests: RSS parsing, failure falls back to cache (stub HTTP handler); no API test can reach the network.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -55,7 +55,7 @@ Run `npm run dev` (online).
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M6 done with the expected results
-- [ ] `roadmap.md` phase 6.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M6 done with the expected results
+- [x] `roadmap.md` phase 6.2 ticked and set to `done`

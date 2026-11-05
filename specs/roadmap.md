@@ -177,12 +177,12 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Reminders card lists today's English and tech reminders (times from 7.2 settings, defaults until then).
 - [x] Home renders from cached data first; nothing on it blocks on the network.
 
-#### 6.2 YouTube RSS — `todo`
-- [ ] Settings: add/remove YouTube channels (channel ID or URL).
-- [ ] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
-- [ ] "New videos" card with thumbnail, title, date; click opens in the default browser.
-- [ ] Offline or failed fetch shows the cached list plus an error card.
-- [ ] Tests: RSS parsing, failure falls back to cache (stub HTTP handler).
+#### 6.2 YouTube RSS — `done`
+- [x] Settings: add/remove YouTube channels (channel ID or URL).
+- [x] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
+- [x] "New videos" card with thumbnail, title, date; click opens in the default browser.
+- [x] Offline or failed fetch shows the cached list plus an error card.
+- [x] Tests: RSS parsing, failure falls back to cache (stub HTTP handler).
 
 #### 6.3 GitHub stats and "what changed" — `todo`
 - [ ] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
