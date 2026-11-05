@@ -13,8 +13,10 @@ RUN dotnet publish DevPath.Api/DevPath.Api.csproj -c Release --no-restore -p:Deb
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app ./
+# ASPNETCORE_HTTP_PORTS is cleared because the API picks its own address and DEVPATH_PORT.
 ENV DEVPATH_IN_CONTAINER=1 \
     ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_HTTP_PORTS= \
     DEVPATH_DATA_DIR=/data
 USER $APP_UID
 ENTRYPOINT ["dotnet", "DevPath.Api.dll"]
