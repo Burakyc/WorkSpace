@@ -32,4 +32,18 @@ public class CalendarGridTests
     {
         Assert.False(CalendarGrid.TryParseMonth(month, out _));
     }
+
+    [Theory]
+    [InlineData("2026-11-05", true)]
+    [InlineData("2028-02-29", true)]
+    [InlineData("2026-02-30", false)]
+    [InlineData("2026-11-5", false)]
+    [InlineData("1999-12-31", false)]
+    [InlineData("2101-01-01", false)]
+    [InlineData("05.11.2026", false)]
+    [InlineData(null, false)]
+    public void Parses_real_dates_only(string? value, bool valid)
+    {
+        Assert.Equal(valid, CalendarGrid.TryParseDate(value, out _));
+    }
 }

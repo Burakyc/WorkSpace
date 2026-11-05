@@ -32,6 +32,11 @@ public static partial class CalendarGrid
         return true;
     }
 
+    /// <summary>Parses a real "YYYY-MM-DD" date in the years 2000–2100.</summary>
+    public static bool TryParseDate(string? value, out DateOnly date) =>
+        DateOnly.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out date) &&
+        date.Year is >= 2000 and <= 2100;
+
     public static (DateOnly First, DateOnly Last) VisibleRange(DateOnly firstOfMonth)
     {
         var lastOfMonth = firstOfMonth.AddMonths(1).AddDays(-1);

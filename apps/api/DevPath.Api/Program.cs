@@ -28,6 +28,7 @@ builder.Services.AddGoals();
 builder.Services.AddProjects();
 builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddSingleton<CalendarService>();
+builder.Services.AddSingleton<DayService>();
 
 var app = builder.Build();
 
