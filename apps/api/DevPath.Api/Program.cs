@@ -33,6 +33,7 @@ builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<DayService>();
 builder.Services.AddSingleton<FeedService>();
+builder.Services.AddYouTube();
 
 var app = builder.Build();
 

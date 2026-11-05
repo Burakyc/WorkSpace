@@ -1,12 +1,14 @@
 using DevPath.Api.Infrastructure.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
 
 namespace DevPath.Api.Tests;
 
 /// <summary>
 /// Test host whose clients call the API the way Electron does: on 127.0.0.1 with the token header,
-/// and with a temp data folder so tests never touch %APPDATA%.
+/// with a temp data folder so tests never touch %APPDATA%, and with outgoing HTTP refused.
 /// </summary>
 public class ApiFactory : WebApplicationFactory<Program>
 {
@@ -23,6 +25,9 @@ public class ApiFactory : WebApplicationFactory<Program>
     {
         builder.UseSetting("DEVPATH_TOKEN", Token);
         builder.UseSetting("DEVPATH_DATA_DIR", DataDir);
+        // Every named HttpClient fails unless a test installs a stub after this (ConfigureTestServices).
+        builder.ConfigureServices(services => services.ConfigureAll<HttpClientFactoryOptions>(options =>
+            options.HttpMessageHandlerBuilderActions.Add(handler => handler.PrimaryHandler = new NoNetworkHandler())));
     }
 
     protected override void ConfigureClient(HttpClient client)
