@@ -59,7 +59,7 @@ export function LessonPartPage() {
   const partPath = (id: string) => `/learning/${lesson.slug}/${id}`;
 
   function toggleDone() {
-    if (!part) return;
+    if (!part || saving) return;
     setSaving(true);
     setFailedPart(null);
     getApiClient()
@@ -104,7 +104,8 @@ export function LessonPartPage() {
           type="button"
           className={done ? buttons.primary : buttons.secondary}
           aria-pressed={done}
-          disabled={saving}
+          // Not `disabled`: a disabled button loses keyboard focus while the mark saves.
+          aria-disabled={saving}
           onClick={toggleDone}
         >
           Tamamlandı

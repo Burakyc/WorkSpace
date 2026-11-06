@@ -25,6 +25,7 @@ export function QuestionCard({ item, onPractised }: QuestionCardProps) {
   const practised = item.mark === 'practised';
 
   function toggle() {
+    if (saving) return;
     setSaving(true);
     setFailed(false);
     onPractised(!practised).then(
@@ -61,7 +62,8 @@ export function QuestionCard({ item, onPractised }: QuestionCardProps) {
           type="button"
           className={practised ? buttons.primary : buttons.secondary}
           aria-pressed={practised}
-          disabled={saving}
+          // Not `disabled`: a disabled button loses keyboard focus while the mark saves.
+          aria-disabled={saving}
           onClick={toggle}
         >
           Çalıştım
