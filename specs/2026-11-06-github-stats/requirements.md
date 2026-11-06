@@ -56,13 +56,14 @@ Ana Sayfa shows the user's public GitHub numbers (stars, followers, public repos
 ### Cache (`cache/github.json`) and endpoints
 
 ```json
-{ "schemaVersion": 1, "username": "…", "fetchedAt": "…", "stars": 12, "followers": 5, "publicRepos": 9,
-  "commitsLast30Days": 41, "recentCommits": [ { "repo", "sha", "message", "date", "url" } ],
-  "lastRefreshAt": "…", "error": null }
+{ "schemaVersion": 1, "username": "…",
+  "stats": { "stars": 12, "followers": 5, "publicRepos": 9, "commitsLast30Days": 41,
+             "recentCommits": [ { "repo", "sha", "message", "date", "url" } ] },
+  "fetchedAt": "…", "lastRefreshAt": "…", "error": null }
 ```
 
 - A successful refresh replaces the numbers and `fetchedAt`; a failed one keeps them and sets `error`. `lastRefreshAt` is the attempt time. A cache for another username than the saved one counts as empty. No username → nothing is fetched.
-- `GET /api/github/stats` (cache only) and `POST /api/github/refresh` answer `{ username, stats: { stars, followers, publicRepos, commitsLast30Days, recentCommits, fetchedAt } | null, lastRefreshAt, error }`.
+- `GET /api/github/stats` (cache only) and `POST /api/github/refresh` answer `{ username, stats: { stars, followers, publicRepos, commitsLast30Days, recentCommits } | null, fetchedAt, lastRefreshAt, error }`.
 - Refreshes never overlap (`SemaphoreSlim`). `HomeRefresher` runs YouTube then GitHub right after start and every 6 hours.
 
 ### What changed (`POST /api/home/visit?timeZone=<IANA>`, `visit.json`)

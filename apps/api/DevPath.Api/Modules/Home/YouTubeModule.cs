@@ -1,6 +1,6 @@
 namespace DevPath.Api.Modules.Home;
 
-/// <summary>The YouTube feed: the named HTTP client, the service and the background refresh.</summary>
+/// <summary>The YouTube feed: the named HTTP client and the service (refreshed by <see cref="HomeRefresher"/>).</summary>
 public static class YouTubeModule
 {
     public static IServiceCollection AddYouTube(this IServiceCollection services)
@@ -12,7 +12,6 @@ public static class YouTubeModule
         });
         services.AddSingleton<YouTubeFeedClient>();
         services.AddSingleton<YouTubeService>();
-        services.AddHostedService<YouTubeRefresher>();
         return services;
     }
 }
