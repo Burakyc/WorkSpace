@@ -6,11 +6,11 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 7.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Settings: English reminder time and tech reminder time, each can be turned off.
-- [ ] Main process shows one calm OS notification at each time while the app runs, including when minimized.
-- [ ] Clicking the notification opens the related module (İngilizce / Öğrenme).
-- [ ] Tests: next-trigger calculation, including after the time has passed today.
-- [ ] Ana Sayfa shows the saved times; `tech-stack.md` is updated.
+- [x] Settings: English reminder time and tech reminder time, each can be turned off.
+- [x] Main process shows one calm OS notification at each time while the app runs, including when minimized.
+- [x] Clicking the notification opens the related module (İngilizce / Öğrenme).
+- [x] Tests: next-trigger calculation, including after the time has passed today.
+- [x] Ana Sayfa shows the saved times; `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -50,7 +50,7 @@ Run the app (`npm run dev`).
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M5 done with the expected results
-- [ ] `roadmap.md` phase 7.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M5 done with the expected results
+- [x] `roadmap.md` phase 7.2 ticked and set to `done`

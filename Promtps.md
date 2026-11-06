@@ -669,3 +669,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-06-daily-reminders/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-06 – Implement phase 7.2 daily reminders
+**Phase:** 7.2 Daily reminders
+**Prompt:**
+Implement the spec in specs/2026-11-06-daily-reminders/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 7.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `reminders` section in `settings.json` with `PUT /api/settings/reminders`; `electron/reminders.ts` (`nextTrigger`, `parseReminders`, a daily scheduler that skips late timers) wired in main, which reads the times from the API and shows silent notifications that open İngilizce / Öğrenme; `reminders.refresh()` in the preload; Ayarlar → "Hatırlatmalar" form; the home card reads the saved times; `main` merged in first; tech-stack and specs updated; phase 7.2 done.

@@ -23,6 +23,8 @@ The user sets a daily English reminder time and a daily tech reminder time in Ay
 | Branch | **`main` merged into the Milestone 7 branch** before this phase (commit `chore: merge main into milestone 7`), so the real İngilizce / Öğrenme modules and the home card are here. |
 | Tech module | The tech reminder opens **Öğrenme** (`/learning`); the English one opens **İngilizce** (`/english`). |
 | Defaults | **English 09:00, tech 20:00, both on** (the same times the home card shows today). |
+| Deviation: early timers | Node timers can fire a few milliseconds early; the next day is computed from the reminder's own time at the earliest, so an early timer never notifies twice (extra test in task 2). |
+| Deviation: manual check | M2–M5 were checked in the dev app with the main process under the inspector: `Notification.show` was recorded (title, body, `silent`) and the notification's `click` was emitted, since an OS toast cannot be clicked through CDP. |
 | Missed times | **No catch-up.** A time that passed while the app was closed is not notified; the next one is tomorrow. The home card already shows it as "geçti". |
 
 ## User stories

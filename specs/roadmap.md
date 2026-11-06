@@ -198,11 +198,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Shortcuts do not fire while typing in the editor unless they use a modifier.
 - [x] Tests: shortcut handler (Vitest).
 
-#### 7.2 Daily reminders — `todo`
-- [ ] Settings: English reminder time and tech reminder time, each can be turned off.
-- [ ] Main process shows one calm OS notification at each time while the app runs, including when minimized.
-- [ ] Clicking the notification opens the related module.
-- [ ] Tests: next-trigger calculation, including after the time has passed today.
+#### 7.2 Daily reminders — `done`
+- [x] Settings: English reminder time and tech reminder time, each can be turned off.
+- [x] Main process shows one calm OS notification at each time while the app runs, including when minimized.
+- [x] Clicking the notification opens the related module.
+- [x] Tests: next-trigger calculation, including after the time has passed today.
 
 #### 7.3 Developer panel — `todo`
 - [ ] Hidden route (`Ctrl+Shift+D`) showing API health and version, last 50 errors from an in-memory log buffer, and data file sizes.
