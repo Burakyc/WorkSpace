@@ -33,6 +33,7 @@ The API does not change.
 | Atomic backup | A backup is copied to `backups\<name>.partial\` and renamed when complete; a leftover `.partial` (crash) is deleted by the next backup and never listed. |
 | What is copied | Everything in the data folder except `backups\` and `*.tmp` files (half-written atomic writes). |
 | Confirmation | Inline panel like the note delete confirmation (`role="alertdialog"`), no native dialog. |
+| Failed restore message (implementation) | An unknown backup name is refused **before** the API is stopped and the page shows "Yedek bulunamadı.". A failed copy (rolled back) happens after the API restarted on a new port and token, so the page must reload anyway: main shows the message in an error message box (`dialog.showMessageBox`) and then reloads, instead of returning it to the page. |
 
 ## User stories
 
@@ -71,7 +72,7 @@ The API does not change.
 ### Main and IPC
 
 - `devpath:list-backups` → `BackupInfo[]` for the current data folder.
-- `devpath:restore-backup(name)`: `name` must be a string. Main stops the API, waits for it to exit, runs `restoreBackup`, starts the API on the same data folder and reloads the window. If the restore fails, the API is started again on the unchanged (or rolled back) data and the page gets `{ error }`. If the API cannot be started again, the error window opens and the app quits (as with a failed data folder switch).
+- `devpath:restore-backup(name)`: `name` must be a string. Main stops the API, waits for it to exit, runs `restoreBackup`, starts the API on the same data folder and reloads the window. An unknown name returns `{ error: "Yedek bulunamadı." }` without stopping the API. If the copy fails, the API is started again on the rolled back data, main shows the message in an error box and reloads the window (see the decisions table). If the API cannot be started again, the error window opens and the app quits (as with a failed data folder switch).
 - Preload: `settings.listBackups(): Promise<BackupInfo[]>`, `settings.restoreBackup(name): Promise<void>` (rejects with the Turkish message).
 
 ### Renderer — "Yedekler" section on Ayarlar

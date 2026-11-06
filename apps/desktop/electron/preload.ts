@@ -1,5 +1,11 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import type { ApiConfig, ChangeDataDirResult, DevPathBridge } from '../src/shared/api/types';
+import type {
+  ApiConfig,
+  BackupInfo,
+  ChangeDataDirResult,
+  DevPathBridge,
+  RestoreBackupResult,
+} from '../src/shared/api/types';
 
 // Work the page must finish before the window closes (e.g. a pending note save).
 const beforeClose = new Set<() => Promise<void>>();
@@ -46,6 +52,16 @@ const bridge: DevPathBridge = {
         throw new Error(result.error);
       }
       return result.dataDir;
+    },
+    listBackups: () => ipcRenderer.invoke('devpath:list-backups') as Promise<BackupInfo[]>,
+    restoreBackup: async (name) => {
+      const result = (await ipcRenderer.invoke(
+        'devpath:restore-backup',
+        name,
+      )) as RestoreBackupResult;
+      if (result.error) {
+        throw new Error(result.error);
+      }
     },
   },
 };

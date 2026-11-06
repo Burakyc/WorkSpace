@@ -10,9 +10,10 @@ import {
   shell,
   type IpcMainInvokeEvent,
 } from 'electron';
-import type { ApiConfig, ChangeDataDirResult } from '../src/shared/api/types';
+import type { ApiConfig, ChangeDataDirResult, RestoreBackupResult } from '../src/shared/api/types';
 import { createCloseGuard } from './closeGuard';
 import { resolveApiExePath, startApi, type ApiHandle } from './apiProcess';
+import { dailyBackup, listBackups, restoreBackup } from './backups';
 import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
 import { isAllowedExternalUrl, isAllowedNavigation } from './navigation';
@@ -57,6 +58,13 @@ async function launch(): Promise<ApiState<ApiHandle>> {
     mkdirSync(dataDir, { recursive: true });
   } catch (error) {
     throw new Error(`Veri klasörü oluşturulamadı: ${dataDir}`, { cause: error });
+  }
+  try {
+    // Before the API starts, so no file is being written during the copy.
+    dailyBackup(dataDir, new Date());
+  } catch (error) {
+    // A missing backup must not keep the user from their data.
+    console.error('Daily backup failed:', error);
   }
   if (!existsSync(apiExePath)) {
     const hint = app.isPackaged
@@ -229,6 +237,37 @@ if (!app.requestSingleInstanceLock()) {
         setTimeout(() => window.webContents.reload(), 0);
       }
       return { dataDir: current.dataDir };
+    });
+
+    handle('devpath:list-backups', () => listBackups(current!.dataDir));
+
+    handle('devpath:restore-backup', async (_event, name): Promise<RestoreBackupResult> => {
+      const { dataDir, api } = current!;
+      if (typeof name !== 'string' || !listBackups(dataDir).some((b) => b.name === name)) {
+        return { error: 'Yedek bulunamadı.' };
+      }
+      api.stop();
+      await api.exited;
+      let failure: string | undefined;
+      try {
+        restoreBackup(dataDir, name, new Date());
+      } catch (error) {
+        failure = error instanceof Error ? error.message : String(error);
+      }
+      try {
+        current = { dataDir, api: await startApiFor(dataDir) };
+      } catch (error) {
+        current = undefined;
+        fail(new Error(`API geri yüklemeden sonra başlatılamadı: ${dataDir}`, { cause: error }));
+        throw error;
+      }
+      const window = mainWindow!;
+      if (failure) {
+        // The page reloads below (new port and token), so the message goes to a dialog instead of the page.
+        await dialog.showMessageBox(window, { type: 'error', message: failure });
+      }
+      setTimeout(() => window.webContents.reload(), 0);
+      return {};
     });
 
     mainWindow = createWindow();
