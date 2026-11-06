@@ -190,6 +190,48 @@ export interface ImportResult {
   report: ImportReport | null;
 }
 
+/** GET /api/content/{type}: a topic in a module's list; `marks` counts the items per mark. */
+export interface TopicSummary {
+  slug: string;
+  topic: string;
+  level: string;
+  tags: string[];
+  itemCount: number;
+  marks: Record<string, number>;
+  updatedAt: string;
+}
+
+/** What every stored item has besides its imported fields: an id, when it was added and the user's mark. */
+export interface ContentItemBase {
+  id: string;
+  addedAt: string;
+  mark?: string;
+  markedAt?: string;
+}
+
+/** GET /api/content/{type}/{slug}: the topic file as stored. */
+export interface ContentTopic<TItem extends ContentItemBase> {
+  type: ContentType;
+  topic: string;
+  slug: string;
+  level: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  items: TItem[];
+}
+
+export type VocabMark = 'known' | 'repeat';
+
+/** An English card: `meaning` is Turkish, `definition` English. */
+export interface VocabItem extends ContentItemBase {
+  term: string;
+  meaning: string;
+  example: string;
+  definition?: string;
+  mark?: VocabMark;
+}
+
 export type NoteKind = 'folder' | 'page';
 
 /** A marked part of a search snippet (positions in `snippet`). */

@@ -2,6 +2,8 @@ import type {
   ApiConfig,
   AppSettings,
   CalendarMonth,
+  ContentItemBase,
+  ContentTopic,
   ContentType,
   DayDetail,
   Goal,
@@ -19,6 +21,7 @@ import type {
   ProjectUpdateInput,
   Session,
   SessionInput,
+  TopicSummary,
 } from './types';
 
 export const TOKEN_HEADER = 'X-DevPath-Token';
@@ -61,6 +64,19 @@ export interface ApiClient {
   validateImport(type: ContentType, text: string): Promise<ImportValidation>;
   /** Validates, then merges into the topic (new items added, existing ones skipped). */
   importContent(type: ContentType, text: string): Promise<ImportResult>;
+  /** The type's topics, alphabetical. */
+  listTopics(type: ContentType): Promise<TopicSummary[]>;
+  getTopic<TItem extends ContentItemBase>(
+    type: ContentType,
+    slug: string,
+  ): Promise<ContentTopic<TItem>>;
+  /** Sets one of the type's marks on an item, or removes it with null; returns the item. */
+  markItem<TItem extends ContentItemBase>(
+    type: ContentType,
+    slug: string,
+    id: string,
+    mark: string | null,
+  ): Promise<TItem>;
   listNotes(): Promise<NoteNode[]>;
   createNote(parentId: string | null, kind: NoteKind, title: string): Promise<NoteNode>;
   renameNote(id: string, title: string): Promise<NoteNode>;
@@ -104,6 +120,7 @@ export function createApiClient(
   const goal = (id: string) => `/api/goals/${encodeURIComponent(id)}`;
   const project = (id: string) => `/api/projects/${encodeURIComponent(id)}`;
   const note = (id: string) => `/api/notes/${encodeURIComponent(id)}`;
+  const content = (type: ContentType) => `/api/content/${type}`;
 
   return {
     getHealth: () => request<HealthResponse>('GET', '/api/health'),
@@ -140,6 +157,20 @@ export function createApiClient(
     validateImport: (type, text) =>
       request<ImportValidation>('POST', '/api/import/validate', { type, text }),
     importContent: (type, text) => request<ImportResult>('POST', '/api/import', { type, text }),
+    listTopics: (type) => request<TopicSummary[]>('GET', content(type)),
+    getTopic: <TItem extends ContentItemBase>(type: ContentType, slug: string) =>
+      request<ContentTopic<TItem>>('GET', `${content(type)}/${encodeURIComponent(slug)}`),
+    markItem: <TItem extends ContentItemBase>(
+      type: ContentType,
+      slug: string,
+      id: string,
+      mark: string | null,
+    ) =>
+      request<TItem>(
+        'PUT',
+        `${content(type)}/${encodeURIComponent(slug)}/items/${encodeURIComponent(id)}/mark`,
+        { mark },
+      ),
     listNotes: () => request<NoteNode[]>('GET', '/api/notes'),
     createNote: (parentId, kind, title) =>
       request<NoteNode>('POST', '/api/notes', { parentId, kind, title }),
