@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isTextField, matchShortcut } from './shortcuts';
+import { isTextField, matchShortcut, shortcuts } from './shortcuts';
 
 type Init = Partial<{
   ctrlKey: boolean;
@@ -27,6 +27,11 @@ describe('matchShortcut', () => {
     expect(press('N', { ctrlKey: true })).toBe('newNote');
     expect(press('P', { ctrlKey: true, shiftKey: true })).toBe('pomodoro');
     expect(press('k', { ctrlKey: true })).toBe('search');
+    expect(press('D', { ctrlKey: true, shiftKey: true })).toBe('devPanel');
+  });
+
+  it('keeps the developer panel out of the help list', () => {
+    expect(shortcuts.map((s) => s.id)).toEqual(['newNote', 'pomodoro', 'search', 'help']);
   });
 
   it('ignores other combinations', () => {

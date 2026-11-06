@@ -10,6 +10,29 @@ export interface HealthResponse {
   version: string;
 }
 
+/** An API error for the developer panel: never a message. `path` is `METHOD route-template`. */
+export interface ApiErrorEntry {
+  at: string;
+  source: string;
+  kind: string;
+  path: string | null;
+}
+
+/** A top-level data file, or a top-level folder with its file count and total size. */
+export interface DataFileSize {
+  name: string;
+  folder: boolean;
+  files: number;
+  bytes: number;
+}
+
+/** GET /api/dev. */
+export interface DevStatus {
+  errors: ApiErrorEntry[];
+  files: DataFileSize[];
+  totalBytes: number;
+}
+
 /** A goal (mirrors Goal in DevPath.Api). `createdAt` is ISO 8601 UTC. */
 export interface Goal {
   id: string;

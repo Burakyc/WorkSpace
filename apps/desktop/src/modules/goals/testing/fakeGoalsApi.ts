@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import type {
   DayDetail,
   DayNote,
+  DevStatus,
   FeedResponse,
   GitHubStatus,
   Goal,
@@ -66,6 +67,10 @@ export function installFakeGoalsApi(
     /** GET /api/notes/search answers by query; queries not listed find nothing. */
     search?: Record<string, NoteSearchResult[]>;
     failSearch?: boolean;
+    /** GET /api/dev answer; no errors and no files by default. */
+    devStatus?: DevStatus;
+    failDev?: boolean;
+    failHealth?: boolean;
     /** GET /api/home/feed answer; missing by default. */
     feed?: FeedResponse;
     failFeed?: boolean;
@@ -457,6 +462,14 @@ export function installFakeGoalsApi(
     const [, , resource, rawId, action] = pathname.split('/');
     const id = rawId === undefined ? undefined : decodeURIComponent(rawId);
     const includeArchived = searchParams.get('includeArchived') === 'true';
+    if (resource === 'health') {
+      if (options.failHealth) return Promise.reject(new TypeError('Failed to fetch'));
+      return Promise.resolve(json({ status: 'ok', version: '0.0.1' }));
+    }
+    if (resource === 'dev') {
+      if (options.failDev) return Promise.resolve(json({ title: 'Server error' }, 500));
+      return Promise.resolve(json(options.devStatus ?? { errors: [], files: [], totalBytes: 0 }));
+    }
     if (resource === 'home' && id === 'feed') {
       if (options.failFeed) return Promise.resolve(json({ title: 'Server error' }, 500));
       return Promise.resolve(

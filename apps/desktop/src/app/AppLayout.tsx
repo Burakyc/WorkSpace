@@ -34,7 +34,7 @@ function PomodoroBadge() {
 
 export function AppLayout() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname, key: locationKey } = useLocation();
 
   // Main asks for a page, e.g. when the session-end notification is clicked.
   useEffect(
@@ -51,6 +51,11 @@ export function AppLayout() {
       if (!shortcut) return;
       event.preventDefault();
       if (shortcut === 'help') return setHelpOpen(true);
+      // The hidden developer panel: the same keys leave it again (Ana Sayfa when it was the first page).
+      if (shortcut === 'devPanel') {
+        if (pathname !== '/dev') return void navigate('/dev');
+        return void (locationKey === 'default' ? navigate('/') : navigate(-1));
+      }
       // The page carries the request out (see useShortcutRequest); Notlar keeps its open item.
       const to =
         shortcut === 'pomodoro' ? '/pomodoro' : pathname.startsWith('/notes') ? pathname : '/notes';
@@ -58,7 +63,7 @@ export function AppLayout() {
     }
     window.addEventListener('keydown', onKeyDown, true);
     return () => window.removeEventListener('keydown', onKeyDown, true);
-  }, [navigate, pathname]);
+  }, [navigate, pathname, locationKey]);
 
   return (
     <div className={styles.shell}>

@@ -3,6 +3,7 @@ import type {
   ApiConfig,
   AppSettings,
   CalendarMonth,
+  DevStatus,
   ContentItemBase,
   ContentTopic,
   ContentType,
@@ -48,6 +49,7 @@ export class ApiError extends Error {
 
 export interface ApiClient {
   getHealth(): Promise<HealthResponse>;
+  getDevStatus(): Promise<DevStatus>;
   listGoals(includeArchived?: boolean): Promise<Goal[]>;
   createGoal(input: GoalInput): Promise<Goal>;
   updateGoal(id: string, input: GoalInput): Promise<Goal>;
@@ -160,6 +162,7 @@ export function createApiClient(
 
   return {
     getHealth: () => request<HealthResponse>('GET', '/api/health'),
+    getDevStatus: () => request<DevStatus>('GET', '/api/dev'),
     listGoals: (includeArchived = false) =>
       request<Goal[]>('GET', `/api/goals?includeArchived=${includeArchived}`),
     createGoal: (input) => request<Goal>('POST', '/api/goals', input),

@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router';
 import { DayPage } from '../modules/calendar/DayPage';
+import { DevPanelPage } from '../modules/devpanel/DevPanelPage';
 import { VocabTopicPage } from '../modules/english/VocabTopicPage';
 import { InterviewTopicPage } from '../modules/interview/InterviewTopicPage';
 import { LessonPartPage } from '../modules/learning/LessonPartPage';
@@ -28,6 +29,7 @@ export function AppRoutes() {
         <Route path="/interview/:slug" element={<InterviewTopicPage />} />
         <Route path="/learning/:slug" element={<LessonTopicPage />} />
         <Route path="/learning/:slug/:partId" element={<LessonPartPage />} />
+        <Route path="/dev" element={<DevPanelPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

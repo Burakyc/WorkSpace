@@ -1,6 +1,6 @@
-export type ShortcutId = 'newNote' | 'pomodoro' | 'search' | 'help';
+export type ShortcutId = 'newNote' | 'pomodoro' | 'search' | 'help' | 'devPanel';
 
-/** The shortcuts in the order the help window lists them. */
+/** The shortcuts in the order the help window lists them. `Ctrl+Shift+D` (developer panel) is left out on purpose. */
 export const shortcuts: readonly { id: ShortcutId; keys: string[]; description: string }[] = [
   { id: 'newNote', keys: ['Ctrl', 'N'], description: 'Yeni not (açık klasörün içine)' },
   { id: 'pomodoro', keys: ['Ctrl', 'Shift', 'P'], description: 'Pomodoro başlat / durdur' },
@@ -28,6 +28,7 @@ export function matchShortcut(event: KeyInfo): ShortcutId | null {
   const key = event.key.toLowerCase();
   if (event.ctrlKey) {
     if (key === 'p' && event.shiftKey) return 'pomodoro';
+    if (key === 'd' && event.shiftKey) return 'devPanel';
     if (event.shiftKey) return null;
     if (key === 'n') return 'newNote';
     if (key === 'k') return 'search';
