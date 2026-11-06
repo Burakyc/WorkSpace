@@ -33,4 +33,33 @@ public class SettingsEndpointTests
         var errors = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("errors");
         Assert.Equal("Odak süresi 1 ile 120 dakika arasında olmalı.", errors.GetProperty("focusMinutes")[0].GetString());
     }
+
+    [Fact]
+    public async Task Put_reminders_saves_and_get_returns_them()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+
+        var defaults = JsonDocument.Parse(await client.GetStringAsync("/api/settings")).RootElement.GetProperty("reminders");
+        Assert.Equal("09:00", defaults.GetProperty("english").GetProperty("time").GetString());
+
+        var saved = await client.PutAsJsonAsync("/api/settings/reminders", new
+        {
+            english = new { time = "08:30", enabled = false },
+            tech = new { time = "21:00", enabled = true },
+        });
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        var after = JsonDocument.Parse(await client.GetStringAsync("/api/settings")).RootElement.GetProperty("reminders");
+        Assert.False(after.GetProperty("english").GetProperty("enabled").GetBoolean());
+        Assert.Equal("21:00", after.GetProperty("tech").GetProperty("time").GetString());
+
+        var bad = await client.PutAsJsonAsync("/api/settings/reminders", new
+        {
+            english = new { time = "24:00", enabled = true },
+            tech = new { time = "21:00", enabled = true },
+        });
+        Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);
+        var errors = JsonDocument.Parse(await bad.Content.ReadAsStringAsync()).RootElement.GetProperty("errors");
+        Assert.True(errors.TryGetProperty("english", out _));
+    }
 }

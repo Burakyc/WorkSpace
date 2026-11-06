@@ -13,6 +13,8 @@ public sealed class SettingsService(JsonFileStore store)
 {
     public const string FileName = "settings.json";
     private const string PomodoroSection = "pomodoro";
+    private const string RemindersSection = "reminders";
+    private const string TimeMessage = "Saat SS:DD biçiminde olmalı (00:00–23:59).";
 
     public static readonly DocumentSchema Schema = new(1, []);
 
@@ -20,7 +22,7 @@ public sealed class SettingsService(JsonFileStore store)
     public async Task<AppSettings> GetAsync(CancellationToken cancellationToken)
     {
         var document = await store.ReadAsync(FileName, Schema, cancellationToken);
-        return new AppSettings(ReadPomodoro(document));
+        return new AppSettings(ReadPomodoro(document), ReadReminders(document));
     }
 
     public async Task<PomodoroSettings> SavePomodoroAsync(PomodoroSettingsInput input, CancellationToken cancellationToken)
@@ -47,6 +49,58 @@ public sealed class SettingsService(JsonFileStore store)
             return document;
         }, cancellationToken);
         return settings;
+    }
+
+    public async Task<ReminderSettings> SaveRemindersAsync(ReminderSettingsInput input, CancellationToken cancellationToken)
+    {
+        var errors = new Dictionary<string, string[]>();
+        var english = ToReminder(errors, "english", input.English);
+        var tech = ToReminder(errors, "tech", input.Tech);
+        if (english is null || tech is null)
+        {
+            throw new ValidationException(errors);
+        }
+
+        var settings = new ReminderSettings(english, tech);
+        await store.UpdateAsync(FileName, Schema, document =>
+        {
+            document ??= new JsonObject();
+            document[RemindersSection] = JsonSerializer.SerializeToNode(settings, StorageJson.Options);
+            return document;
+        }, cancellationToken);
+        return settings;
+    }
+
+    private static Reminder? ToReminder(Dictionary<string, string[]> errors, string field, ReminderInput? input)
+    {
+        if (input is { Enabled: { } enabled } && ReminderSettings.IsValidTime(input.Time))
+        {
+            return new Reminder(input.Time!, enabled);
+        }
+        errors[field] = [TimeMessage];
+        return null;
+    }
+
+    /// <summary>Each reminder on its own: a missing or broken one gives its default.</summary>
+    private static ReminderSettings ReadReminders(JsonObject? document)
+    {
+        var section = document?[RemindersSection] as JsonObject;
+        return new ReminderSettings(
+            ReadReminder(section?["english"], ReminderSettings.Default.English),
+            ReadReminder(section?["tech"], ReminderSettings.Default.Tech));
+    }
+
+    private static Reminder ReadReminder(JsonNode? node, Reminder fallback)
+    {
+        try
+        {
+            var reminder = node is JsonObject ? node.Deserialize<Reminder>(StorageJson.Options) : null;
+            return reminder is not null && ReminderSettings.IsValidTime(reminder.Time) ? reminder : fallback;
+        }
+        catch (JsonException)
+        {
+            return fallback;
+        }
     }
 
     private static PomodoroSettings ReadPomodoro(JsonObject? document)

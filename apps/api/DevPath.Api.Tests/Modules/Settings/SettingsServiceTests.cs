@@ -70,4 +70,59 @@ public sealed class SettingsServiceTests : IDisposable
 
         Assert.Equal(4, ex.Errors.Count);
     }
+
+    private static readonly ReminderSettings DefaultReminders = new(new Reminder("09:00", true), new Reminder("20:00", true));
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("""{ "schemaVersion": 1, "reminders": { "english": "09:00" } }""")]
+    [InlineData("""{ "schemaVersion": 1, "reminders": { "english": { "time": "25:00", "enabled": true }, "tech": { "time": 7 } } }""")]
+    public async Task Reminders_default_without_a_valid_section(string? file)
+    {
+        if (file is not null) await File.WriteAllTextAsync(SettingsFile, file);
+
+        var settings = await _settings.GetAsync(CancellationToken.None);
+
+        Assert.Equal(DefaultReminders, settings.Reminders);
+    }
+
+    [Fact]
+    public async Task Saves_the_reminders_and_keeps_the_pomodoro_section()
+    {
+        await _settings.SavePomodoroAsync(new PomodoroSettingsInput(50, 10, 20, 3), CancellationToken.None);
+
+        var saved = await _settings.SaveRemindersAsync(
+            new ReminderSettingsInput(new ReminderInput("08:30", false), new ReminderInput("21:05", true)), CancellationToken.None);
+
+        var expected = new ReminderSettings(new Reminder("08:30", false), new Reminder("21:05", true));
+        Assert.Equal(expected, saved);
+        var read = await _settings.GetAsync(CancellationToken.None);
+        Assert.Equal(expected, read.Reminders);
+        Assert.Equal(50, read.Pomodoro.FocusMinutes);
+    }
+
+    [Theory]
+    [InlineData("24:00", "english")]
+    [InlineData("9:00", "english")]
+    [InlineData("ab:cd", "english")]
+    [InlineData("", "english")]
+    [InlineData(null, "english")]
+    public async Task Rejects_invalid_reminder_times(string? time, string field)
+    {
+        var ex = await Assert.ThrowsAsync<ValidationException>(() => _settings.SaveRemindersAsync(
+            new ReminderSettingsInput(new ReminderInput(time, true), new ReminderInput("20:00", true)), CancellationToken.None));
+
+        Assert.Equal([field], ex.Errors.Keys);
+        Assert.False(File.Exists(SettingsFile));
+    }
+
+    [Fact]
+    public async Task Rejects_missing_reminders_and_fields()
+    {
+        var ex = await Assert.ThrowsAsync<ValidationException>(() => _settings.SaveRemindersAsync(
+            new ReminderSettingsInput(new ReminderInput("09:00", null), null), CancellationToken.None));
+
+        Assert.Equal(["english", "tech"], ex.Errors.Keys.Order());
+        Assert.Equal("Saat SS:DD biçiminde olmalı (00:00–23:59).", ex.Errors["tech"][0]);
+    }
 }

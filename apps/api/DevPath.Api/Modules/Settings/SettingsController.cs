@@ -12,4 +12,8 @@ public sealed class SettingsController(SettingsService settings) : ControllerBas
     [HttpPut("pomodoro")]
     public Task<PomodoroSettings> SavePomodoro(PomodoroSettingsInput input, CancellationToken cancellationToken) =>
         settings.SavePomodoroAsync(input, cancellationToken);
+
+    [HttpPut("reminders")]
+    public Task<ReminderSettings> SaveReminders(ReminderSettingsInput input, CancellationToken cancellationToken) =>
+        settings.SaveRemindersAsync(input, cancellationToken);
 }
