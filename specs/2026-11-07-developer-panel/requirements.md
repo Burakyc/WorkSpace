@@ -38,7 +38,7 @@ A hidden page, opened with `Ctrl+Shift+D`, shows whether the API is healthy and 
   - `source`: the type that threw (`exception.TargetSite.DeclaringType.Name`, without compiler-generated parts), otherwise the last part of the log category.
   - `kind`: the exception type name, or `Log` without an exception.
   - `path`: `METHOD route-template` of the current request (e.g. `PUT api/notes/{id}/content`) from the matched endpoint, or `null` outside a request or without a matched route. The real path and query are never kept.
-- `GET /api/dev` → `{ startedAt, errors: [...], files: [...], totalBytes }` (token-protected like every endpoint).
+- `GET /api/dev` → `{ errors: [...], files: [...], totalBytes }` (token-protected like every endpoint).
 
 ### Data file sizes (`DataFileSizes.Measure(dataDir)`)
 
