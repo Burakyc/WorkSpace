@@ -189,6 +189,12 @@ export interface NoteNode {
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 
+/** A folder in `<dataDir>/backups`: `YYYY-MM-DD` (daily) or `YYYY-MM-DD-HHmmss` (made before a restore). */
+export interface BackupInfo {
+  name: string;
+  kind: 'daily' | 'beforeRestore';
+}
+
 /** What the preload script exposes as `window.devpath`. */
 export interface DevPathBridge {
   getApiConfig(): Promise<ApiConfig>;

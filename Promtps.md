@@ -469,3 +469,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-06-daily-backups/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-06 – Implement phase 8.1 daily backups
+**Phase:** 8.1 Daily backups
+**Prompt:**
+Implement the spec in specs/2026-11-06-daily-backups/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 8.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:**
