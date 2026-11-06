@@ -469,3 +469,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-06-keyboard-shortcuts/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-06 – Implement phase 7.1 keyboard shortcuts
+**Phase:** 7.1 Keyboard shortcuts
+**Prompt:**
+Implement the spec in specs/2026-11-06-keyboard-shortcuts/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 7.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `matchShortcut` (`Ctrl+N`, `Ctrl+Shift+P`, `Ctrl+K`, `?`, never `?` in text fields) with a capture-phase handler in `AppLayout`; the "Klavye kısayolları" dialog and the "Kısayollar" sidebar button; `useShortcutRequest` so Notlar creates a page inside the open item, the search box takes focus and Pomodoro stops or starts with the last selection; tech-stack and specs updated; phase 7.1 done.

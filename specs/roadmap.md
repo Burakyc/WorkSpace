@@ -193,10 +193,10 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 7 — MVP polish and release
 
-#### 7.1 Keyboard shortcuts — `todo`
-- [ ] `Ctrl+N` new note, `Ctrl+Shift+P` start/stop pomodoro, `Ctrl+K` search; shown in a shortcuts help (`?`).
-- [ ] Shortcuts do not fire while typing in the editor unless they use a modifier.
-- [ ] Tests: shortcut handler (Vitest).
+#### 7.1 Keyboard shortcuts — `done`
+- [x] `Ctrl+N` new note, `Ctrl+Shift+P` start/stop pomodoro, `Ctrl+K` search; shown in a shortcuts help (`?`).
+- [x] Shortcuts do not fire while typing in the editor unless they use a modifier.
+- [x] Tests: shortcut handler (Vitest).
 
 #### 7.2 Daily reminders — `todo`
 - [ ] Settings: English reminder time and tech reminder time, each can be turned off.

@@ -6,11 +6,11 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 7.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] `Ctrl+N` new note, `Ctrl+Shift+P` start/stop pomodoro, `Ctrl+K` search; shown in a shortcuts help (`?`).
-- [ ] Shortcuts do not fire while typing in the editor unless they use a modifier.
-- [ ] `Ctrl+N` creates the page inside the open item; `Ctrl+Shift+P` starts with the last used goal.
-- [ ] Tests: shortcut handler (Vitest).
-- [ ] `tech-stack.md` is updated.
+- [x] `Ctrl+N` new note, `Ctrl+Shift+P` start/stop pomodoro, `Ctrl+K` search; shown in a shortcuts help (`?`).
+- [x] Shortcuts do not fire while typing in the editor unless they use a modifier.
+- [x] `Ctrl+N` creates the page inside the open item; `Ctrl+Shift+P` starts with the last used goal.
+- [x] Tests: shortcut handler (Vitest).
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -48,7 +48,7 @@ Run the app (`npm run dev`) with at least one goal and one note folder.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M5 done with the expected results
-- [ ] `roadmap.md` phase 7.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M5 done with the expected results
+- [x] `roadmap.md` phase 7.1 ticked and set to `done`

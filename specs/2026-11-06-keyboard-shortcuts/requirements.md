@@ -23,6 +23,8 @@ The most common actions work from the keyboard anywhere in the app: `Ctrl+N` cre
 | `Ctrl+N` | **Inside the open item.** On `/notes/:id` the new page becomes the last child of the open folder or page; anywhere else it is a top-level page. The new page opens (`/notes/<new id>`) with its title in rename mode. |
 | `Ctrl+K` | **Focus the notes search.** Opens Notlar (keeps the open item when already there) and focuses "Notlarda ara". No command palette. |
 | Help | **Window + sidebar button.** `?` (outside text fields) and a "Kısayollar" button in the sidebar footer open the same modal window. |
+| Deviation: dialog in tests | jsdom has no `showModal()` / `close()`; `src/test/setup.ts` adds a small stand-in (sets `open`, `close` fires the `close` event). Committed with task 2. |
+| Deviation: test wait | The `Ctrl+N` subpage test (task 3) ended before the new page opened and failed in the full run; it now waits for the new address. The fix went into the task 4 commit. |
 
 ## User stories
 
