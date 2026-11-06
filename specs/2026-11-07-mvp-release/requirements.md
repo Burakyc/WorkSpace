@@ -24,6 +24,11 @@ Ship DevPath Workspace 0.1.0: the Windows installer built with `npm run package`
 | Version | **Bump to 0.1.0**: `apps/desktop/package.json`, `apps/api/Directory.Build.props`, the health test, and user agents read the version instead of a literal. |
 | Offline start | **Simulated** by starting the installed app with `HTTPS_PROXY=http://127.0.0.1:9` (and `HTTP_PROXY`), so the API's GitHub / YouTube requests cannot leave the machine. |
 | Timer accuracy | **A real 25-minute focus session** with the window minimized; the other checks run meanwhile. |
+| Result: timer | The saved session is exact (`endedAt` = start + 25:00, 01:27:53–01:52:53). While minimized, Chromium runs page timers about once a minute, so the page switched to "Süre doldu" 58 s after the end; the end notification comes from main's own timer and is not throttled (seen in the packaged app at 0 s with a 1-minute session). No change needed. |
+| Result: contrast | The new token test found dark muted text on the hover surface at 4.04:1 and field borders under 3:1; fixed with `--color-text-muted: #a3b1c4` (dark) and a new `--color-input-border` (`#64748b` / `#748299`) in `fix(ui): raise muted text and field border contrast`. |
+| Result: notifications | An OS toast cannot be seen through CDP; the packaged app was started with `--inspect` and `Notification.show` was recorded (reminder and pomodoro end, both silent, on time). |
+| Deviation: clean-up | Everything under `%APPDATA%\DevPath` was created by this test run (after the rename), so the whole folder was removed instead of single files; the next start is a true first run. The leftover profile stays in `%APPDATA%\DevPath.before-0.1.0`. "Promptu kopyala" put the interview prompt on the clipboard. |
+| Follow-up: Electron fuses | The packaged app accepts `--inspect` and `--remote-debugging-port` (Electron's defaults). Turning off the `EnableNodeCliInspectArguments` fuse (and similar) is a hardening step for after 0.1.0. |
 
 ## Rules
 

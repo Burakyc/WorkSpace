@@ -6,11 +6,11 @@ The release is done when every acceptance criterion is checked, `npm run check` 
 
 From `roadmap.md` phase 7.4:
 
-- [ ] All four README scenarios work in the installed app except "Preparing a post" (post-MVP).
-- [ ] Manual smoke checklist on a fresh install: first run creates the data folder, every module's empty state, offline start.
-- [ ] Startup under 3 seconds; timer accurate after 25 minutes minimized.
-- [ ] Contrast checked in light and dark themes; full keyboard navigation.
-- [ ] Tag `v0.1.0` (after the user's yes).
+- [x] All four README scenarios work in the installed app except "Preparing a post" (post-MVP).
+- [x] Manual smoke checklist on a fresh install: first run creates the data folder, every module's empty state, offline start.
+- [x] Startup under 3 seconds; timer accurate after 25 minutes minimized.
+- [x] Contrast checked in light and dark themes; full keyboard navigation.
+- [x] Tag `v0.1.0` (after the user's yes).
 
 ## Automated tests
 
@@ -37,7 +37,7 @@ From `roadmap.md` phase 7.4:
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] S1–S11 done with the expected results; test data removed
-- [ ] `roadmap.md` phase 7.4 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] S1–S11 done with the expected results; test data removed
+- [x] `roadmap.md` phase 7.4 ticked and set to `done`

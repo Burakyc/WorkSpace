@@ -209,12 +209,12 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] No secrets or personal content shown.
 - [x] Tests: error buffer keeps only the last 50.
 
-#### 7.4 MVP release — `todo`
-- [ ] All four README scenarios work in the installed app except "Preparing a post" (post-MVP).
-- [ ] Manual smoke checklist on a fresh install: first run creates the data folder, every module's empty state, offline start.
-- [ ] Startup under 3 seconds; timer accurate after 25 minutes minimized.
-- [ ] Contrast checked in light and dark themes; full keyboard navigation.
-- [ ] Tag `v0.1.0`.
+#### 7.4 MVP release — `done`
+- [x] All four README scenarios work in the installed app except "Preparing a post" (post-MVP).
+- [x] Manual smoke checklist on a fresh install: first run creates the data folder, every module's empty state, offline start.
+- [x] Startup under 3 seconds; timer accurate after 25 minutes minimized.
+- [x] Contrast checked in light and dark themes; full keyboard navigation.
+- [x] Tag `v0.1.0`.
 
 ## Post-MVP
 
