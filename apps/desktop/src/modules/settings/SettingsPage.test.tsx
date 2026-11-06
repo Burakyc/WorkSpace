@@ -4,7 +4,12 @@ import type { DevPathBridge } from '../../shared/api/types';
 import { SettingsPage } from './SettingsPage';
 
 function stubSettings(changeDataDir: DevPathBridge['settings']['changeDataDir']) {
-  const settings = { getDataDir: () => Promise.resolve('C:\\Data'), changeDataDir };
+  const settings = {
+    getDataDir: () => Promise.resolve('C:\\Data'),
+    changeDataDir,
+    listBackups: () => Promise.resolve([]),
+    restoreBackup: () => Promise.resolve(),
+  };
   vi.stubGlobal('devpath', { settings });
   return settings;
 }
