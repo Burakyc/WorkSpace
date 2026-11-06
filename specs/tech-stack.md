@@ -29,6 +29,7 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 │  - spawns the API process, kills it on quit              │
 │  - safeStorage (secrets), notifications, reminders       │
 │  - reads and writes app config (data folder path)        │
+│  - daily backup of the data folder, restore              │
 │                                                          │
 │ preload (contextBridge, minimal)                         │
 │  - getApiConfig(), settings.*, pomodoro.*, onOpenPage(), │
@@ -52,7 +53,8 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
    - Packaged: `resources/api/DevPath.Api.exe` (with `appsettings.json` next to it), started in `Production`. `npm run package` runs `dotnet publish -r win-x64 --self-contained -p:PublishSingleFile=true` first. The installed app is named `DevPath` through electron-builder `extraMetadata.productName`, so its `userData` is `%APPDATA%\DevPath`, separate from development (`%APPDATA%\@devpath\desktop`). Uninstall keeps `%APPDATA%\DevPath`.
 3. Main polls `GET /api/health` (with the token) until it answers `200` (timeout 10 s, or earlier if the API process exits). On failure it shows `dialog.showErrorBox` with a Turkish message and quits; the main window is never opened.
 4. When a secret or the data folder changes, main restarts the API. A data folder change (Ayarlar, `settings.changeDataDir()`) creates the folder, writes `app-config.json`, stops the old API, starts a new one on a new port with a new token, and reloads the window. If the new API does not start, the old `app-config.json` is restored and the old API is started again.
-5. On quit, main stops the API process. If main dies without quitting, the API notices that `DEVPATH_PARENT_PID` exited and stops itself.
+5. Daily backup: in `launch()`, after creating the data folder and **before** starting the API (so nothing is written during the copy), main runs `dailyBackup` (`electron/backups.ts`). A failure is logged and the app starts anyway. A restore (Ayarlar → Yedekler, `settings.listBackups()` / `settings.restoreBackup(name)`) checks the name against the list, stops the API and waits for the process to exit (`ApiHandle.exited`), backs up the current data, replaces the data folder's contents with the backup, starts the API again on the same folder and reloads the window. A failed copy is rolled back from the pre-restore backup and shown in an error message box before the reload; if the API cannot start again, the error window opens and the app quits.
+6. On quit, main stops the API process. If main dies without quitting, the API notices that `DEVPATH_PARENT_PID` exited and stops itself.
 
 ### API rules
 
@@ -102,7 +104,7 @@ UI text is Turkish. Code, identifiers, comments, commits and docs are English.
 - Path is configurable in settings (`dataDir` in `app-config.json`). Default: `%APPDATA%\DevPath\data` for the installed app, `%APPDATA%\DevPath\dev-data` for unpackaged Electron and for the API run on its own in Development, so development never touches real data.
 - The API takes the path from `DEVPATH_DATA_DIR` (absolute only); outside Development it refuses to start without it. Electron main creates the folder before starting the API (so its error window can name the folder) and the API creates it again at startup (so `dotnet run` and Docker work alone). An invalid `app-config.json` or an uncreatable folder is an error window, never a silent fallback to another folder.
 - The repo also gitignores `data/` in case it is pointed there, but the default avoids the OneDrive-synced repo, where sync can lock files during writes.
-- Post-MVP backups go to a sibling folder: `%APPDATA%\DevPath\backups\YYYY-MM-DD\`, last 14 days kept.
+- Backups live **inside** the data folder, `<dataDir>\backups\`, so each data folder has its own and development never mixes with the installed app. On the first start of each local day main copies the data folder (without `backups\` and `*.tmp` files) to `backups\YYYY-MM-DD\` through a `.partial` folder that is renamed when complete; an empty data folder is not backed up. A restore first copies the current data to `backups\YYYY-MM-DD-HHmmss\` (local time, listed as "Geri yükleme öncesi"). Retention keeps every backup of the 14 newest dates that have one and deletes older ones; only folders named `YYYY-MM-DD` or `YYYY-MM-DD-HHmmss` count, anything else in `backups\` is left alone. The API never reads or writes `backups\`.
 
 ### Layout
 
@@ -127,7 +129,10 @@ data/
 ├── feed.json               # written by the agent, read-only for the app
 ├── stats.json              # written by the agent, read-only for the app
 ├── posts.json              # post drafts (post-MVP)
-└── style.json              # style prompt (post-MVP)
+├── style.json              # style prompt (post-MVP)
+└── backups/                # written by Electron main only
+    ├── 2026-11-06/         # daily copy of everything above
+    └── 2026-11-06-140509/  # copy made before a restore
 ```
 
 Pomodoros for a day are read from `sessions.json` by the local date of `startedAt` (in the time zone the page sends); notes for a day are read from `notes/index.json` by `createdAt`/`updatedAt` in the same time zone (pages only). The daily file only holds what is not stored elsewhere: `{ "schemaVersion": 1, "date": "YYYY-MM-DD", "text": "…" }`, plain text up to 10,000 characters, trailing whitespace trimmed, written atomically through `JsonFileStore`; a day without a file has an empty log.
@@ -262,6 +267,7 @@ devpath-workspace/
 │   │   │   ├── main.ts            # window, API process, reminders, notifications
 │   │   │   ├── preload.ts         # contextBridge API
 │   │   │   ├── apiProcess.ts      # spawn/health-check/stop the API
+│   │   │   ├── backups.ts         # daily backup, retention, restore
 │   │   │   └── secrets.ts         # safeStorage wrapper
 │   │   ├── src/
 │   │   │   ├── app/               # router, layout (sidebar + content), providers

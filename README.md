@@ -17,7 +17,7 @@ A personal desktop application that manages learning, English practice, intervie
 
   **Reliability**
   - JSON writes are atomic (write to a temp file, then replace); an interrupted write never corrupts data.
-  - Automatic daily backup (`backups/YYYY-MM-DD/`), last 14 days kept.
+  - Automatic daily backup on the first start of the day (`<data folder>/backups/YYYY-MM-DD/`), last 14 days kept; Settings → Yedekler restores one (the current data is backed up first).
   - Every JSON file has a `schemaVersion` field; migrations run when the version changes.
   - If an external source (GitHub, YouTube) is unreachable, the app opens with the last cached data and shows an error card.
 
