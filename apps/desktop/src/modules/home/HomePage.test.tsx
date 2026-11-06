@@ -194,16 +194,51 @@ describe('HomePage reminders card', () => {
     vi.useRealTimers();
   });
 
-  it("shows today's reminders with their status", () => {
+  const rows = async () =>
+    (await within(card('Hatırlatmalar')).findAllByRole('listitem')).map((li) => li.textContent);
+
+  it("shows today's reminders with their status", async () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date(2026, 10, 6, 12, 30));
     installFakeGoalsApi([]);
     renderPage();
 
-    const rows = within(card('Hatırlatmalar'))
-      .getAllByRole('listitem')
-      .map((li) => li.textContent);
-    expect(rows).toEqual(['09:00 İngilizcegeçti', '20:00 Tekniksıradaki']);
+    expect(await rows()).toEqual(['09:00 İngilizcegeçti', '20:00 Tekniksıradaki']);
+  });
+
+  it('shows the saved times and leaves out a disabled reminder', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 10, 6, 12, 30));
+    installFakeGoalsApi([], {
+      reminders: {
+        english: { time: '08:30', enabled: false },
+        tech: { time: '21:00', enabled: true },
+      },
+    });
+    renderPage();
+
+    expect(await rows()).toEqual(['21:00 Tekniksıradaki']);
+  });
+
+  it('says when both reminders are off', async () => {
+    installFakeGoalsApi([], {
+      reminders: {
+        english: { time: '09:00', enabled: false },
+        tech: { time: '20:00', enabled: false },
+      },
+    });
+    renderPage();
+
+    expect(
+      await within(card('Hatırlatmalar')).findByText('Hatırlatmalar kapalı.'),
+    ).toBeInTheDocument();
+  });
+
+  it('falls back to the default times when the settings cannot be read', async () => {
+    installFakeGoalsApi([], { failSettings: true });
+    renderPage();
+
+    expect((await rows()).map((row) => row?.slice(0, 5))).toEqual(['09:00', '20:00']);
   });
 });
 

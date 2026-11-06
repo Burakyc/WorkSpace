@@ -1,3 +1,5 @@
+import { DEFAULT_REMINDER_SETTINGS, type ReminderSettings } from '../../shared/api/types';
+
 /** A daily reminder at a local time (`HH:MM`). */
 export interface Reminder {
   id: 'english' | 'tech';
@@ -5,11 +7,16 @@ export interface Reminder {
   time: string;
 }
 
-// ponytail: fixed until phase 7.2 moves the times to settings.json.
-export const DEFAULT_REMINDERS: readonly Reminder[] = [
-  { id: 'english', label: 'İngilizce', time: '09:00' },
-  { id: 'tech', label: 'Teknik', time: '20:00' },
-];
+const labels: Record<Reminder['id'], string> = { english: 'İngilizce', tech: 'Teknik' };
+
+/** The enabled reminders of the settings. */
+export function remindersFrom(settings: ReminderSettings): Reminder[] {
+  return (['english', 'tech'] as const)
+    .filter((id) => settings[id].enabled)
+    .map((id) => ({ id, label: labels[id], time: settings[id].time }));
+}
+
+export const DEFAULT_REMINDERS: readonly Reminder[] = remindersFrom(DEFAULT_REMINDER_SETTINGS);
 
 export type ReminderStatus = 'passed' | 'next' | 'later';
 
