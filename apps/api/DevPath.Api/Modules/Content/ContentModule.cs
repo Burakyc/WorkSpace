@@ -12,6 +12,7 @@ public static class ContentModule
     public static IServiceCollection AddContent(this IServiceCollection services)
     {
         services.AddSingleton<ImportService>();
+        services.AddSingleton<ContentService>();
         return services;
     }
 }

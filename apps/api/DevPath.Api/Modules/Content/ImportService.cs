@@ -1,6 +1,5 @@
 using System.Text.Json.Nodes;
 using DevPath.Api.Infrastructure.Storage;
-using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Pomodoro;
 
 namespace DevPath.Api.Modules.Content;
@@ -15,11 +14,11 @@ public sealed record ImportResult(IReadOnlyList<ImportError> Errors, ImportRepor
 public sealed class ImportService(JsonFileStore store, TimeProvider time)
 {
     public IReadOnlyList<ImportError> Validate(string? type, string? text) =>
-        ImportValidator.Validate(Require(type), text).Errors;
+        ImportValidator.Validate(ContentType.Require(type), text).Errors;
 
     public async Task<ImportResult> ImportAsync(string? type, string? text, CancellationToken cancellationToken)
     {
-        var contentType = Require(type);
+        var contentType = ContentType.Require(type);
         var (document, errors) = ImportValidator.Validate(contentType, text);
         if (document is null)
         {
@@ -100,10 +99,4 @@ public sealed class ImportService(JsonFileStore store, TimeProvider time)
     /// <summary>Normalized tags of a validated document or item (the validator already rejected invalid ones).</summary>
     private static IReadOnlyList<string> TagsOf(JsonObject node) =>
         Tags.NormalizeAll(node["tags"]?.AsArray().Select(tag => tag?.GetValue<string>()), out _);
-
-    private static ContentType Require(string? type) =>
-        ContentType.Find(type) ?? throw new ValidationException(new Dictionary<string, string[]>
-        {
-            ["type"] = ["Tür vocab, lesson veya interview olmalı."],
-        });
 }
