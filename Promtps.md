@@ -694,3 +694,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-07-developer-panel/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-07 – Implement phase 7.3 developer panel
+**Phase:** 7.3 Developer panel
+**Prompt:**
+Implement the spec in specs/2026-11-07-developer-panel/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 7.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `ErrorBuffer` (last 50) filled by `ErrorBufferLoggerProvider` (source, exception type, route template; no messages); `DataFileSizes` and `GET /api/dev`; renderer `errorLog` (last 50, window errors and failed requests with masked paths); the hidden `/dev` "Geliştirici paneli" (health, merged errors, file sizes, Yenile) toggled with `Ctrl+Shift+D`; tech-stack and specs updated; phase 7.3 done.

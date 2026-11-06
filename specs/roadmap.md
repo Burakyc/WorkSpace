@@ -204,10 +204,10 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Clicking the notification opens the related module.
 - [x] Tests: next-trigger calculation, including after the time has passed today.
 
-#### 7.3 Developer panel — `todo`
-- [ ] Hidden route (`Ctrl+Shift+D`) showing API health and version, last 50 errors from an in-memory log buffer, and data file sizes.
-- [ ] No secrets or personal content shown.
-- [ ] Tests: error buffer keeps only the last 50.
+#### 7.3 Developer panel — `done`
+- [x] Hidden route (`Ctrl+Shift+D`) showing API health and version, last 50 errors from an in-memory log buffer, and data file sizes.
+- [x] No secrets or personal content shown.
+- [x] Tests: error buffer keeps only the last 50.
 
 #### 7.4 MVP release — `todo`
 - [ ] All four README scenarios work in the installed app except "Preparing a post" (post-MVP).

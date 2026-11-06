@@ -6,11 +6,11 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 7.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Hidden route (`Ctrl+Shift+D`) showing API health and version, last 50 errors from an in-memory log buffer, and data file sizes.
-- [ ] No secrets or personal content shown (no messages, no real paths, no file names inside folders).
-- [ ] API and renderer errors are both listed.
-- [ ] Tests: error buffer keeps only the last 50.
-- [ ] `tech-stack.md` is updated.
+- [x] Hidden route (`Ctrl+Shift+D`) showing API health and version, last 50 errors from an in-memory log buffer, and data file sizes.
+- [x] No secrets or personal content shown (no messages, no real paths, no file names inside folders).
+- [x] API and renderer errors are both listed.
+- [x] Tests: error buffer keeps only the last 50.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -48,7 +48,7 @@ Run the app (`npm run dev`) with some data.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M4 done with the expected results
-- [ ] `roadmap.md` phase 7.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M4 done with the expected results
+- [x] `roadmap.md` phase 7.3 ticked and set to `done`

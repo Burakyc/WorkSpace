@@ -21,6 +21,9 @@ A hidden page, opened with `Ctrl+Shift+D`, shows whether the API is healthy and 
 | Error sources | **API and renderer.** The API keeps its `Error`/`Critical` log entries (unhandled exceptions included); the renderer keeps uncaught errors, unhandled promise rejections and failed API requests. The panel shows both, newest first. |
 | Privacy | **Type and path, no message.** A row is time, source, kind (exception type or HTTP status) and path. Messages and stack traces are never kept, since they can hold note text or tokens. |
 | File sizes | **Files and folder totals.** Each top-level file with its size; each top-level folder with its file count and total size; a grand total. No file inside a folder is named. |
+| Deviation: no `startedAt` | The planned `startedAt` field of `GET /api/dev` was dropped: the panel never shows it. The spec line was changed with task 2. |
+| Deviation: listeners file | `installErrorListeners` lives in `shared/errors/errorListeners.ts`: `client.ts` is also compiled for main (`TOKEN_HEADER`), which has no DOM types, so `errorLog.ts` stays DOM-free. |
+| Deviation: source column | API rows show "API (<type>)", e.g. "API (DocumentSchema)", so the throwing type is visible. |
 | Opening | **`Ctrl+Shift+D`, not in the help.** `/dev` is not in the sidebar or the `?` help. Pressing it on `/dev` goes back to the previous page (Ana Sayfa when there is none). |
 
 ## User stories
