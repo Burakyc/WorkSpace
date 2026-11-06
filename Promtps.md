@@ -680,3 +680,17 @@ Implement the spec in specs/2026-11-06-daily-reminders/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 7.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `reminders` section in `settings.json` with `PUT /api/settings/reminders`; `electron/reminders.ts` (`nextTrigger`, `parseReminders`, a daily scheduler that skips late timers) wired in main, which reads the times from the API and shows silent notifications that open İngilizce / Öğrenme; `reminders.refresh()` in the preload; Ayarlar → "Hatırlatmalar" form; the home card reads the saved times; `main` merged in first; tech-stack and specs updated; phase 7.2 done.
+
+## 2026-11-07 – Plan phase 7.3 developer panel
+**Phase:** 7.3 Developer panel
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 7.3 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-07-developer-panel/` (`requirements.md`, `plan.md`, `validation.md`).
