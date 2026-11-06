@@ -11,6 +11,8 @@ export default defineConfig({
           name: 'renderer',
           environment: 'jsdom',
           setupFiles: ['src/test/setup.ts'],
+          // CSS is stubbed in tests; the contrast test reads the design tokens as raw text.
+          css: { include: [/tokens\.css/] },
           include: ['src/**/*.test.{ts,tsx}'],
         },
       },
