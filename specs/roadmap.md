@@ -142,54 +142,54 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 5 — Content modules with import
 
-#### 5.1 Import engine and validator — `todo`
-- [ ] `schemas/vocab.schema.json`, `lesson.schema.json`, `interview.schema.json` with the shared envelope (`schemaVersion`, `type`, `topic`, `level`, `tags`, `items`).
-- [ ] API: `POST /api/import/validate` returns `{ path, line, message }` errors; `POST /api/import` validates, then merges by topic slug and item merge key, and reports added/skipped counts.
-- [ ] Rejects non-JSON, files over 2 MB and unknown properties.
-- [ ] Shared import UI: paste box or file picker, line-by-line error list, success summary.
-- [ ] Prompt templates in `prompts/` and a "Promptu kopyala" button.
-- [ ] Tests: validation errors with line numbers, merge never overwrites, duplicates skipped.
+#### 5.1 Import engine and validator — `done`
+- [x] `schemas/vocab.schema.json`, `lesson.schema.json`, `interview.schema.json` with the shared envelope (`schemaVersion`, `type`, `topic`, `level`, `tags`, `items`).
+- [x] API: `POST /api/import/validate` returns `{ path, line, message }` errors; `POST /api/import` validates, then merges by topic slug and item merge key, and reports added/skipped counts.
+- [x] Rejects non-JSON, files over 2 MB and unknown properties.
+- [x] Shared import UI: paste box or file picker, line-by-line error list, success summary.
+- [x] Prompt templates in `prompts/` and a "Promptu kopyala" button.
+- [x] Tests: validation errors with line numbers, merge never overwrites, duplicates skipped.
 
-#### 5.2 English module — `todo`
-- [ ] Empty state: "Copy the prompt to add your first content" (in Turkish) with the copy button.
-- [ ] Topic list with level and tags; topic page shows vocab cards (term, meaning, example).
-- [ ] Simple practice: flip card, mark "biliyorum / tekrar et" (stored per item; spaced repetition comes later).
-- [ ] Importing into an existing topic merges.
-- [ ] Tests: import-then-show flow (RTL).
+#### 5.2 English module — `done`
+- [x] Empty state: "Copy the prompt to add your first content" (in Turkish) with the copy button.
+- [x] Topic list with level and tags; topic page shows vocab cards (term, meaning, example).
+- [x] Simple practice: flip card, mark "biliyorum / tekrar et" (stored per item; spaced repetition comes later).
+- [x] Importing into an existing topic merges.
+- [x] Tests: import-then-show flow (RTL).
 
-#### 5.3 Interview module — `todo`
-- [ ] Topic list and question cards (question, answer, optional code sample, difficulty).
-- [ ] "Adding content" scenario works end to end: copy prompt → paste AI JSON → cards appear.
-- [ ] Mark a question as practised; filter by tag and difficulty.
-- [ ] Tests: interview merge key, filter logic.
+#### 5.3 Interview module — `done`
+- [x] Topic list and question cards (question, answer, optional code sample, difficulty).
+- [x] "Adding content" scenario works end to end: copy prompt → paste AI JSON → cards appear.
+- [x] Mark a question as practised; filter by tag and difficulty.
+- [x] Tests: interview merge key, filter logic.
 
-#### 5.4 Learning module — `todo`
-- [ ] Topic list and lesson pages split into parts (title, summary, body, optional exercises).
-- [ ] Mark a part as done; topic shows parts done / total.
-- [ ] Tests: lesson merge by part title, progress count.
+#### 5.4 Learning module — `done`
+- [x] Topic list and lesson pages split into parts (title, summary, body, optional exercises).
+- [x] Mark a part as done; topic shows parts done / total.
+- [x] Tests: lesson merge by part title, progress count.
 
 ### Milestone 6 — Home dashboard
 
-#### 6.1 Dashboard, reminders and feed — `todo`
-- [ ] Home page grid: one column under 900 px, multi-column on large screens.
-- [ ] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
-- [ ] Feed card reads `feed.json` (agent-written X summaries); validated; error card if missing or invalid.
-- [ ] Reminders card lists today's English and tech reminders (times from 7.2 settings, defaults until then).
-- [ ] Home renders from cached data first; nothing on it blocks on the network.
+#### 6.1 Dashboard, reminders and feed — `done`
+- [x] Home page grid: one column under 900 px, multi-column on large screens.
+- [x] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
+- [x] Feed card reads `feed.json` (agent-written X summaries); validated; error card if missing or invalid.
+- [x] Reminders card lists today's English and tech reminders (times from 7.2 settings, defaults until then).
+- [x] Home renders from cached data first; nothing on it blocks on the network.
 
-#### 6.2 YouTube RSS — `todo`
-- [ ] Settings: add/remove YouTube channels (channel ID or URL).
-- [ ] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
-- [ ] "New videos" card with thumbnail, title, date; click opens in the default browser.
-- [ ] Offline or failed fetch shows the cached list plus an error card.
-- [ ] Tests: RSS parsing, failure falls back to cache (stub HTTP handler).
+#### 6.2 YouTube RSS — `done`
+- [x] Settings: add/remove YouTube channels (channel ID or URL).
+- [x] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
+- [x] "New videos" card with thumbnail, title, date; click opens in the default browser.
+- [x] Offline or failed fetch shows the cached list plus an error card.
+- [x] Tests: RSS parsing, failure falls back to cache (stub HTTP handler).
 
-#### 6.3 GitHub stats and "what changed" — `todo`
-- [ ] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
-- [ ] API fetches public stars, followers and recent public commits; uses the token if present; caches to `cache/github.json`.
-- [ ] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
-- [ ] Offline or rate-limited fetch shows cached numbers plus an error card.
-- [ ] Tests: diff since last visit, token never appears in logs or responses.
+#### 6.3 GitHub stats and "what changed" — `done`
+- [x] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
+- [x] API fetches public stars, followers and recent public commits; uses the token if present; caches to `cache/github.json`.
+- [x] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
+- [x] Offline or rate-limited fetch shows cached numbers plus an error card.
+- [x] Tests: diff since last visit, token never appears in logs or responses.
 
 ### Milestone 7 — MVP polish and release
 

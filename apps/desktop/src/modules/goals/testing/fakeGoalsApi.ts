@@ -2,6 +2,8 @@ import { vi } from 'vitest';
 import type {
   DayDetail,
   DayNote,
+  FeedResponse,
+  GitHubStatus,
   Goal,
   GoalInput,
   GoalProgress,
@@ -11,8 +13,12 @@ import type {
   PomodoroSettings,
   Project,
   ProjectCreateInput,
+  SecretName,
   Session,
   SessionInput,
+  VisitChanges,
+  YouTubeChannel,
+  YouTubeVideos,
 } from '../../../shared/api/types';
 import { DEFAULT_POMODORO_SETTINGS } from '../../../shared/api/types';
 import { buildMonthGrid } from '../../calendar/monthGrid';
@@ -57,6 +63,28 @@ export function installFakeGoalsApi(
     /** GET /api/notes/search answers by query; queries not listed find nothing. */
     search?: Record<string, NoteSearchResult[]>;
     failSearch?: boolean;
+    /** GET /api/home/feed answer; missing by default. */
+    feed?: FeedResponse;
+    failFeed?: boolean;
+    /** Followed channels; mutated by add/remove. Adding `UC…` succeeds with the title from `youTubeTitles`. */
+    youTubeChannels?: YouTubeChannel[];
+    youTubeTitles?: Record<string, string>;
+    /** GET /api/youtube/videos answer, and what POST /api/youtube/refresh answers (default: the same). */
+    youTubeVideos?: YouTubeVideos;
+    refreshedVideos?: YouTubeVideos;
+    failYouTube?: boolean;
+    failRefresh?: boolean;
+    /** The saved GitHub username and the stats GET/refresh answer (refresh: `refreshedGitHub`, default the same). */
+    gitHubUsername?: string | null;
+    gitHub?: Omit<GitHubStatus, 'username'>;
+    refreshedGitHub?: Omit<GitHubStatus, 'username'>;
+    failGitHub?: boolean;
+    /** POST /api/home/visit answer. */
+    visit?: VisitChanges;
+    failVisit?: boolean;
+    /** Whether a GitHub token is saved (the fake `secrets` bridge); `secretError` makes `set` reject. */
+    hasToken?: boolean;
+    secretError?: string;
   } = {},
 ) {
   const goals = initialGoals.map((g) => ({ ...g }));
@@ -347,6 +375,64 @@ export function installFakeGoalsApi(
     return json({ title: 'Unexpected request' }, 500);
   }
 
+  const youTubeChannels = (options.youTubeChannels ?? []).map((c) => ({ ...c }));
+  const noVideos: YouTubeVideos = { videos: [], lastRefreshAt: null, error: null };
+
+  function youTubeRoute(
+    method: string,
+    id: string | undefined,
+    action: string | undefined,
+    body: unknown,
+  ) {
+    if (options.failYouTube) return json({ title: 'Server error' }, 500);
+    if (id === 'videos') return json(options.youTubeVideos ?? noVideos);
+    if (id === 'refresh') {
+      if (options.failRefresh) return json({ title: 'Server error' }, 500);
+      return json(options.refreshedVideos ?? options.youTubeVideos ?? noVideos);
+    }
+    if (method === 'GET') return json(youTubeChannels);
+    if (method === 'DELETE') {
+      const index = youTubeChannels.findIndex((c) => c.id === action);
+      if (index < 0) return notFound();
+      youTubeChannels.splice(index, 1);
+      return new Response(null, { status: 204 });
+    }
+    const input = (body as { input: string }).input.trim();
+    if (!input.startsWith('UC')) {
+      return json(
+        {
+          errors: {
+            input: ["Kanal ID'si (UC ile başlar) ya da youtube.com/channel/… adresi gir."],
+          },
+        },
+        400,
+      );
+    }
+    if (youTubeChannels.some((c) => c.id === input)) {
+      return json({ errors: { input: ['Bu kanal zaten ekli.'] } }, 400);
+    }
+    const channel = { id: input, title: options.youTubeTitles?.[input] ?? input };
+    youTubeChannels.push(channel);
+    return json(channel, 201);
+  }
+
+  let gitHubUsername = options.gitHubUsername ?? null;
+  const noGitHub = { stats: null, fetchedAt: null, lastRefreshAt: null, error: null };
+
+  function gitHubRoute(method: string, id: string | undefined, body: unknown) {
+    if (options.failGitHub) return json({ title: 'Server error' }, 500);
+    if (id === 'settings' && method === 'GET') return json({ username: gitHubUsername });
+    if (id === 'settings') {
+      const username = (body as { username: string }).username.trim();
+      if (username.startsWith('-')) {
+        return json({ errors: { username: ['Geçerli bir GitHub kullanıcı adı gir.'] } }, 400);
+      }
+      gitHubUsername = username === '' ? null : username;
+    }
+    const answer = id === 'refresh' ? (options.refreshedGitHub ?? options.gitHub) : options.gitHub;
+    return json({ username: gitHubUsername, ...(answer ?? noGitHub) });
+  }
+
   const fetchFn = vi.fn<typeof fetch>((url, init) => {
     const { pathname, searchParams } = new URL(String(url));
     const method = init?.method ?? 'GET';
@@ -354,6 +440,32 @@ export function installFakeGoalsApi(
     const [, , resource, rawId, action] = pathname.split('/');
     const id = rawId === undefined ? undefined : decodeURIComponent(rawId);
     const includeArchived = searchParams.get('includeArchived') === 'true';
+    if (resource === 'home' && id === 'feed') {
+      if (options.failFeed) return Promise.resolve(json({ title: 'Server error' }, 500));
+      return Promise.resolve(
+        json(options.feed ?? { status: 'missing', generatedAt: null, items: [], errors: [] }),
+      );
+    }
+    if (resource === 'github') {
+      return Promise.resolve(gitHubRoute(method, id, body));
+    }
+    if (resource === 'home' && id === 'visit') {
+      if (options.failVisit) return Promise.resolve(json({ title: 'Server error' }, 500));
+      return Promise.resolve(
+        json(
+          options.visit ?? {
+            since: null,
+            newStars: null,
+            newFollowers: null,
+            newVideos: null,
+            streakDays: 0,
+          },
+        ),
+      );
+    }
+    if (resource === 'youtube') {
+      return Promise.resolve(youTubeRoute(method, id, action, body));
+    }
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
     if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
     if (resource === 'notes') {
@@ -372,10 +484,24 @@ export function installFakeGoalsApi(
   });
 
   const openExternal = vi.fn<(url: string) => Promise<void>>(() => Promise.resolve());
+  const tokenState = { saved: options.hasToken ?? false };
+  const secrets = {
+    has: vi.fn<(name: SecretName) => Promise<boolean>>(() => Promise.resolve(tokenState.saved)),
+    set: vi.fn<(name: SecretName, value: string) => Promise<void>>(() => {
+      if (options.secretError) return Promise.reject(new Error(options.secretError));
+      tokenState.saved = true;
+      return Promise.resolve();
+    }),
+    clear: vi.fn<(name: SecretName) => Promise<void>>(() => {
+      tokenState.saved = false;
+      return Promise.resolve();
+    }),
+  };
   const beforeClose = new Set<() => Promise<void>>();
   vi.stubGlobal('devpath', {
     getApiConfig: () => Promise.resolve({ baseUrl: 'http://api.test', token: 't' }),
     openExternal,
+    secrets,
     onBeforeClose: (callback: () => Promise<void>) => {
       beforeClose.add(callback);
       return () => beforeClose.delete(callback);
@@ -391,6 +517,9 @@ export function installFakeGoalsApi(
     logs,
     notes,
     contents,
+    youTubeChannels,
+    secrets,
+    gitHubUsername: () => gitHubUsername,
     closeApp,
     fetchFn,
     openExternal,

@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -7,15 +8,17 @@ import {
   dialog,
   ipcMain,
   Notification,
+  safeStorage,
   shell,
   type IpcMainInvokeEvent,
 } from 'electron';
-import type { ApiConfig, ChangeDataDirResult } from '../src/shared/api/types';
+import type { ApiConfig, ChangeDataDirResult, SecretResult } from '../src/shared/api/types';
 import { createCloseGuard } from './closeGuard';
-import { resolveApiExePath, startApi, type ApiHandle } from './apiProcess';
+import { apiEnvironment, resolveApiExePath, startApi, type ApiHandle } from './apiProcess';
 import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
 import { isAllowedExternalUrl, isAllowedNavigation } from './navigation';
+import { createSecretStore, isSecretName, isValidSecretValue } from './secrets';
 import { createSessionNotifier, isValidSchedule } from './sessionNotifier';
 
 const devServerUrl = process.env['ELECTRON_RENDERER_URL'];
@@ -29,6 +32,22 @@ const apiExePath = resolveApiExePath({
   appPath: app.getAppPath(),
 });
 const appConfigFile = join(app.getPath('userData'), 'app-config.json');
+const secretsFile = join(app.getPath('userData'), 'secrets.bin');
+// One id per app launch; every API started in this launch gets it (see VisitService).
+const launchId = randomUUID();
+
+// safeStorage works only after 'ready'; the store calls it only when used.
+const secrets = createSecretStore({
+  read: () => (existsSync(secretsFile) ? readFileSync(secretsFile, 'utf8') : null),
+  write: (text) => {
+    const temp = `${secretsFile}.tmp`;
+    writeFileSync(temp, text);
+    renameSync(temp, secretsFile);
+  },
+  encrypt: (plain) => safeStorage.encryptString(plain),
+  decrypt: (encrypted) => safeStorage.decryptString(encrypted),
+  available: () => safeStorage.isEncryptionAvailable(),
+});
 
 // Windows shows toasts only for an AppUserModelID that has a Start menu shortcut. The installer creates one for
 // com.devpath.workspace (electron-builder appId); unpackaged runs keep Electron's default id, which Windows knows.
@@ -44,6 +63,7 @@ function startApiFor(dataDir: string): Promise<ApiHandle> {
     origin: appOrigin,
     dataDir,
     development: !app.isPackaged,
+    env: apiEnvironment(secrets.get('githubToken'), launchId),
   });
 }
 
@@ -229,6 +249,42 @@ if (!app.requestSingleInstanceLock()) {
         setTimeout(() => window.webContents.reload(), 0);
       }
       return { dataDir: current.dataDir };
+    });
+
+    handle('devpath:secrets-has', (_event, name) => {
+      if (!isSecretName(name)) throw new Error('Unknown secret.');
+      return secrets.has(name);
+    });
+
+    /** Applies a secret change, then restarts the API with the new environment and reloads the page. */
+    async function changeSecret(apply: () => void): Promise<SecretResult> {
+      try {
+        apply();
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : String(error) };
+      }
+      const { dataDir, api } = current!;
+      api.stop();
+      try {
+        current = { dataDir, api: await startApiFor(dataDir) };
+      } catch (error) {
+        current = undefined;
+        fail(error);
+        throw error;
+      }
+      setTimeout(() => mainWindow?.webContents.reload(), 0);
+      return { ok: true };
+    }
+
+    handle('devpath:secrets-set', (_event, name, value) => {
+      if (!isSecretName(name)) throw new Error('Unknown secret.');
+      if (!isValidSecretValue(value)) return { error: 'Token geçersiz.' };
+      return changeSecret(() => secrets.set(name, value));
+    });
+
+    handle('devpath:secrets-clear', (_event, name) => {
+      if (!isSecretName(name)) throw new Error('Unknown secret.');
+      return changeSecret(() => secrets.clear(name));
     });
 
     mainWindow = createWindow();

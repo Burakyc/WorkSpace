@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devpath.local/schemas/feed.schema.json",
+  "title": "DevPath feed",
+  "description": "X List summaries written to feed.json in the data folder by the morning agent task. The app only reads this file. At most 2 MB.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "items"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": {
+      "description": "When the agent wrote the file, RFC 3339 date-time with offset, e.g. 2026-11-06T07:00:00Z.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "summary"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\S" },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 2000, "pattern": "\\S" },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://", "maxLength": 2000 },
+        "source": {
+          "description": "The X List or author the summary comes from.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "\\S"
+        },
+        "publishedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

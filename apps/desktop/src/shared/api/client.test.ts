@@ -243,4 +243,80 @@ describe('createApiClient', () => {
       [`GET ${base}/search?q=di%20%C3%B6m%C3%BCr`, undefined],
     ]);
   });
+
+  it('validates and imports content with the type and the text as it is', async () => {
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockImplementation(() => Promise.resolve(json({ errors: [], report: null })));
+    const client = createApiClient(config, fetchFn);
+    const text = '{\n  "type": "vocab"\n}';
+
+    await client.validateImport('vocab', text);
+    await client.importContent('interview', text);
+
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      ['POST http://127.0.0.1:4321/api/import/validate', JSON.stringify({ type: 'vocab', text })],
+      ['POST http://127.0.0.1:4321/api/import', JSON.stringify({ type: 'interview', text })],
+    ]);
+  });
+
+  it('lists and gets topics and marks items', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockImplementation(() => Promise.resolve(json([])));
+    const client = createApiClient(config, fetchFn);
+
+    await client.listTopics('vocab');
+    await client.getTopic('vocab', 'a b');
+    await client.markItem('vocab', 's', 'i 1', 'known');
+    await client.markItem('vocab', 's', 'i 1', null);
+
+    const base = 'http://127.0.0.1:4321/api/content/vocab';
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      [`GET ${base}`, undefined],
+      [`GET ${base}/a%20b`, undefined],
+      [`PUT ${base}/s/items/i%201/mark`, JSON.stringify({ mark: 'known' })],
+      [`PUT ${base}/s/items/i%201/mark`, JSON.stringify({ mark: null })],
+    ]);
+  });
+
+  it('sends the home requests', async () => {
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockImplementation((_url, init) =>
+        Promise.resolve(init?.method === 'DELETE' ? new Response(null, { status: 204 }) : json({})),
+      );
+    const client = createApiClient(config, fetchFn);
+
+    await client.getFeed();
+    await client.listYouTubeChannels();
+    await client.addYouTubeChannel('UC123');
+    await client.removeYouTubeChannel('UC 1');
+    await client.getYouTubeVideos();
+    await client.refreshYouTube();
+    await client.getGitHubSettings();
+    await client.saveGitHubSettings('octo');
+    await client.getGitHubStats();
+    await client.refreshGitHub();
+    await client.recordVisit('Europe/Istanbul');
+
+    const base = 'http://127.0.0.1:4321/api';
+    expect(
+      fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
+    ).toEqual([
+      [`GET ${base}/home/feed`, undefined],
+      [`GET ${base}/youtube/channels`, undefined],
+      [`POST ${base}/youtube/channels`, JSON.stringify({ input: 'UC123' })],
+      [`DELETE ${base}/youtube/channels/UC%201`, undefined],
+      [`GET ${base}/youtube/videos`, undefined],
+      [`POST ${base}/youtube/refresh`, undefined],
+      [`GET ${base}/github/settings`, undefined],
+      [`PUT ${base}/github/settings`, JSON.stringify({ username: 'octo' })],
+      [`GET ${base}/github/stats`, undefined],
+      [`POST ${base}/github/refresh`, undefined],
+      [`POST ${base}/home/visit?timeZone=Europe%2FIstanbul`, undefined],
+    ]);
+  });
 });

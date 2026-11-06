@@ -1,5 +1,10 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
-import type { ApiConfig, ChangeDataDirResult, DevPathBridge } from '../src/shared/api/types';
+import type {
+  ApiConfig,
+  ChangeDataDirResult,
+  DevPathBridge,
+  SecretResult,
+} from '../src/shared/api/types';
 
 // Work the page must finish before the window closes (e.g. a pending note save).
 const beforeClose = new Set<() => Promise<void>>();
@@ -35,6 +40,18 @@ const bridge: DevPathBridge = {
     },
     cancelEnd: async () => {
       await ipcRenderer.invoke('devpath:pomodoro-cancel-end');
+    },
+  },
+  secrets: {
+    has: (name) => ipcRenderer.invoke('devpath:secrets-has', name) as Promise<boolean>,
+    // Main returns the error as data, so the page gets the plain Turkish message.
+    set: async (name, value) => {
+      const result = (await ipcRenderer.invoke('devpath:secrets-set', name, value)) as SecretResult;
+      if ('error' in result) throw new Error(result.error);
+    },
+    clear: async (name) => {
+      const result = (await ipcRenderer.invoke('devpath:secrets-clear', name)) as SecretResult;
+      if ('error' in result) throw new Error(result.error);
     },
   },
   settings: {

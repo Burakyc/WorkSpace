@@ -12,7 +12,11 @@ import {
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { CalendarPage } from '../modules/calendar/CalendarPage';
+import { EnglishPage } from '../modules/english/EnglishPage';
+import { InterviewPage } from '../modules/interview/InterviewPage';
+import { LearningPage } from '../modules/learning/LearningPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
+import { HomePage } from '../modules/home/HomePage';
 import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
 import { SettingsPage } from '../modules/settings/SettingsPage';
@@ -28,15 +32,7 @@ export interface NavEntry {
 }
 
 export const navigation: readonly NavEntry[] = [
-  {
-    path: '/',
-    label: 'Ana Sayfa',
-    icon: House,
-    emptyState: {
-      description: 'Bugünün özeti, hatırlatmalar ve son değişiklikler burada görünecek.',
-      next: 'Başlamak için soldan bir bölüm seç.',
-    },
-  },
+  { path: '/', label: 'Ana Sayfa', icon: House, element: <HomePage /> },
   { path: '/goals', label: 'Hedefler', icon: Target, element: <GoalsPage /> },
   { path: '/pomodoro', label: 'Pomodoro', icon: Timer, element: <PomodoroPage /> },
   {
@@ -50,28 +46,19 @@ export const navigation: readonly NavEntry[] = [
     path: '/english',
     label: 'İngilizce',
     icon: Languages,
-    emptyState: {
-      description: 'Kendi eklediğin kelime ve ifade kartları burada olacak.',
-      next: "İçerik, prompt kopyalayıp yapay zekâdan aldığın JSON'u yapıştırarak eklenecek.",
-    },
+    element: <EnglishPage />,
   },
   {
     path: '/learning',
     label: 'Öğrenme',
     icon: GraduationCap,
-    emptyState: {
-      description: 'Konulara ve parçalara bölünmüş derslerin burada olacak.',
-      next: 'Dersler JSON içe aktarma ile eklenecek.',
-    },
+    element: <LearningPage />,
   },
   {
     path: '/interview',
     label: 'Mülakat',
     icon: MessagesSquare,
-    emptyState: {
-      description: 'Mülakat soruların ve cevapların kart olarak burada olacak.',
-      next: 'Sorular JSON içe aktarma ile eklenecek.',
-    },
+    element: <InterviewPage />,
   },
   { path: '/settings', label: 'Ayarlar', icon: Settings, element: <SettingsPage /> },
 ];

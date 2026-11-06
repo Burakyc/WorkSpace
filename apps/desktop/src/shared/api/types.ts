@@ -158,6 +158,101 @@ export interface DayDetail {
   log: string;
 }
 
+/** A content type of the shared import format; each module imports one. */
+export type ContentType = 'vocab' | 'lesson' | 'interview';
+
+/** One import problem: JSON pointer of the value, its 1-based line (null when unknown) and a Turkish message. */
+export interface ImportError {
+  path: string;
+  line: number | null;
+  message: string;
+}
+
+/** What a saved import did. `levelKept` is true when the topic existed and the file's level was ignored. */
+export interface ImportReport {
+  type: ContentType;
+  topic: string;
+  slug: string;
+  created: boolean;
+  added: number;
+  skipped: number;
+  levelKept: boolean;
+}
+
+/** POST /api/import/validate. */
+export interface ImportValidation {
+  errors: ImportError[];
+}
+
+/** POST /api/import: errors (nothing saved) or a report. */
+export interface ImportResult {
+  errors: ImportError[];
+  report: ImportReport | null;
+}
+
+/** GET /api/content/{type}: a topic in a module's list; `marks` counts the items per mark. */
+export interface TopicSummary {
+  slug: string;
+  topic: string;
+  level: string;
+  tags: string[];
+  itemCount: number;
+  marks: Record<string, number>;
+  updatedAt: string;
+}
+
+/** What every stored item has besides its imported fields: an id, when it was added and the user's mark. */
+export interface ContentItemBase {
+  id: string;
+  addedAt: string;
+  mark?: string;
+  markedAt?: string;
+}
+
+/** GET /api/content/{type}/{slug}: the topic file as stored. */
+export interface ContentTopic<TItem extends ContentItemBase> {
+  type: ContentType;
+  topic: string;
+  slug: string;
+  level: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  items: TItem[];
+}
+
+export type VocabMark = 'known' | 'repeat';
+
+/** An English card: `meaning` is Turkish, `definition` English. */
+export interface VocabItem extends ContentItemBase {
+  term: string;
+  meaning: string;
+  example: string;
+  definition?: string;
+  mark?: VocabMark;
+}
+
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
+/** An interview question; `code` is a C# sample, `tags` are the question's own tags. */
+export interface InterviewItem extends ContentItemBase {
+  question: string;
+  answer: string;
+  difficulty: Difficulty;
+  code?: string;
+  tags?: string[];
+  mark?: 'practised';
+}
+
+/** One part of a lesson; `body` is plain text with blank lines between paragraphs and ``` code fences. */
+export interface LessonItem extends ContentItemBase {
+  title: string;
+  summary: string;
+  body: string;
+  exercises?: string[];
+  mark?: 'done';
+}
+
 export type NoteKind = 'folder' | 'page';
 
 /** A marked part of a search snippet (positions in `snippet`). */
@@ -186,8 +281,95 @@ export interface NoteNode {
   updatedAt: string;
 }
 
+/** One X summary from feed.json (mirrors FeedItem). */
+export interface FeedItem {
+  title: string;
+  summary: string;
+  url: string | null;
+  source: string | null;
+  publishedAt: string | null;
+}
+
+/** GET /api/home/feed. `errors` are Turkish lines with a JSON path; an invalid file has no items. */
+export interface FeedResponse {
+  status: 'ok' | 'missing' | 'invalid';
+  generatedAt: string | null;
+  items: FeedItem[];
+  errors: string[];
+}
+
+/** A followed YouTube channel (mirrors YouTubeChannel). */
+export interface YouTubeChannel {
+  id: string;
+  title: string;
+}
+
+/** A cached video; `thumbnailUrl` and `url` are built by the API from the video id. */
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  channelId: string;
+  channelTitle: string;
+  publishedAt: string;
+  thumbnailUrl: string;
+  url: string;
+}
+
+/** GET /api/youtube/videos, POST /api/youtube/refresh: the 10 newest videos and how the last refresh went. */
+export interface YouTubeVideos {
+  videos: YouTubeVideo[];
+  lastRefreshAt: string | null;
+  error: string | null;
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
+
+/** GET/PUT /api/github/settings. */
+export interface GitHubSettings {
+  username: string | null;
+}
+
+/** One recent public commit; `url` is a github.com link or null. */
+export interface GitHubCommit {
+  repo: string;
+  sha: string;
+  message: string;
+  date: string;
+  url: string | null;
+}
+
+export interface GitHubStats {
+  stars: number;
+  followers: number;
+  publicRepos: number;
+  commitsLast30Days: number;
+  recentCommits: GitHubCommit[];
+}
+
+/** GET /api/github/stats, POST /api/github/refresh, PUT /api/github/settings: cached stats and the last refresh. */
+export interface GitHubStatus {
+  username: string | null;
+  stats: GitHubStats | null;
+  fetchedAt: string | null;
+  lastRefreshAt: string | null;
+  error: string | null;
+}
+
+/** POST /api/home/visit: what changed since the previous app session; null when a side has no number. */
+export interface VisitChanges {
+  since: string | null;
+  newStars: number | null;
+  newFollowers: number | null;
+  newVideos: number | null;
+  streakDays: number;
+}
+
+/** The secrets the page may set (never read): stored encrypted by main with safeStorage. */
+export type SecretName = 'githubToken';
+
+/** What main answers to a secret change; the error is a Turkish message. */
+export type SecretResult = { ok: true } | { error: string };
 
 /** What the preload script exposes as `window.devpath`. */
 export interface DevPathBridge {
@@ -202,6 +384,13 @@ export interface DevPathBridge {
     /** Schedules the end-of-timer notification; replaces any earlier one. */
     scheduleEnd(endsAt: number, title: string, body: string): Promise<void>;
     cancelEnd(): Promise<void>;
+  };
+  /** Saving or deleting restarts the API with the new value and reloads the window. A secret is never readable here. */
+  secrets: {
+    has(name: SecretName): Promise<boolean>;
+    /** Rejects with a Turkish message (e.g. no OS encryption). */
+    set(name: SecretName, value: string): Promise<void>;
+    clear(name: SecretName): Promise<void>;
   };
   settings: {
     getDataDir(): Promise<string>;
