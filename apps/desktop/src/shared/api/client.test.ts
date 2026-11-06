@@ -257,6 +257,11 @@ describe('createApiClient', () => {
     await client.removeYouTubeChannel('UC 1');
     await client.getYouTubeVideos();
     await client.refreshYouTube();
+    await client.getGitHubSettings();
+    await client.saveGitHubSettings('octo');
+    await client.getGitHubStats();
+    await client.refreshGitHub();
+    await client.recordVisit('Europe/Istanbul');
 
     const base = 'http://127.0.0.1:4321/api';
     expect(
@@ -268,6 +273,11 @@ describe('createApiClient', () => {
       [`DELETE ${base}/youtube/channels/UC%201`, undefined],
       [`GET ${base}/youtube/videos`, undefined],
       [`POST ${base}/youtube/refresh`, undefined],
+      [`GET ${base}/github/settings`, undefined],
+      [`PUT ${base}/github/settings`, JSON.stringify({ username: 'octo' })],
+      [`GET ${base}/github/stats`, undefined],
+      [`POST ${base}/github/refresh`, undefined],
+      [`POST ${base}/home/visit?timeZone=Europe%2FIstanbul`, undefined],
     ]);
   });
 });

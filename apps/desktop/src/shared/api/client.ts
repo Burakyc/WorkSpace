@@ -4,6 +4,8 @@ import type {
   CalendarMonth,
   DayDetail,
   FeedResponse,
+  GitHubSettings,
+  GitHubStatus,
   Goal,
   GoalInput,
   GoalProgress,
@@ -17,6 +19,7 @@ import type {
   ProjectUpdateInput,
   Session,
   SessionInput,
+  VisitChanges,
   YouTubeChannel,
   YouTubeVideos,
 } from './types';
@@ -82,6 +85,14 @@ export interface ApiClient {
   getYouTubeVideos(): Promise<YouTubeVideos>;
   /** Fetches every channel now, then answers like `getYouTubeVideos`. */
   refreshYouTube(): Promise<YouTubeVideos>;
+  getGitHubSettings(): Promise<GitHubSettings>;
+  /** Saves the username (empty clears it); a new name is fetched at once. */
+  saveGitHubSettings(username: string): Promise<GitHubStatus>;
+  /** The cached stats; never waits on GitHub. */
+  getGitHubStats(): Promise<GitHubStatus>;
+  refreshGitHub(): Promise<GitHubStatus>;
+  /** Records a visit of Ana Sayfa and answers what changed since the previous app session. */
+  recordVisit(timeZone: string): Promise<VisitChanges>;
 }
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -162,6 +173,13 @@ export function createApiClient(
       request<void>('DELETE', `/api/youtube/channels/${encodeURIComponent(id)}`),
     getYouTubeVideos: () => request<YouTubeVideos>('GET', '/api/youtube/videos'),
     refreshYouTube: () => request<YouTubeVideos>('POST', '/api/youtube/refresh'),
+    getGitHubSettings: () => request<GitHubSettings>('GET', '/api/github/settings'),
+    saveGitHubSettings: (username) =>
+      request<GitHubStatus>('PUT', '/api/github/settings', { username }),
+    getGitHubStats: () => request<GitHubStatus>('GET', '/api/github/stats'),
+    refreshGitHub: () => request<GitHubStatus>('POST', '/api/github/refresh'),
+    recordVisit: (timeZone) =>
+      request<VisitChanges>('POST', `/api/home/visit?timeZone=${encodeURIComponent(timeZone)}`),
   };
 }
 

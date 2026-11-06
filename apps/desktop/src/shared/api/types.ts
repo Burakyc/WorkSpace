@@ -230,6 +230,46 @@ export interface YouTubeVideos {
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 
+/** GET/PUT /api/github/settings. */
+export interface GitHubSettings {
+  username: string | null;
+}
+
+/** One recent public commit; `url` is a github.com link or null. */
+export interface GitHubCommit {
+  repo: string;
+  sha: string;
+  message: string;
+  date: string;
+  url: string | null;
+}
+
+export interface GitHubStats {
+  stars: number;
+  followers: number;
+  publicRepos: number;
+  commitsLast30Days: number;
+  recentCommits: GitHubCommit[];
+}
+
+/** GET /api/github/stats, POST /api/github/refresh, PUT /api/github/settings: cached stats and the last refresh. */
+export interface GitHubStatus {
+  username: string | null;
+  stats: GitHubStats | null;
+  fetchedAt: string | null;
+  lastRefreshAt: string | null;
+  error: string | null;
+}
+
+/** POST /api/home/visit: what changed since the previous app session; null when a side has no number. */
+export interface VisitChanges {
+  since: string | null;
+  newStars: number | null;
+  newFollowers: number | null;
+  newVideos: number | null;
+  streakDays: number;
+}
+
 /** The secrets the page may set (never read): stored encrypted by main with safeStorage. */
 export type SecretName = 'githubToken';
 
