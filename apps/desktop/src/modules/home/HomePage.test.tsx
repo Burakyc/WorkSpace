@@ -301,3 +301,119 @@ describe('HomePage videos card', () => {
     ).toBeInTheDocument();
   });
 });
+
+const gitHub = {
+  stats: {
+    stars: 12,
+    followers: 5,
+    publicRepos: 9,
+    commitsLast30Days: 41,
+    recentCommits: [
+      {
+        repo: 'octo/app',
+        sha: 'abc',
+        message: 'fix: first line',
+        date: '2026-11-05T10:00:00Z',
+        url: 'https://github.com/octo/app/commit/abc',
+      },
+      {
+        repo: 'octo/lib',
+        sha: 'def',
+        message: 'feat: no link',
+        date: '2026-11-04T10:00:00Z',
+        url: null,
+      },
+    ],
+  },
+  fetchedAt: '2026-11-06T06:00:00Z',
+  lastRefreshAt: '2026-11-06T06:00:00Z',
+  error: null,
+};
+
+describe('HomePage GitHub card', () => {
+  it('shows the numbers and opens a commit', async () => {
+    const api = installFakeGoalsApi([], { gitHubUsername: 'octo', gitHub });
+    renderPage();
+
+    const github = card('GitHub');
+    expect(await within(github).findByText('Son 30 günde 41 commit')).toBeInTheDocument();
+    expect(within(github).getByText('Yıldız').nextSibling).toHaveTextContent('12');
+    expect(within(github).getByText('Takipçi').nextSibling).toHaveTextContent('5');
+    expect(within(github).getByText('Public repo').nextSibling).toHaveTextContent('9');
+
+    fireEvent.click(within(github).getByRole('button', { name: 'fix: first line' }));
+    expect(api.openExternal).toHaveBeenCalledWith('https://github.com/octo/app/commit/abc');
+    expect(within(github).queryByRole('button', { name: 'feat: no link' })).not.toBeInTheDocument();
+  });
+
+  it('shows the error together with the cached numbers, and refreshes', async () => {
+    installFakeGoalsApi([], {
+      gitHubUsername: 'octo',
+      gitHub: { ...gitHub, error: "GitHub'a ulaşılamadı." },
+      refreshedGitHub: { ...gitHub, stats: { ...gitHub.stats, commitsLast30Days: 42 } },
+    });
+    renderPage();
+
+    const github = card('GitHub');
+    expect(await within(github).findByText("GitHub'a ulaşılamadı.")).toBeInTheDocument();
+    expect(within(github).getByText('Son 30 günde 41 commit')).toBeInTheDocument();
+
+    fireEvent.click(within(github).getByRole('button', { name: 'Yenile' }));
+    expect(await within(github).findByText('Son 30 günde 42 commit')).toBeInTheDocument();
+    expect(within(github).queryByText("GitHub'a ulaşılamadı.")).not.toBeInTheDocument();
+  });
+
+  it('points to Ayarlar without a username', async () => {
+    installFakeGoalsApi([]);
+    renderPage();
+
+    expect(
+      await within(card('GitHub')).findByRole('link', { name: "Ayarlar'dan gir" }),
+    ).toHaveAttribute('href', '/settings');
+  });
+});
+
+describe('HomePage changes card', () => {
+  it('shows what changed and the streak', async () => {
+    installFakeGoalsApi([], {
+      visit: {
+        since: '2026-11-05T18:00:00Z',
+        newStars: 2,
+        newFollowers: -1,
+        newVideos: 3,
+        streakDays: 4,
+      },
+    });
+    renderPage();
+
+    const changes = card('Son ziyaretinden beri');
+    const rows = await within(changes).findAllByRole('listitem');
+    expect(rows.map((li) => li.textContent)).toEqual([
+      'Yeni yıldız+2',
+      'Yeni takipçi−1',
+      'Yeni video3',
+      'Pomodoro serisi4 gün',
+    ]);
+    expect(within(changes).queryByText(/İlk açılış/)).not.toBeInTheDocument();
+  });
+
+  it('says it is the first visit and invites a pomodoro without a streak', async () => {
+    installFakeGoalsApi([]);
+    renderPage();
+
+    const changes = card('Son ziyaretinden beri');
+    expect(await within(changes).findByText(/^İlk açılış/)).toBeInTheDocument();
+    expect(within(changes).getAllByRole('listitem')).toHaveLength(1);
+    expect(within(changes).getByText('Bugün bir pomodoro ile başla.')).toBeInTheDocument();
+  });
+
+  it('shows an error when the visit cannot be recorded, and the other cards still work', async () => {
+    installFakeGoalsApi([], { failVisit: true });
+    renderPage();
+
+    expect(
+      await within(card('Son ziyaretinden beri')).findByText('Değişiklikler yüklenemedi.'),
+    ).toBeInTheDocument();
+    expect(await within(card('Bugün')).findByText('Bugün 0 pomodoro · 0 dk')).toBeInTheDocument();
+  });
+});

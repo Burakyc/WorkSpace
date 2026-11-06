@@ -128,3 +128,21 @@
   cursor: pointer;
   overflow-wrap: anywhere;
 }
+
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.numbers dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.numbers dd {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}

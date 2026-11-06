@@ -1,4 +1,6 @@
+import { ChangesCard } from './ChangesCard';
 import { FeedCard } from './FeedCard';
+import { GitHubCard } from './GitHubCard';
 import styles from './HomePage.module.css';
 import { RemindersCard } from './RemindersCard';
 import { TodayCard } from './TodayCard';
@@ -11,7 +13,9 @@ export function HomePage() {
       <h1 className={styles.title}>Ana Sayfa</h1>
       <div className={styles.grid}>
         <TodayCard />
+        <ChangesCard />
         <RemindersCard />
+        <GitHubCard />
         <VideosCard />
         <FeedCard />
       </div>
