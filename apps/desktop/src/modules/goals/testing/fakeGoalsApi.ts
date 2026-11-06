@@ -11,6 +11,7 @@ import type {
   NoteNode,
   NoteSearchResult,
   PomodoroSettings,
+  ReminderSettings,
   Project,
   ProjectCreateInput,
   SecretName,
@@ -20,7 +21,7 @@ import type {
   YouTubeChannel,
   YouTubeVideos,
 } from '../../../shared/api/types';
-import { DEFAULT_POMODORO_SETTINGS } from '../../../shared/api/types';
+import { DEFAULT_POMODORO_SETTINGS, DEFAULT_REMINDER_SETTINGS } from '../../../shared/api/types';
 import { buildMonthGrid } from '../../calendar/monthGrid';
 import { descendantIds } from '../../notes/treeHelpers';
 
@@ -43,6 +44,8 @@ export function installFakeGoalsApi(
     projects?: Project[];
     failSessions?: boolean;
     settings?: PomodoroSettings;
+    reminders?: ReminderSettings;
+    failSettings?: boolean;
     tags?: string[];
     /** Completed pomodoros per local date (YYYY-MM-DD) for GET /api/calendar; 25 minutes each. */
     calendar?: Record<string, number>;
@@ -91,6 +94,7 @@ export function installFakeGoalsApi(
   const projects = (options.projects ?? []).map((p) => ({ ...p }));
   const sessions: Session[] = [];
   let settings: PomodoroSettings = { ...(options.settings ?? DEFAULT_POMODORO_SETTINGS) };
+  let reminders: ReminderSettings = structuredClone(options.reminders ?? DEFAULT_REMINDER_SETTINGS);
   let created = 0;
   const nextCreatedAt = () => `2030-01-01T00:00:${String(++created).padStart(2, '0')}Z`;
 
@@ -222,8 +226,21 @@ export function installFakeGoalsApi(
     };
   }
 
-  function settingsRoute(method: string, body: unknown) {
-    if (method === 'GET') return json({ pomodoro: settings });
+  function settingsRoute(method: string, id: string | undefined, body: unknown) {
+    if (options.failSettings) return json({ title: 'Server Error' }, 500);
+    if (method === 'GET') return json({ pomodoro: settings, reminders });
+    if (id === 'reminders') {
+      const input = body as ReminderSettings;
+      const bad = (['english', 'tech'] as const).filter(
+        (key) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(input[key].time),
+      );
+      if (bad.length > 0) {
+        const message = ['Saat SS:DD biçiminde olmalı (00:00–23:59).'];
+        return json({ errors: Object.fromEntries(bad.map((key) => [key, message])) }, 400);
+      }
+      reminders = structuredClone(input);
+      return json(reminders);
+    }
     const input = body as PomodoroSettings;
     if (input.focusMinutes < 1 || input.focusMinutes > 120) {
       return json(
@@ -467,7 +484,7 @@ export function installFakeGoalsApi(
       return Promise.resolve(youTubeRoute(method, id, action, body));
     }
     if (resource === 'sessions') return Promise.resolve(sessionsRoute(method, id, body));
-    if (resource === 'settings') return Promise.resolve(settingsRoute(method, body));
+    if (resource === 'settings') return Promise.resolve(settingsRoute(method, id, body));
     if (resource === 'notes') {
       return Promise.resolve(notesRoute(method, id, action, body, searchParams.get('q') ?? ''));
     }
@@ -524,6 +541,7 @@ export function installFakeGoalsApi(
     fetchFn,
     openExternal,
     settings: () => settings,
+    reminders: () => reminders,
   };
 }
 

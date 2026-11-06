@@ -19,6 +19,7 @@ import type {
   NoteNode,
   NoteSearchResult,
   PomodoroSettings,
+  ReminderSettings,
   Project,
   ProjectCreateInput,
   ProjectUpdateInput,
@@ -61,6 +62,7 @@ export interface ApiClient {
   listTags(): Promise<string[]>;
   getSettings(): Promise<AppSettings>;
   savePomodoroSettings(settings: PomodoroSettings): Promise<PomodoroSettings>;
+  saveReminderSettings(settings: ReminderSettings): Promise<ReminderSettings>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
   getDay(date: string, timeZone: string): Promise<DayDetail>;
@@ -166,6 +168,8 @@ export function createApiClient(
     getSettings: () => request<AppSettings>('GET', '/api/settings'),
     savePomodoroSettings: (settings) =>
       request<PomodoroSettings>('PUT', '/api/settings/pomodoro', settings),
+    saveReminderSettings: (settings) =>
+      request<ReminderSettings>('PUT', '/api/settings/reminders', settings),
     getCalendar: (month, timeZone) =>
       request<CalendarMonth>(
         'GET',

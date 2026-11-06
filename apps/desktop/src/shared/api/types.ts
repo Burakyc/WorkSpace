@@ -82,9 +82,27 @@ export interface PomodoroSettings {
   longBreakInterval: number;
 }
 
+/** A daily reminder: local time (`HH:MM`, 24-hour) and whether it notifies. */
+export interface Reminder {
+  time: string;
+  enabled: boolean;
+}
+
+/** The daily English and tech reminders; `PUT /api/settings/reminders`. */
+export interface ReminderSettings {
+  english: Reminder;
+  tech: Reminder;
+}
+
+export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
+  english: { time: '09:00', enabled: true },
+  tech: { time: '20:00', enabled: true },
+};
+
 /** GET /api/settings. */
 export interface AppSettings {
   pomodoro: PomodoroSettings;
+  reminders: ReminderSettings;
 }
 
 export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {

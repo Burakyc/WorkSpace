@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ApiError, createApiClient, TOKEN_HEADER } from './client';
+import { DEFAULT_REMINDER_SETTINGS } from './types';
 
 const config = { baseUrl: 'http://127.0.0.1:4321', token: 'secret' };
 
@@ -172,6 +173,7 @@ describe('createApiClient', () => {
     await client.listTags();
     await client.getSettings();
     await client.savePomodoroSettings(pomodoro);
+    await client.saveReminderSettings(DEFAULT_REMINDER_SETTINGS);
 
     expect(
       fetchFn.mock.calls.map(([url, init]) => [`${init?.method} ${String(url)}`, init?.body]),
@@ -179,6 +181,10 @@ describe('createApiClient', () => {
       ['GET http://127.0.0.1:4321/api/sessions/tags', undefined],
       ['GET http://127.0.0.1:4321/api/settings', undefined],
       ['PUT http://127.0.0.1:4321/api/settings/pomodoro', JSON.stringify(pomodoro)],
+      [
+        'PUT http://127.0.0.1:4321/api/settings/reminders',
+        JSON.stringify(DEFAULT_REMINDER_SETTINGS),
+      ],
     ]);
   });
 
