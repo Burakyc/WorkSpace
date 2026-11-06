@@ -730,3 +730,17 @@ Implement the spec in specs/2026-11-06-daily-backups/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 8.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `electron/backups.ts` (daily backup to `<dataDir>/backups/YYYY-MM-DD/` before the API starts, retention of the 14 newest dates, restore with a pre-restore backup and rollback), `devpath:list-backups` / `devpath:restore-backup` with API restart and window reload, the Yedekler section on Ayarlar with an inline confirmation; two UI fixes; tech-stack, README and specs updated; phase 8.1 done.
+
+## 2026-11-07 – Plan phase 7.4 MVP release
+**Phase:** 7.4 MVP release
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 7.4 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-07-mvp-release/` (`requirements.md`, `plan.md`, `validation.md`).
