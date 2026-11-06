@@ -1,6 +1,6 @@
 import { Keyboard } from 'lucide-react';
 import { useEffect, useState, type MouseEvent } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { usePomodoro } from '../modules/pomodoro/PomodoroContext';
 import { formatClock, remainingMs } from '../modules/pomodoro/timer';
 import type { DevPathBridge } from '../shared/api/types';
@@ -34,6 +34,7 @@ function PomodoroBadge() {
 
 export function AppLayout() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   // Main asks for a page, e.g. when the session-end notification is clicked.
   useEffect(
@@ -49,11 +50,14 @@ export function AppLayout() {
       const shortcut = matchShortcut(event);
       if (!shortcut) return;
       event.preventDefault();
-      if (shortcut === 'help') setHelpOpen(true);
+      if (shortcut === 'help') return setHelpOpen(true);
+      // The page carries the request out (see useShortcutRequest); Notlar keeps its open item.
+      const to = pathname.startsWith('/notes') ? pathname : '/notes';
+      void navigate(to, { state: { shortcut } });
     }
     window.addEventListener('keydown', onKeyDown, true);
     return () => window.removeEventListener('keydown', onKeyDown, true);
-  }, []);
+  }, [navigate, pathname]);
 
   return (
     <div className={styles.shell}>

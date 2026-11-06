@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { AppRoutes } from '../../app/AppRoutes';
 import type { NoteNode } from '../../shared/api/types';
 import { installFakeGoalsApi } from '../goals/testing/fakeGoalsApi';
 import { NotesPage } from './NotesPage';
@@ -391,5 +392,51 @@ describe('notes search', () => {
     renderAt('/notes', pages, { failSearch: true });
     await searchFor('dependency');
     expect(await screen.findByRole('alert')).toHaveTextContent('Arama yapılamadı.');
+  });
+});
+
+describe('notes shortcuts', () => {
+  function renderApp(path: string, notes: NoteNode[] = []) {
+    const api = installFakeGoalsApi([], { notes });
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <AppRoutes />
+        <Location />
+      </MemoryRouter>,
+    );
+    return api;
+  }
+
+  it('Ctrl+N on another page creates a top-level page, opens it and renames it', async () => {
+    const api = renderApp('/english');
+
+    fireEvent.keyDown(document.body, { key: 'n', ctrlKey: true });
+
+    const field = await screen.findByRole('textbox', { name: 'Başlık' });
+    expect(field).toHaveValue('Adsız sayfa');
+    expect(field).toHaveFocus();
+    expect(api.notes.map((n) => [n.title, n.parentId])).toEqual([['Adsız sayfa', null]]);
+    await waitFor(() =>
+      expect(screen.getByRole('status', { name: 'Adres' })).toHaveTextContent(
+        `/notes/${api.notes[0]!.id}`,
+      ),
+    );
+  });
+
+  it('Ctrl+N on an open folder creates the page inside it', async () => {
+    const api = renderApp('/notes/f', folderWithPages);
+    await within(await screen.findByRole('navigation', { name: 'Not ağacı' })).findByRole('link', {
+      name: 'DI',
+    });
+
+    fireEvent.keyDown(document.body, { key: 'n', ctrlKey: true });
+
+    expect(await screen.findByRole('textbox', { name: 'Başlık' })).toHaveValue('Adsız sayfa');
+    expect(api.notes.filter((n) => n.parentId === 'f').map((n) => n.title)).toEqual([
+      'DI',
+      'Middleware',
+      'Adsız sayfa',
+    ]);
+    expect(api.notes).toHaveLength(4);
   });
 });

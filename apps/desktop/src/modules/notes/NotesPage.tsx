@@ -6,6 +6,7 @@ import { getApiClient } from '../../shared/api/getApiClient';
 import type { NoteKind, NoteNode } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
+import { useShortcutRequest } from '../../app/useShortcutRequest';
 import { NoteTree, type TreeActions } from './NoteTree';
 import { NoteView } from './NoteView';
 import { descendantIds } from './treeHelpers';
@@ -54,6 +55,15 @@ export function NotesPage() {
       setVersion((v) => v + 1);
     }
   }
+
+  // Ctrl+N: a new page inside the open item (top level when none is open), opened with its title in rename mode.
+  useShortcutRequest('newNote', true, () => {
+    void change(async (client) => {
+      const node = await client.createNote(id ?? null, 'page', defaultTitle.page);
+      setRenamingId(node.id);
+      void navigate(`/notes/${node.id}`);
+    });
+  });
 
   const actions: TreeActions = {
     create: (parentId, kind) =>
