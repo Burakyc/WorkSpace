@@ -244,6 +244,15 @@ export interface InterviewItem extends ContentItemBase {
   mark?: 'practised';
 }
 
+/** One part of a lesson; `body` is plain text with blank lines between paragraphs and ``` code fences. */
+export interface LessonItem extends ContentItemBase {
+  title: string;
+  summary: string;
+  body: string;
+  exercises?: string[];
+  mark?: 'done';
+}
+
 export type NoteKind = 'folder' | 'page';
 
 /** A marked part of a search snippet (positions in `snippet`). */

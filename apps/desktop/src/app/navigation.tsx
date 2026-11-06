@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { CalendarPage } from '../modules/calendar/CalendarPage';
-import { ContentEmptyPage } from '../modules/content/ContentEmptyPage';
 import { EnglishPage } from '../modules/english/EnglishPage';
 import { InterviewPage } from '../modules/interview/InterviewPage';
+import { LearningPage } from '../modules/learning/LearningPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
 import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
@@ -59,14 +59,7 @@ export const navigation: readonly NavEntry[] = [
     path: '/learning',
     label: 'Öğrenme',
     icon: GraduationCap,
-    element: (
-      <ContentEmptyPage
-        type="lesson"
-        icon={GraduationCap}
-        title="Öğrenme"
-        description="Konulara ve parçalara bölünmüş derslerin burada olacak."
-      />
-    ),
+    element: <LearningPage />,
   },
   {
     path: '/interview',
