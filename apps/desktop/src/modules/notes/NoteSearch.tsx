@@ -1,5 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
+import { useShortcutRequest } from '../../app/useShortcutRequest';
 import { getApiClient } from '../../shared/api/getApiClient';
 import type { Highlight, NoteSearchResult } from '../../shared/api/types';
 import form from '../../shared/ui/form.module.css';
@@ -18,6 +19,8 @@ export function NoteSearch({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>({ kind: 'idle' });
   // Only the answer to the latest search is shown.
   const latest = useRef(0);
+  const input = useRef<HTMLInputElement>(null);
+  useShortcutRequest('search', true, () => input.current?.focus());
 
   function clear() {
     latest.current++;
@@ -53,6 +56,7 @@ export function NoteSearch({ children }: { children: ReactNode }) {
         }}
       >
         <input
+          ref={input}
           type="search"
           className={form.input}
           aria-label="Notlarda ara"

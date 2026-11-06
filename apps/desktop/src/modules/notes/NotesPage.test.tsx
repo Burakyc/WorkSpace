@@ -438,5 +438,19 @@ describe('notes shortcuts', () => {
       'Adsız sayfa',
     ]);
     expect(api.notes).toHaveLength(4);
+    await waitFor(() =>
+      expect(screen.getByRole('status', { name: 'Adres' })).toHaveTextContent(
+        `/notes/${api.notes[3]!.id}`,
+      ),
+    );
+  });
+
+  it('Ctrl+K opens Notlar with the search box focused', async () => {
+    renderApp('/english', folderWithPages);
+
+    fireEvent.keyDown(document.body, { key: 'k', ctrlKey: true });
+
+    const box = await screen.findByRole('searchbox', { name: 'Notlarda ara' });
+    await waitFor(() => expect(box).toHaveFocus());
   });
 });
