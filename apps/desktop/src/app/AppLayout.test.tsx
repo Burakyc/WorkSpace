@@ -132,4 +132,30 @@ describe('AppLayout', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Takvim' })).toBeInTheDocument();
   });
+
+  it('opens the shortcuts help with ? and the sidebar button', () => {
+    renderAt('/');
+
+    fireEvent.keyDown(document.body, { key: '?', shiftKey: true });
+    const dialog = screen.getByRole('dialog', { name: 'Klavye kısayolları' });
+    expect(within(dialog).getAllByRole('term')).toHaveLength(4);
+    expect(within(dialog).getByText('Pomodoro başlat / durdur')).toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Kapat' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Kısayollar' }));
+    expect(screen.getByRole('dialog', { name: 'Klavye kısayolları' })).toBeInTheDocument();
+  });
+
+  it('does not open the help for ? typed in a text field', () => {
+    renderAt('/');
+    const input = document.createElement('input');
+    document.body.append(input);
+
+    fireEvent.keyDown(input, { key: '?', shiftKey: true });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    input.remove();
+  });
 });

@@ -1,4 +1,5 @@
-import { useEffect, type MouseEvent } from 'react';
+import { Keyboard } from 'lucide-react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
 import { usePomodoro } from '../modules/pomodoro/PomodoroContext';
 import { formatClock, remainingMs } from '../modules/pomodoro/timer';
@@ -6,6 +7,8 @@ import type { DevPathBridge } from '../shared/api/types';
 import { ApiStatus } from './ApiStatus';
 import styles from './AppLayout.module.css';
 import { navigation } from './navigation';
+import { matchShortcut } from './shortcuts';
+import { ShortcutsHelp } from './ShortcutsHelp';
 
 // The hash is the route (HashRouter), so the skip link moves focus itself instead of changing the hash.
 function skipToContent(event: MouseEvent<HTMLAnchorElement>) {
@@ -39,6 +42,19 @@ export function AppLayout() {
     [navigate],
   );
 
+  const [helpOpen, setHelpOpen] = useState(false);
+  // Capture phase: a matched shortcut never reaches the page (e.g. the note editor).
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const shortcut = matchShortcut(event);
+      if (!shortcut) return;
+      event.preventDefault();
+      if (shortcut === 'help') setHelpOpen(true);
+    }
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, []);
+
   return (
     <div className={styles.shell}>
       <a className={styles.skipLink} href="#content" onClick={skipToContent}>
@@ -68,6 +84,15 @@ export function AppLayout() {
           </ul>
         </nav>
         <div className={styles.footer}>
+          <button
+            type="button"
+            className={styles.link}
+            title="Kısayollar"
+            onClick={() => setHelpOpen(true)}
+          >
+            <Keyboard aria-hidden="true" size={20} />
+            <span className={styles.label}>Kısayollar</span>
+          </button>
           <ApiStatus />
         </div>
       </div>
@@ -76,6 +101,7 @@ export function AppLayout() {
           <Outlet />
         </div>
       </main>
+      {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
     </div>
   );
 }
