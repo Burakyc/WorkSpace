@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import buttons from '../../shared/ui/buttons.module.css';
+import { GitHubSettingsForm } from './GitHubSettingsForm';
 import { PomodoroSettingsForm } from './PomodoroSettingsForm';
 import styles from './SettingsPage.module.css';
 import { YouTubeChannelsForm } from './YouTubeChannelsForm';
@@ -66,6 +67,7 @@ export function SettingsPage() {
       </section>
       <PomodoroSettingsForm />
       <YouTubeChannelsForm />
+      <GitHubSettingsForm />
     </>
   );
 }
