@@ -120,7 +120,7 @@ public class GitHubClientTests
         var without = new FakeGitHub();
         await Client(without).FetchAsync("octo", CancellationToken.None);
         Assert.All(without.Handler.Requests, r => Assert.Null(r.Headers.Authorization));
-        Assert.All(without.Handler.Requests, r => Assert.Equal("DevPath", r.Headers.UserAgent.ToString()));
+        Assert.All(without.Handler.Requests, r => Assert.Equal("DevPath/0.1.0", r.Headers.UserAgent.ToString()));
     }
 
     [Fact]

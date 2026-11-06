@@ -1,3 +1,4 @@
+using DevPath.Api.Modules.System;
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
@@ -99,7 +100,7 @@ public sealed class GitHubClient(
         using var request = new HttpRequestMessage(HttpMethod.Get, new Uri($"https://api.github.com/{path}"));
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
         request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-        request.Headers.UserAgent.ParseAdd("DevPath");
+        request.Headers.UserAgent.ParseAdd($"DevPath/{AppInfo.Version}");
         if (_token is not null)
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);

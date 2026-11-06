@@ -1,3 +1,4 @@
+using DevPath.Api.Modules.System;
 namespace DevPath.Api.Modules.Home;
 
 /// <summary>The YouTube feed: the named HTTP client and the service (refreshed by <see cref="HomeRefresher"/>).</summary>
@@ -8,7 +9,7 @@ public static class YouTubeModule
         services.AddHttpClient(YouTubeFeedClient.ClientName, client =>
         {
             client.Timeout = TimeSpan.FromSeconds(10);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("DevPath/0.0.1");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"DevPath/{AppInfo.Version}");
         });
         services.AddSingleton<YouTubeFeedClient>();
         services.AddSingleton<YouTubeService>();
