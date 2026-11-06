@@ -112,6 +112,19 @@ public sealed class ImportServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task Interview_questions_merge_by_normalized_question()
+    {
+        await _service.ImportAsync("interview", ImportSamples.Interview(), default);
+        var again = ImportSamples.Interview()
+            .Replace("What is middleware?", "  what is  MIDDLEWARE? ")
+            .Replace("Scoped vs singleton?", "What is a filter?");
+
+        var result = await _service.ImportAsync("interview", again, default);
+
+        Assert.Equal((1, 1), (result.Report!.Added, result.Report.Skipped));
+    }
+
+    [Fact]
     public void An_unknown_type_is_a_validation_error()
     {
         var error = Assert.Throws<ValidationException>(() => _service.Validate("x", "{}"));

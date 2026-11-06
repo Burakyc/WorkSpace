@@ -16,7 +16,7 @@ public sealed record ContentType(
     [
         Load("vocab", "english", "term", ["known", "repeat"]),
         Load("lesson", "learning", "title", []),
-        Load("interview", "interview", "question", []),
+        Load("interview", "interview", "question", ["practised"]),
     ];
 
     public static ContentType? Find(string? name) => All.FirstOrDefault(type => type.Name == name);

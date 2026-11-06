@@ -114,4 +114,17 @@ public sealed class ContentServiceTests : IDisposable
 
         Assert.Equal(["Geçersiz işaret."], error.Errors["mark"]);
     }
+
+    [Fact]
+    public async Task Interview_questions_can_be_marked_practised_only()
+    {
+        await _imports.ImportAsync("interview", ImportSamples.Interview(), default);
+        var id = (await _service.GetAsync("interview", "asp-net-core", default))!["items"]![0]!["id"]!.GetValue<string>();
+
+        await _service.MarkAsync("interview", "asp-net-core", id, "practised", default);
+
+        Assert.Equal(new Dictionary<string, int> { ["practised"] = 1 }, (await _service.ListAsync("interview", default))[0].Marks);
+        var error = await Assert.ThrowsAsync<ValidationException>(() => _service.MarkAsync("interview", "asp-net-core", id, "known", default));
+        Assert.Equal(["Geçersiz işaret."], error.Errors["mark"]);
+    }
 }
