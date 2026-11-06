@@ -655,3 +655,17 @@ Implement the spec in specs/2026-11-06-keyboard-shortcuts/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 7.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `matchShortcut` (`Ctrl+N`, `Ctrl+Shift+P`, `Ctrl+K`, `?`, never `?` in text fields) with a capture-phase handler in `AppLayout`; the "Klavye kısayolları" dialog and the "Kısayollar" sidebar button; `useShortcutRequest` so Notlar creates a page inside the open item, the search box takes focus and Pomodoro stops or starts with the last selection; tech-stack and specs updated; phase 7.1 done.
+
+## 2026-11-06 – Plan phase 7.2 daily reminders
+**Phase:** 7.2 Daily reminders
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 7.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-06-daily-reminders/` (`requirements.md`, `plan.md`, `validation.md`).
