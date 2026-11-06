@@ -127,4 +127,20 @@ public sealed class ContentServiceTests : IDisposable
         var error = await Assert.ThrowsAsync<ValidationException>(() => _service.MarkAsync("interview", "asp-net-core", id, "known", default));
         Assert.Equal(["Geçersiz işaret."], error.Errors["mark"]);
     }
+
+    [Fact]
+    public async Task Lesson_progress_counts_done_parts()
+    {
+        var lesson = ImportSamples.Lesson().Replace("\"items\": [", "\"items\": [{ \"title\": \"Third\", \"summary\": \"s\", \"body\": \"b\" },");
+        await _imports.ImportAsync("lesson", lesson, default);
+        var ids = (await _service.GetAsync("lesson", "dependency-injection", default))!["items"]!.AsArray()
+            .Select(i => i!["id"]!.GetValue<string>()).ToList();
+
+        await _service.MarkAsync("lesson", "dependency-injection", ids[0], "done", default);
+        await _service.MarkAsync("lesson", "dependency-injection", ids[2], "done", default);
+
+        var summary = Assert.Single(await _service.ListAsync("lesson", default));
+        Assert.Equal((3, 2), (summary.ItemCount, summary.Marks["done"]));
+        await Assert.ThrowsAsync<ValidationException>(() => _service.MarkAsync("lesson", "dependency-injection", ids[1], "known", default));
+    }
 }

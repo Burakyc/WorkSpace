@@ -15,7 +15,7 @@ public sealed record ContentType(
     public static readonly IReadOnlyList<ContentType> All =
     [
         Load("vocab", "english", "term", ["known", "repeat"]),
-        Load("lesson", "learning", "title", []),
+        Load("lesson", "learning", "title", ["done"]),
         Load("interview", "interview", "question", ["practised"]),
     ];
 

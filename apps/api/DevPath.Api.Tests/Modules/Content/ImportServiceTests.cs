@@ -125,6 +125,26 @@ public sealed class ImportServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task Lesson_parts_merge_by_normalized_title_and_keep_their_progress()
+    {
+        await _service.ImportAsync("lesson", ImportSamples.Lesson(), default);
+        const string file = "content/learning/dependency-injection.json";
+        await _store.UpdateAsync(file, ContentModule.TopicSchema, document =>
+        {
+            document!["items"]![0]!["mark"] = "done";
+            return document;
+        }, default);
+        var again = ImportSamples.Lesson().Replace("\"Why DI\"", "\"  why  di \"").Replace("\"Lifetimes\"", "\"Scopes\"");
+
+        var result = await _service.ImportAsync("lesson", again, default);
+
+        Assert.Equal((1, 1), (result.Report!.Added, result.Report.Skipped));
+        var items = (await _store.ReadAsync(file, ContentModule.TopicSchema, default))!["items"]!.AsArray();
+        Assert.Equal(["Why DI", "Lifetimes", "Scopes"], items.Select(i => i!["title"]!.GetValue<string>()));
+        Assert.Equal("done", items[0]!["mark"]!.GetValue<string>());
+    }
+
+    [Fact]
     public void An_unknown_type_is_a_validation_error()
     {
         var error = Assert.Throws<ValidationException>(() => _service.Validate("x", "{}"));
