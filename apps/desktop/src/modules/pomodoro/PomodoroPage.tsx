@@ -1,6 +1,7 @@
 import { Timer } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router';
+import { useShortcutRequest } from '../../app/useShortcutRequest';
 import { ApiError } from '../../shared/api/client';
 import { getApiClient } from '../../shared/api/getApiClient';
 import {
@@ -18,6 +19,38 @@ import { usePomodoro } from './PomodoroContext';
 import styles from './PomodoroPage.module.css';
 import { TagInput } from './TagInput';
 import { focusedMs, formatClock, remainingMs } from './timer';
+
+/** The goal, project and tags of the last started focus session, for Ctrl+Shift+P. */
+export const LAST_KEY = 'devpath.pomodoro.last';
+interface LastSelection {
+  goalId: string;
+  projectId: string | null;
+  tags: string[];
+}
+
+function loadLast(): LastSelection | null {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem(LAST_KEY) ?? 'null');
+    if (typeof value !== 'object' || value === null) return null;
+    const { goalId, projectId, tags } = value as Record<string, unknown>;
+    if (typeof goalId !== 'string') return null;
+    return {
+      goalId,
+      projectId: typeof projectId === 'string' ? projectId : null,
+      tags: Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveLast(selection: LastSelection) {
+  try {
+    localStorage.setItem(LAST_KEY, JSON.stringify(selection));
+  } catch {
+    // Storage blocked: the shortcut then opens the goal picker.
+  }
+}
 
 export function PomodoroPage() {
   const id = useId();
@@ -43,6 +76,7 @@ export function PomodoroPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [noteError, setNoteError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const goalPicker = useRef<HTMLSelectElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -205,13 +239,28 @@ export function PomodoroPage() {
     pomodoro.reset();
   }
 
-  function start() {
-    if (!selectedGoal) return;
+  function start(goal = selectedGoal, chosenProjectId = projectId || null, chosenTags = tags) {
+    if (!goal) return;
     setFeedback(null);
     setSaveError(null);
     setBreakOffer(null);
-    pomodoro.start(selectedGoal, projectId || null, tags, settings.focusMinutes * 60_000);
+    saveLast({ goalId: goal.id, projectId: chosenProjectId, tags: chosenTags });
+    pomodoro.start(goal, chosenProjectId, chosenTags, settings.focusMinutes * 60_000);
   }
+
+  // Ctrl+Shift+P: stop what runs, or start with the last selection while its goal is still active.
+  useShortcutRequest('pomodoro', goals !== null, () => {
+    if (state.status === 'running' || state.status === 'paused') return void stop();
+    if (state.status !== 'idle') return;
+    const last = loadLast();
+    const goal = last && goals?.find((g) => g.id === last.goalId);
+    if (!last || !goal) return goalPicker.current?.focus();
+    const project = projects.find((p) => p.id === last.projectId && p.goalId === goal.id);
+    setGoalId(goal.id);
+    setProjectId(project?.id ?? '');
+    setTags(last.tags);
+    start(goal, project?.id ?? null, last.tags);
+  });
 
   if (goals === null) {
     return (
@@ -257,6 +306,7 @@ export function PomodoroPage() {
           <div className={form.field}>
             <label htmlFor={`${id}-goal`}>Hedef</label>
             <select
+              ref={goalPicker}
               id={`${id}-goal`}
               className={form.input}
               value={shownGoalId}
@@ -321,7 +371,7 @@ export function PomodoroPage() {
               type="button"
               className={buttons.primary}
               disabled={!selectedGoal}
-              onClick={start}
+              onClick={() => start()}
             >
               Başlat
             </button>

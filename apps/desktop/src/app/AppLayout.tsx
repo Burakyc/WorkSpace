@@ -52,7 +52,8 @@ export function AppLayout() {
       event.preventDefault();
       if (shortcut === 'help') return setHelpOpen(true);
       // The page carries the request out (see useShortcutRequest); Notlar keeps its open item.
-      const to = pathname.startsWith('/notes') ? pathname : '/notes';
+      const to =
+        shortcut === 'pomodoro' ? '/pomodoro' : pathname.startsWith('/notes') ? pathname : '/notes';
       void navigate(to, { state: { shortcut } });
     }
     window.addEventListener('keydown', onKeyDown, true);

@@ -1,9 +1,10 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
+import { AppRoutes } from '../../app/AppRoutes';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { goal, installFakeGoalsApi, project } from '../goals/testing/fakeGoalsApi';
 import { CYCLE_KEY, PomodoroProvider, STORAGE_KEY } from './PomodoroContext';
-import { PomodoroPage } from './PomodoroPage';
+import { LAST_KEY, PomodoroPage } from './PomodoroPage';
 import { startTimer } from './timer';
 
 const MIN = 60_000;
@@ -433,5 +434,81 @@ describe('PomodoroPage breaks', () => {
 
     expect(screen.queryByRole('button', { name: /mola/i })).toBeNull();
     expect(localStorage.getItem(CYCLE_KEY)).toBe('1');
+  });
+});
+
+describe('PomodoroPage shortcut', () => {
+  const pressShortcut = () =>
+    fireEvent.keyDown(document.body, { key: 'P', ctrlKey: true, shiftKey: true });
+
+  function renderApp(goals = [aspnet, english]) {
+    const api = installFakeGoalsApi(goals, { projects: [todo, blog, podcasts] });
+    render(
+      <MemoryRouter initialEntries={['/english']}>
+        <AppRoutes />
+      </MemoryRouter>,
+    );
+    return api;
+  }
+
+  it('remembers the selection of a started session', async () => {
+    installFakeGoalsApi([aspnet], { projects: [todo] });
+    renderPage();
+    fireEvent.change(await screen.findByLabelText('Hedef'), { target: { value: 'a' } });
+    fireEvent.change(projectSelect(), { target: { value: 'p1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Başlat' }));
+
+    expect(JSON.parse(localStorage.getItem(LAST_KEY)!)).toEqual({
+      goalId: 'a',
+      projectId: 'p1',
+      tags: [],
+    });
+  });
+
+  it('starts with the last goal, project and tags from another page', async () => {
+    localStorage.setItem(LAST_KEY, JSON.stringify({ goalId: 'a', projectId: 'p1', tags: ['di'] }));
+    renderApp();
+
+    pressShortcut();
+
+    expect(await screen.findByRole('button', { name: 'Duraklat' })).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
+      status: 'running',
+      kind: 'focus',
+      goalId: 'a',
+      projectId: 'p1',
+      tags: ['di'],
+    });
+    expect(goalSelect()).toHaveValue('a');
+  });
+
+  it('stops a running session like Durdur', async () => {
+    localStorage.setItem(LAST_KEY, JSON.stringify({ goalId: 'a', projectId: null, tags: [] }));
+    const api = renderApp();
+    pressShortcut();
+    await screen.findByRole('button', { name: 'Duraklat' });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    act(() => vi.advanceTimersByTime(3 * MIN));
+
+    pressShortcut();
+
+    expect(await screen.findByRole('button', { name: 'Başlat' })).toBeInTheDocument();
+    expect(api.sessions).toEqual([
+      expect.objectContaining({ goalId: 'a', durationMinutes: 3, completed: false }),
+    ]);
+  });
+
+  it.each([
+    ['no last selection', null],
+    ['an archived last goal', JSON.stringify({ goalId: 'gone', projectId: null, tags: [] })],
+  ])('with %s, focuses the goal picker and starts nothing', async (_name, stored) => {
+    if (stored) localStorage.setItem(LAST_KEY, stored);
+    renderApp();
+
+    pressShortcut();
+
+    const picker = await screen.findByLabelText('Hedef');
+    await vi.waitFor(() => expect(picker).toHaveFocus());
+    expect(screen.getByRole('button', { name: 'Başlat' })).toBeDisabled();
   });
 });
