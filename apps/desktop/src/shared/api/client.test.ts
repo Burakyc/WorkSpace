@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ApiError, createApiClient, TOKEN_HEADER } from './client';
+import { clearErrors, recentErrors } from '../errors/errorLog';
 import { DEFAULT_REMINDER_SETTINGS } from './types';
 
 const config = { baseUrl: 'http://127.0.0.1:4321', token: 'secret' };
@@ -323,6 +324,25 @@ describe('createApiClient', () => {
       [`GET ${base}/github/stats`, undefined],
       [`POST ${base}/github/refresh`, undefined],
       [`POST ${base}/home/visit?timeZone=Europe%2FIstanbul`, undefined],
+    ]);
+  });
+
+  it('records failed requests for the developer panel, but not validation answers', async () => {
+    clearErrors();
+    const fetchFn = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(json({ title: 'Server Error' }, 500))
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValueOnce(json({ errors: { title: ['Başlık gerekli.'] } }, 400));
+    const client = createApiClient(config, fetchFn);
+
+    await expect(client.getNoteContent('0f8f6d3e-1111-2222-3333-444455556666')).rejects.toThrow();
+    await expect(client.listTags()).rejects.toThrow();
+    await expect(client.createGoal({ ...goal, title: '' })).rejects.toThrow();
+
+    expect(recentErrors().map(({ kind, path }) => [kind, path])).toEqual([
+      ['NetworkError', 'GET /api/sessions/tags'],
+      ['HTTP 500', 'GET /api/notes/{…}/content'],
     ]);
   });
 });

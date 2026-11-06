@@ -1,3 +1,4 @@
+import { maskPath, recordError } from '../errors/errorLog';
 import type {
   ApiConfig,
   AppSettings,
@@ -135,8 +136,17 @@ export function createApiClient(
       init.body = JSON.stringify(body);
     }
 
-    const response = await fetchFn(`${config.baseUrl}${path}`, init);
+    let response: Response;
+    try {
+      response = await fetchFn(`${config.baseUrl}${path}`, init);
+    } catch (error) {
+      recordError('NetworkError', `${method} ${maskPath(path)}`);
+      throw error;
+    }
     if (!response.ok) {
+      // A 400 is a validation answer the page shows; anything else is an error for the developer panel.
+      if (response.status !== 400)
+        recordError(`HTTP ${response.status}`, `${method} ${maskPath(path)}`);
       throw new ApiError(response.status, path, await readFieldErrors(response));
     }
     // 204 No Content has no body; only callers typed `void` get it.
