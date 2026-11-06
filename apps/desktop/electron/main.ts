@@ -19,6 +19,7 @@ import { readAppConfig, resolveDataDir, writeAppConfig } from './appConfig';
 import { FatalSwitchError, switchDataDir, type ApiState, type SwitchSteps } from './dataDirSwitch';
 import { isAllowedExternalUrl, isAllowedNavigation } from './navigation';
 import { createSecretStore, isSecretName, isValidSecretValue } from './secrets';
+import { createReminderScheduler, parseReminders, type DailyReminder } from './reminders';
 import { createSessionNotifier, isValidSchedule } from './sessionNotifier';
 
 const devServerUrl = process.env['ELECTRON_RENDERER_URL'];
@@ -184,22 +185,54 @@ if (!app.requestSingleInstanceLock()) {
 
     // Kept so the notification is not garbage collected before it is clicked.
     let lastNotification: Notification | undefined;
+    /** A silent notification; clicking it brings the window back on `page`. */
+    function showNotification(title: string, body: string, page: string) {
+      lastNotification = new Notification({ title, body, silent: true });
+      lastNotification.on('click', () => {
+        if (!mainWindow) return;
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.show();
+        mainWindow.focus();
+        mainWindow.webContents.send('devpath:open-page', page);
+      });
+      lastNotification.show();
+    }
+
     const notifier = createSessionNotifier({
       now: () => Date.now(),
       setTimer: (callback, ms) => setTimeout(callback, ms),
       clearTimer: (timer) => clearTimeout(timer as ReturnType<typeof setTimeout>),
-      notify: (title, body) => {
-        lastNotification = new Notification({ title, body, silent: true });
-        lastNotification.on('click', () => {
-          if (!mainWindow) return;
-          if (mainWindow.isMinimized()) mainWindow.restore();
-          mainWindow.show();
-          mainWindow.focus();
-          mainWindow.webContents.send('devpath:open-page', '/pomodoro');
-        });
-        lastNotification.show();
-      },
+      notify: (title, body) => showNotification(title, body, '/pomodoro'),
     });
+
+    const reminderTexts: Record<DailyReminder['id'], [title: string, body: string, page: string]> =
+      {
+        english: ['İngilizce zamanı', 'Bugünkü İngilizce çalışmana başla.', '/english'],
+        tech: ['Teknik çalışma zamanı', "Öğrenme'de bugünkü konuna geç.", '/learning'],
+      };
+    const reminders = createReminderScheduler({
+      now: () => new Date(),
+      setTimer: (callback, ms) => setTimeout(callback, ms),
+      clearTimer: (timer) => clearTimeout(timer as ReturnType<typeof setTimeout>),
+      notify: (reminder) => showNotification(...reminderTexts[reminder.id]),
+    });
+
+    /** Reads the reminder times from the API; a failed or odd answer keeps what is scheduled. */
+    async function refreshReminders() {
+      const api = current?.api;
+      if (!api) return;
+      try {
+        const response = await fetch(`${api.baseUrl}/api/settings`, {
+          headers: { 'X-DevPath-Token': api.token },
+        });
+        const parsed = response.ok ? parseReminders(await response.json()) : null;
+        if (parsed) reminders.update(parsed);
+      } catch {
+        // API unreachable: keep the scheduled reminders.
+      }
+    }
+    void refreshReminders();
+    handle('devpath:reminders-refresh', () => refreshReminders());
 
     handle('devpath:pomodoro-schedule-end', (_event, endsAt, title, body) => {
       if (!isValidSchedule(endsAt, title, body, Date.now())) {
@@ -247,6 +280,7 @@ if (!app.requestSingleInstanceLock()) {
       if (current.dataDir !== before.dataDir) {
         // The new API has a new port and token: reload so nothing in the page keeps the old ones.
         setTimeout(() => window.webContents.reload(), 0);
+        void refreshReminders();
       }
       return { dataDir: current.dataDir };
     });

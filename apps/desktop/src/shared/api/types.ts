@@ -385,6 +385,10 @@ export interface DevPathBridge {
     scheduleEnd(endsAt: number, title: string, body: string): Promise<void>;
     cancelEnd(): Promise<void>;
   };
+  reminders: {
+    /** Main reads the reminder times again from the API (after a save in Ayarlar). */
+    refresh(): Promise<void>;
+  };
   /** Saving or deleting restarts the API with the new value and reloads the window. A secret is never readable here. */
   secrets: {
     has(name: SecretName): Promise<boolean>;

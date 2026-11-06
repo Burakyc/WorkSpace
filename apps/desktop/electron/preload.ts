@@ -54,6 +54,11 @@ const bridge: DevPathBridge = {
       if ('error' in result) throw new Error(result.error);
     },
   },
+  reminders: {
+    refresh: async () => {
+      await ipcRenderer.invoke('devpath:reminders-refresh');
+    },
+  },
   settings: {
     getDataDir: () => ipcRenderer.invoke('devpath:get-data-dir') as Promise<string>,
     // Main returns the error as data, so the page gets the plain Turkish message instead of an IPC-wrapped one.
