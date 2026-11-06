@@ -127,6 +127,15 @@ public sealed class YouTubeService(JsonFileStore store, YouTubeFeedClient feeds,
         return new YouTubeVideos(videos, cache.LastRefreshAt, cache.Error);
     }
 
+    /// <summary>How many cached videos of the followed channels were published after <paramref name="since"/>. Never fetches.</summary>
+    public async Task<int> CountVideosSinceAsync(DateTimeOffset since, CancellationToken cancellationToken)
+    {
+        var followed = (await ListChannelsAsync(cancellationToken)).Select(c => c.Id).ToHashSet();
+        return (await ReadCacheAsync(cancellationToken)).Channels
+            .Where(c => followed.Contains(c.ChannelId))
+            .Sum(c => c.Videos.Count(v => v.PublishedAt > since));
+    }
+
     /// <summary>Fetches every channel; a failed channel keeps its cached videos and is named in the error.</summary>
     public async Task<YouTubeVideos> RefreshAsync(CancellationToken cancellationToken)
     {

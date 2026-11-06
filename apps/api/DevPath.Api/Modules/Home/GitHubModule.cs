@@ -12,6 +12,7 @@ public static class GitHubModule
             .RedactLoggedHeaders(_ => true);
         services.AddSingleton<GitHubClient>();
         services.AddSingleton<GitHubService>();
+        services.AddSingleton<VisitService>();
         services.AddHostedService<HomeRefresher>();
         return services;
     }

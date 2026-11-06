@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 
 namespace DevPath.Api.Tests.Modules.Home;
@@ -25,5 +26,21 @@ public class HomeEndpointTests
         Assert.Equal("https://x.com/1", item.GetProperty("url").GetString());
         Assert.Equal(JsonValueKind.Null, item.GetProperty("publishedAt").ValueKind);
         Assert.Equal(0, ok.GetProperty("errors").GetArrayLength());
+    }
+
+    [Fact]
+    public async Task Visit_answers_the_changes_and_refuses_an_unknown_zone()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await client.PostAsync("/api/home/visit?timeZone=Europe/Istanbul", null);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var changes = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        Assert.Equal(JsonValueKind.Null, changes.GetProperty("since").ValueKind);
+        Assert.Equal(0, changes.GetProperty("streakDays").GetInt32());
+        Assert.True(changes.TryGetProperty("newVideos", out _));
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsync("/api/home/visit?timeZone=Mars", null)).StatusCode);
     }
 }
