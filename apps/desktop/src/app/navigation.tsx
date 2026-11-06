@@ -13,6 +13,7 @@ import {
 import type { ReactNode } from 'react';
 import { CalendarPage } from '../modules/calendar/CalendarPage';
 import { ContentEmptyPage } from '../modules/content/ContentEmptyPage';
+import { EnglishPage } from '../modules/english/EnglishPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
 import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
@@ -51,14 +52,7 @@ export const navigation: readonly NavEntry[] = [
     path: '/english',
     label: 'İngilizce',
     icon: Languages,
-    element: (
-      <ContentEmptyPage
-        type="vocab"
-        icon={Languages}
-        title="İngilizce"
-        description="Kendi eklediğin kelime ve ifade kartları burada olacak."
-      />
-    ),
+    element: <EnglishPage />,
   },
   {
     path: '/learning',
