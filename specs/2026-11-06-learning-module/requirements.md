@@ -11,7 +11,7 @@ The Öğrenme page lists the user's lessons (topics). A lesson page lists its pa
 ## Scope
 
 - **API**: lesson gets the mark `done`. No new endpoints.
-- **Renderer**: `CodeSample` and `highlight.ts` move from `modules/interview/` to `modules/content/` (second use); `modules/learning/` with `LearningPage` (shared `TopicListPage`), `LessonTopicPage`, `LessonPartPage`, `LessonBody`, `lessonBody.ts`; routes `/learning/:slug` and `/learning/:slug/:partId`. `ContentEmptyPage` is deleted (no module uses it any more).
+- **Renderer**: `CodeSample` and `highlight.ts` move from `modules/interview/` to `modules/content/` (second use); `modules/learning/` with `LearningPage` (shared `TopicListPage`), `LessonTopicPage`, `LessonPartPage`, `LessonBody`, `parseLessonBody.ts`; routes `/learning/:slug` and `/learning/:slug/:partId`. `ContentEmptyPage` is deleted (no module uses it any more).
 - `tech-stack.md` updated.
 
 ## Decisions (from the planning questions)

@@ -40,8 +40,8 @@ Every task ends with `npm run check`. A task is committed only when it passes. N
 
 **Commit:** `feat(learning): read lesson parts and mark them done`
 
-- `lessonBody.ts`, `LessonBody.tsx`, `LessonTopicPage.tsx`, `LessonPartPage.tsx`, `Learning.module.css`; routes `/learning/:slug` and `/learning/:slug/:partId` in `AppRoutes.tsx`.
-- `lessonBody.test.ts` (T4), `LessonTopicPage.test.tsx` (T5), `LessonPartPage.test.tsx` (T6–T7).
+- `parseLessonBody.ts`, `LessonBody.tsx`, `LessonTopicPage.tsx`, `LessonPartPage.tsx`, `Learning.module.css`; routes `/learning/:slug` and `/learning/:slug/:partId` in `AppRoutes.tsx`.
+- `parseLessonBody.test.ts` (T4), `LessonTopicPage.test.tsx` (T5), `LessonPartPage.test.tsx` (T6–T7).
 - Check: `npm run check`; manual M1–M6.
 
 ### 5. Docs

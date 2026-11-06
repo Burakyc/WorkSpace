@@ -25,7 +25,7 @@ npm run check
 | T1 | Merge by title | `Modules/Content/ImportServiceTests.cs` | "Why DI" then "  why  di " + a new part → added 1, skipped 1; the done mark of the existing part stays |
 | T2 | Progress count | `Modules/Content/ContentServiceTests.cs` | Two of three parts `done` → summary `marks.done` = 2; `known` on lesson → "Geçersiz işaret." |
 | T3 | Import then show | `src/modules/learning/LearningPage.test.tsx` | Empty → empty state; import → row "Başlangıç", "2 parça"; with done parts "3 parça · 1 tamamlandı" |
-| T4 | Body | `src/modules/learning/lessonBody.test.ts` | Paragraphs split on blank lines with line breaks kept; ```` ```csharp ```` … ```` ``` ```` → one code block without fences; CRLF; unclosed fence; blank-only body → no blocks |
+| T4 | Body | `src/modules/learning/parseLessonBody.test.ts` | Paragraphs split on blank lines with line breaks kept; ```` ```csharp ```` … ```` ``` ```` → one code block without fences; CRLF; unclosed fence; blank-only body → no blocks |
 | T5 | Lesson page | `src/modules/learning/LessonTopicPage.test.tsx` | Parts in order with links, summaries and "✓ Tamamlandı" on done ones; "1 / 3 parça" and `<progress>` value 1 max 3; unknown slug → "Konu bulunamadı." |
 | T6 | Part page | `src/modules/learning/LessonPartPage.test.tsx` | "Parça 2 / 3", title, summary, paragraphs, code text, exercises; "← Önceki" / "Sonraki →" links, none at the ends; unknown part → "Parça bulunamadı." |
 | T7 | Done toggle | same | "Tamamlandı" sends `{ mark: "done" }` and is pressed after the reload; again sends `{ mark: null }`; failure → "Kaydedilemedi." |
