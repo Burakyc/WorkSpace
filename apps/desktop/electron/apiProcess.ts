@@ -20,6 +20,8 @@ export interface ApiHandle {
   baseUrl: string;
   token: string;
   stop(): void;
+  /** Settles when the API process has exited (its files are released). */
+  exited: Promise<unknown>;
 }
 
 export interface StartApiOptions {
@@ -160,5 +162,5 @@ export async function startApi({
     throw error;
   }
 
-  return { baseUrl, token, stop };
+  return { baseUrl, token, stop, exited };
 }

@@ -218,10 +218,10 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ## Post-MVP
 
-#### 8.1 Daily backups — `todo`
-- [ ] On first start each day, copy the data folder to `backups/YYYY-MM-DD/`; keep the last 14 days.
-- [ ] Settings: "Restore from backup" lists backups and restores one after confirmation (current data is backed up first).
-- [ ] Tests: retention cleanup, restore.
+#### 8.1 Daily backups — `done`
+- [x] On first start each day, copy the data folder to `backups/YYYY-MM-DD/`; keep the last 14 days.
+- [x] Settings: "Restore from backup" lists backups and restores one after confirmation (current data is backed up first).
+- [x] Tests: retention cleanup, restore.
 
 ### AI connection modes
 

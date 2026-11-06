@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import buttons from '../../shared/ui/buttons.module.css';
+import { BackupsSection } from './BackupsSection';
 import { GitHubSettingsForm } from './GitHubSettingsForm';
 import { PomodoroSettingsForm } from './PomodoroSettingsForm';
 import { ReminderSettingsForm } from './ReminderSettingsForm';
@@ -66,6 +67,7 @@ export function SettingsPage() {
           </p>
         )}
       </section>
+      <BackupsSection />
       <PomodoroSettingsForm />
       <ReminderSettingsForm />
       <YouTubeChannelsForm />

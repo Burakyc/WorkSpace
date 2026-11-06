@@ -1,8 +1,10 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import type {
   ApiConfig,
+  BackupInfo,
   ChangeDataDirResult,
   DevPathBridge,
+  RestoreBackupResult,
   SecretResult,
 } from '../src/shared/api/types';
 
@@ -68,6 +70,16 @@ const bridge: DevPathBridge = {
         throw new Error(result.error);
       }
       return result.dataDir;
+    },
+    listBackups: () => ipcRenderer.invoke('devpath:list-backups') as Promise<BackupInfo[]>,
+    restoreBackup: async (name) => {
+      const result = (await ipcRenderer.invoke(
+        'devpath:restore-backup',
+        name,
+      )) as RestoreBackupResult;
+      if (result.error) {
+        throw new Error(result.error);
+      }
     },
   },
 };

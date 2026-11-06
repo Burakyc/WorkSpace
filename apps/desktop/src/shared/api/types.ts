@@ -412,6 +412,15 @@ export type SecretName = 'githubToken';
 /** What main answers to a secret change; the error is a Turkish message. */
 export type SecretResult = { ok: true } | { error: string };
 
+/** A folder in `<dataDir>/backups`: `YYYY-MM-DD` (daily) or `YYYY-MM-DD-HHmmss` (made before a restore). */
+export interface BackupInfo {
+  name: string;
+  kind: 'daily' | 'beforeRestore';
+}
+
+/** `error` only when the backup is unknown; a failed copy is shown by main before the window reloads. */
+export type RestoreBackupResult = { error?: string };
+
 /** What the preload script exposes as `window.devpath`. */
 export interface DevPathBridge {
   getApiConfig(): Promise<ApiConfig>;
@@ -441,5 +450,9 @@ export interface DevPathBridge {
     getDataDir(): Promise<string>;
     /** Opens the folder dialog and switches to the chosen folder. Resolves null on cancel; rejects with a Turkish message. */
     changeDataDir(): Promise<string | null>;
+    /** Backups of the current data folder, newest first. */
+    listBackups(): Promise<BackupInfo[]>;
+    /** Restores a backup (the current data is backed up first); main then reloads the window. Rejects with a Turkish message. */
+    restoreBackup(name: string): Promise<void>;
   };
 }

@@ -705,3 +705,28 @@ Implement the spec in specs/2026-11-07-developer-panel/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 7.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `ErrorBuffer` (last 50) filled by `ErrorBufferLoggerProvider` (source, exception type, route template; no messages); `DataFileSizes` and `GET /api/dev`; renderer `errorLog` (last 50, window errors and failed requests with masked paths); the hidden `/dev` "Geliştirici paneli" (health, merged errors, file sizes, Yenile) toggled with `Ctrl+Shift+D`; tech-stack and specs updated; phase 7.3 done.
+
+## 2026-11-06 – Plan phase 8.1 daily backups
+**Phase:** 8.1 Daily backups
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 8.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-06-daily-backups/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-06 – Implement phase 8.1 daily backups
+**Phase:** 8.1 Daily backups
+**Prompt:**
+Implement the spec in specs/2026-11-06-daily-backups/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 8.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `electron/backups.ts` (daily backup to `<dataDir>/backups/YYYY-MM-DD/` before the API starts, retention of the 14 newest dates, restore with a pre-restore backup and rollback), `devpath:list-backups` / `devpath:restore-backup` with API restart and window reload, the Yedekler section on Ayarlar with an inline confirmation; two UI fixes; tech-stack, README and specs updated; phase 8.1 done.
