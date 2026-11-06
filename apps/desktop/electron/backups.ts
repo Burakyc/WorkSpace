@@ -53,6 +53,42 @@ export function dailyBackup(dataDir: string, now: Date): void {
   pruneBackups(dataDir);
 }
 
+/**
+ * Replaces the data folder's contents with a listed backup, after backing up the current data. Returns the name of
+ * that pre-restore backup. A failed copy puts the pre-restore data back. The API must not be running.
+ */
+export function restoreBackup(
+  dataDir: string,
+  name: string,
+  now: Date,
+  copy: (from: string, to: string) => void = copyData,
+): string {
+  if (!listBackups(dataDir).some((backup) => backup.name === name)) {
+    throw new Error('Yedek bulunamadı.');
+  }
+  const before = restoreStamp(now);
+  snapshot(dataDir, before);
+  try {
+    replaceData(dataDir, join(backupsDir(dataDir), name), copy);
+  } catch (error) {
+    replaceData(dataDir, join(backupsDir(dataDir), before), copyData);
+    throw new Error('Yedek geri yüklenemedi.', { cause: error });
+  }
+  pruneBackups(dataDir);
+  return before;
+}
+
+function replaceData(
+  dataDir: string,
+  from: string,
+  copy: (from: string, to: string) => void,
+): void {
+  for (const entry of dataEntries(dataDir)) {
+    rmSync(join(dataDir, entry), { recursive: true, force: true });
+  }
+  copy(from, dataDir);
+}
+
 /** Top-level entries of a folder without `backups/`. */
 function dataEntries(dir: string): string[] {
   return readdirSync(dir).filter((name) => name.toLowerCase() !== BACKUPS);

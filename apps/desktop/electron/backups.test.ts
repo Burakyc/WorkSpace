@@ -1,8 +1,23 @@
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { backupDate, dailyBackup, listBackups, pruneBackups, restoreStamp } from './backups';
+import {
+  backupDate,
+  dailyBackup,
+  listBackups,
+  pruneBackups,
+  restoreBackup,
+  restoreStamp,
+} from './backups';
 
 let dataDir: string;
 const today = new Date(2026, 10, 6, 14, 5, 9);
@@ -107,6 +122,58 @@ describe('listBackups', () => {
 
   it('gives an empty list without a backups folder', () => {
     expect(listBackups(dataDir)).toEqual([]);
+  });
+});
+
+describe('restoreBackup', () => {
+  function dataFiles(): string[] {
+    return readdirSync(dataDir, { recursive: true, encoding: 'utf8' })
+      .filter((path) => !path.startsWith('backups'))
+      .map((path) => path.replaceAll('\\', '/'))
+      .sort();
+  }
+
+  beforeEach(() => {
+    write('goals.json', 'old');
+    dailyBackup(dataDir, new Date(2026, 10, 4));
+    write('goals.json', 'new');
+    write('notes/pages/a.json');
+  });
+
+  it('replaces the data with the backup and backs up the current data first', () => {
+    const before = restoreBackup(dataDir, '2026-11-04', today);
+
+    expect(before).toBe('2026-11-06-140509');
+    expect(dataFiles()).toEqual(['goals.json']);
+    expect(readFileSync(join(dataDir, 'goals.json'), 'utf8')).toBe('old');
+    expect(listBackups(dataDir)).toEqual([
+      { name: '2026-11-06-140509', kind: 'beforeRestore' },
+      { name: '2026-11-04', kind: 'daily' },
+    ]);
+    const saved = join(dataDir, 'backups', before);
+    expect(readFileSync(join(saved, 'goals.json'), 'utf8')).toBe('new');
+    expect(existsSync(join(saved, 'notes', 'pages', 'a.json'))).toBe(true);
+  });
+
+  it.each(['../x', '2026-11-99-junk', '2026-11-05', ''])('refuses an unknown backup %j', (name) => {
+    expect(() => restoreBackup(dataDir, name, today)).toThrow('Yedek bulunamadı.');
+
+    expect(readFileSync(join(dataDir, 'goals.json'), 'utf8')).toBe('new');
+    expect(listBackups(dataDir)).toHaveLength(1);
+  });
+
+  it('puts the data back when the copy fails', () => {
+    const failingCopy = (_from: string, to: string): void => {
+      writeFileSync(join(to, 'half.json'), '{');
+      throw new Error('EBUSY');
+    };
+
+    expect(() => restoreBackup(dataDir, '2026-11-04', today, failingCopy)).toThrow(
+      'Yedek geri yüklenemedi.',
+    );
+
+    expect(dataFiles()).toEqual(['goals.json', 'notes', 'notes/pages', 'notes/pages/a.json']);
+    expect(readFileSync(join(dataDir, 'goals.json'), 'utf8')).toBe('new');
   });
 });
 
