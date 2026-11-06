@@ -1,3 +1,4 @@
+using DevPath.Api.Infrastructure.Diagnostics;
 using DevPath.Api.Infrastructure.Hosting;
 using DevPath.Api.Infrastructure.Security;
 using DevPath.Api.Infrastructure.Storage;
@@ -26,6 +27,9 @@ builder.Services.AddSingleton(services => DataDirectory.Resolve(
     services.GetRequiredService<IHostEnvironment>().IsDevelopment()));
 builder.Services.AddSingleton<JsonFileStore>();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<ErrorBuffer>();
+builder.Services.AddSingleton<ILoggerProvider, ErrorBufferLoggerProvider>();
 builder.Services.AddPomodoro();
 builder.Services.AddGoals();
 builder.Services.AddProjects();
