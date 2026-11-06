@@ -24,6 +24,7 @@ Ana Sayfa shows the user's public GitHub numbers (stars, followers, public repos
 | Streak | **Counted back from yesterday when today has none yet.** Consecutive local days with at least one completed pomodoro; today counts once it has one. 0 shows a calm "Bugün bir pomodoro ile başla." (no guilt). |
 | Refresh | **Like YouTube.** On start and every 6 hours in the background, "Yenile" on the card, and right after the username is saved. |
 | Token change (implementation) | As `tech-stack.md` already describes: saving or deleting the token restarts the API with the new environment and reloads the window (a second, like a data folder change). |
+| Empty token variable (implementation) | Without a saved token main passes `DEVPATH_GITHUB_TOKEN` as an empty string instead of leaving it out, so a variable set in the developer's shell cannot reach the API. |
 | One background loop (implementation) | `YouTubeRefresher` from 6.2 is renamed `HomeRefresher` and refreshes YouTube, then GitHub, each failure logged on its own. |
 
 ## User stories
@@ -85,7 +86,7 @@ Ana Sayfa shows the user's public GitHub numbers (stars, followers, public repos
 - `electron/secrets.ts`: `createSecretStore({ read, write, encrypt, decrypt, available })` (injected for tests). The file `userData/secrets.bin` is JSON `{ "schemaVersion": 1, "secrets": { "githubToken": "<base64 of safeStorage.encryptString>" } }`, written atomically (temp file + rename). An unreadable file counts as empty.
 - Names are an allow list: only `githubToken`. A value is 1–255 characters with no whitespace, else rejected ("Token geçersiz."). Without OS encryption (`safeStorage.isEncryptionAvailable()` false) saving fails with "Bu bilgisayarda güvenli depolama kullanılamıyor.".
 - Bridge (`window.devpath.secrets`): `has(name): Promise<boolean>`, `set(name, value): Promise<void>`, `clear(name): Promise<void>`. Main checks the arguments. `set` and `clear` stop the API, start it again with the new environment (same data folder) and reload the window; if it cannot start, the error window shows and the app quits.
-- `startApi` passes `DEVPATH_GITHUB_TOKEN` (when saved) and `DEVPATH_LAUNCH_ID`. The token lives only in main's and the API's memory.
+- `startApi` passes `DEVPATH_GITHUB_TOKEN` (empty when none is saved, so a value inherited from the shell never reaches the API) and `DEVPATH_LAUNCH_ID`. The token lives only in main's and the API's memory.
 
 ### Renderer
 

@@ -36,7 +36,7 @@ npm run check
 | T10 | Visit | `Modules/Home/VisitServiceTests.cs` | First call → no baseline, `since` null; same launch → baseline unchanged, `latest` updated; new launch → previous `latest` is the baseline; new stars/followers (also negative), new videos after `baseline.at`, nulls without GitHub |
 | T11 | Visit endpoint | `Modules/Home/HomeEndpointTests.cs` | `POST /api/home/visit?timeZone=Europe/Istanbul` → `200` with the fields; bad zone → `400` |
 | T12 | Secret store | `electron/secrets.test.ts` | set → has true, get decrypts; clear → has false; unknown name, whitespace or empty value rejected; no encryption → error; broken file → empty; the file never holds the plain value |
-| T13 | API env | `electron/apiProcess.test.ts` | `apiEnvironment` adds `DEVPATH_GITHUB_TOKEN` only when a token exists, and always `DEVPATH_LAUNCH_ID` |
+| T13 | API env | `electron/apiProcess.test.ts` | `apiEnvironment` passes the saved token as `DEVPATH_GITHUB_TOKEN` (empty without one, so an inherited value is overridden) and always `DEVPATH_LAUNCH_ID` |
 | T14 | Client | `src/shared/api/client.test.ts` | The five requests with methods, paths and bodies |
 | T15 | Settings | `src/modules/settings/GitHubSettingsForm.test.tsx` | Save username; API error under the field; without a token: save calls `secrets.set('githubToken', …)`; with a token: "Token kayıtlı." and "Tokeni sil" calls `secrets.clear` |
 | T16 | GitHub card | `src/modules/home/HomePage.test.tsx` | Numbers, commit count, commits open `openExternal(url)`; error with cached numbers; no username → link to Ayarlar; "Yenile" |

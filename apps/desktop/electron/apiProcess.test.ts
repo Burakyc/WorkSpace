@@ -3,7 +3,13 @@ import { createServer } from 'node:net';
 import { join, resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { TOKEN_HEADER } from '../src/shared/api/client';
-import { createToken, findFreePort, resolveApiExePath, waitForHealth } from './apiProcess';
+import {
+  apiEnvironment,
+  createToken,
+  findFreePort,
+  resolveApiExePath,
+  waitForHealth,
+} from './apiProcess';
 
 const baseUrl = 'http://127.0.0.1:1234';
 
@@ -92,5 +98,21 @@ describe('waitForHealth', () => {
     await expect(
       waitForHealth(baseUrl, 'wrong', { timeoutMs: 50, intervalMs: 5, fetchFn }),
     ).rejects.toThrow('yanıt vermedi');
+  });
+});
+
+describe('apiEnvironment', () => {
+  it('passes the token when one is saved and always the launch id', () => {
+    expect(apiEnvironment('ghp_x', 'launch-1')).toEqual({
+      DEVPATH_GITHUB_TOKEN: 'ghp_x',
+      DEVPATH_LAUNCH_ID: 'launch-1',
+    });
+  });
+
+  it('overrides an inherited token with an empty value when none is saved', () => {
+    expect(apiEnvironment(undefined, 'launch-1')).toEqual({
+      DEVPATH_GITHUB_TOKEN: '',
+      DEVPATH_LAUNCH_ID: 'launch-1',
+    });
   });
 });

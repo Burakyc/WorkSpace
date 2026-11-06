@@ -230,6 +230,12 @@ export interface YouTubeVideos {
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 
+/** The secrets the page may set (never read): stored encrypted by main with safeStorage. */
+export type SecretName = 'githubToken';
+
+/** What main answers to a secret change; the error is a Turkish message. */
+export type SecretResult = { ok: true } | { error: string };
+
 /** What the preload script exposes as `window.devpath`. */
 export interface DevPathBridge {
   getApiConfig(): Promise<ApiConfig>;
@@ -243,6 +249,13 @@ export interface DevPathBridge {
     /** Schedules the end-of-timer notification; replaces any earlier one. */
     scheduleEnd(endsAt: number, title: string, body: string): Promise<void>;
     cancelEnd(): Promise<void>;
+  };
+  /** Saving or deleting restarts the API with the new value and reloads the window. A secret is never readable here. */
+  secrets: {
+    has(name: SecretName): Promise<boolean>;
+    /** Rejects with a Turkish message (e.g. no OS encryption). */
+    set(name: SecretName, value: string): Promise<void>;
+    clear(name: SecretName): Promise<void>;
   };
   settings: {
     getDataDir(): Promise<string>;
