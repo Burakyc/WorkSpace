@@ -17,34 +17,6 @@
   line-height: 1.2;
 }
 
-.addPanel {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.topics {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.topic {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-4) var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-.topicLink {
-  color: var(--color-text);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-}
-
 .meta {
   display: flex;
   flex-wrap: wrap;
