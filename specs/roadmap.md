@@ -150,12 +150,12 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Prompt templates in `prompts/` and a "Promptu kopyala" button.
 - [x] Tests: validation errors with line numbers, merge never overwrites, duplicates skipped.
 
-#### 5.2 English module — `todo`
-- [ ] Empty state: "Copy the prompt to add your first content" (in Turkish) with the copy button.
-- [ ] Topic list with level and tags; topic page shows vocab cards (term, meaning, example).
-- [ ] Simple practice: flip card, mark "biliyorum / tekrar et" (stored per item; spaced repetition comes later).
-- [ ] Importing into an existing topic merges.
-- [ ] Tests: import-then-show flow (RTL).
+#### 5.2 English module — `done`
+- [x] Empty state: "Copy the prompt to add your first content" (in Turkish) with the copy button.
+- [x] Topic list with level and tags; topic page shows vocab cards (term, meaning, example).
+- [x] Simple practice: flip card, mark "biliyorum / tekrar et" (stored per item; spaced repetition comes later).
+- [x] Importing into an existing topic merges.
+- [x] Tests: import-then-show flow (RTL).
 
 #### 5.3 Interview module — `todo`
 - [ ] Topic list and question cards (question, answer, optional code sample, difficulty).

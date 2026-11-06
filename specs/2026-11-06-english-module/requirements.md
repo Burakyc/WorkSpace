@@ -22,6 +22,8 @@ The İngilizce page lists the user's vocabulary topics. A topic page shows its c
 | Which cards | **The ones not known yet:** first those marked "Tekrar et", then unmarked ones, each in the order they were added. When every card is known, "Hepsini çalış" practises all of them. |
 | Import panel | **An "İçerik ekle" button** above the topic list opens and closes "Promptu kopyala" and the import panel; after an import the list reloads. With no topics the page shows the empty state with the panel open. |
 | Topic order | Alphabetical by topic name (Turkish collation). (Not asked: a list the user scans by name.) |
+| Deviation: empty state | `EnglishPage` renders the empty state itself instead of reusing `ContentEmptyPage`, so the import panel stays the same element when the first import turns the empty state into the list, and its summary stays visible. |
+| Addition: focus | In practice, focus moves to "Çevir", then to "Biliyorum", so a card can be practised with Enter alone. |
 
 ## User stories
 

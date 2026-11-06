@@ -504,4 +504,4 @@ Implement the spec in specs/2026-11-06-english-module/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 5.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `ContentService` with `GET /api/content/{type}`, `GET /api/content/{type}/{slug}` and `PUT …/items/{id}/mark` (vocab marks `known` / `repeat`); the İngilizce topic list with "İçerik ekle", the topic page with cards and the practice mode ("Tekrar et" first, flip, mark); tech-stack and specs updated; phase 5.2 done.

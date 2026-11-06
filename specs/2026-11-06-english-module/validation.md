@@ -6,13 +6,13 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 5.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Empty state: "Copy the prompt to add your first content" (in Turkish) with the copy button.
-- [ ] Topic list with level and tags; topic page shows vocab cards (term, meaning, example).
-- [ ] Simple practice: flip card, mark "biliyorum / tekrar et" (stored per item; spaced repetition comes later).
-- [ ] Importing into an existing topic merges.
-- [ ] Practice shows "Tekrar et" cards first, then unmarked ones; "Hepsini çalış" when all are known.
-- [ ] Tests: import-then-show flow (RTL).
-- [ ] `tech-stack.md` is updated.
+- [x] Empty state: "Copy the prompt to add your first content" (in Turkish) with the copy button.
+- [x] Topic list with level and tags; topic page shows vocab cards (term, meaning, example).
+- [x] Simple practice: flip card, mark "biliyorum / tekrar et" (stored per item; spaced repetition comes later).
+- [x] Importing into an existing topic merges.
+- [x] Practice shows "Tekrar et" cards first, then unmarked ones; "Hepsini çalış" when all are known.
+- [x] Tests: import-then-show flow (RTL).
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -53,7 +53,7 @@ Run `npm run dev` with no English topics.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 5.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 5.2 ticked and set to `done`
