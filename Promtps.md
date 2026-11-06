@@ -529,4 +529,4 @@ Implement the spec in specs/2026-11-06-interview-module/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 5.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** interview mark `practised`; the shared `TopicListPage` (İngilizce and Mülakat) with Turkish level names; the Mülakat topic page with question cards, "Cevabı göster", "Çalıştım" and difficulty / tag / state filters; C# code samples highlighted with Shiki 4.6.0 (no HTML injection); tech-stack and specs updated; phase 5.3 done.

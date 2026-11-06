@@ -24,6 +24,7 @@ The Mülakat page lists the user's interview topics. A topic page shows its ques
 | Code | **C# highlighting with Shiki**, the same engine as the notes code blocks. Rendered as coloured spans (no HTML injection); light and dark colours switch with CSS. |
 | Shiki packages | **`@shikijs/*` 4.6.0 as direct dependencies.** BlockNote uses Shiki but does not export its highlighter. |
 | Tag filter options | The tags used on questions (not the topic's tags, which every question of the topic shares). Without question tags the tag filter is not shown. (Not asked.) |
+| Deviation: hard badge | "Zor" uses the danger colour so hard questions stand out; easy and medium use the accent badge. |
 
 ## User stories
 

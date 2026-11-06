@@ -157,11 +157,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Importing into an existing topic merges.
 - [x] Tests: import-then-show flow (RTL).
 
-#### 5.3 Interview module — `todo`
-- [ ] Topic list and question cards (question, answer, optional code sample, difficulty).
-- [ ] "Adding content" scenario works end to end: copy prompt → paste AI JSON → cards appear.
-- [ ] Mark a question as practised; filter by tag and difficulty.
-- [ ] Tests: interview merge key, filter logic.
+#### 5.3 Interview module — `done`
+- [x] Topic list and question cards (question, answer, optional code sample, difficulty).
+- [x] "Adding content" scenario works end to end: copy prompt → paste AI JSON → cards appear.
+- [x] Mark a question as practised; filter by tag and difficulty.
+- [x] Tests: interview merge key, filter logic.
 
 #### 5.4 Learning module — `todo`
 - [ ] Topic list and lesson pages split into parts (title, summary, body, optional exercises).

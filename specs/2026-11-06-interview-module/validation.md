@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 5.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Topic list and question cards (question, answer, optional code sample, difficulty).
-- [ ] "Adding content" scenario works end to end: copy prompt → paste AI JSON → cards appear.
-- [ ] Mark a question as practised; filter by tag and difficulty.
-- [ ] The answer is hidden behind "Cevabı göster"; code samples are highlighted as C#.
-- [ ] Tests: interview merge key, filter logic.
-- [ ] `tech-stack.md` is updated.
+- [x] Topic list and question cards (question, answer, optional code sample, difficulty).
+- [x] "Adding content" scenario works end to end: copy prompt → paste AI JSON → cards appear.
+- [x] Mark a question as practised; filter by tag and difficulty.
+- [x] The answer is hidden behind "Cevabı göster"; code samples are highlighted as C#.
+- [x] Tests: interview merge key, filter logic.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -49,7 +49,7 @@ Run `npm run dev` with no interview topics.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M6 done with the expected results
-- [ ] `roadmap.md` phase 5.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M6 done with the expected results
+- [x] `roadmap.md` phase 5.3 ticked and set to `done`
