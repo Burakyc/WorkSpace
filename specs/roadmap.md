@@ -163,10 +163,10 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Mark a question as practised; filter by tag and difficulty.
 - [x] Tests: interview merge key, filter logic.
 
-#### 5.4 Learning module — `todo`
-- [ ] Topic list and lesson pages split into parts (title, summary, body, optional exercises).
-- [ ] Mark a part as done; topic shows parts done / total.
-- [ ] Tests: lesson merge by part title, progress count.
+#### 5.4 Learning module — `done`
+- [x] Topic list and lesson pages split into parts (title, summary, body, optional exercises).
+- [x] Mark a part as done; topic shows parts done / total.
+- [x] Tests: lesson merge by part title, progress count.
 
 ### Milestone 6 — Home dashboard
 

@@ -6,11 +6,11 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 5.4, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Topic list and lesson pages split into parts (title, summary, body, optional exercises).
-- [ ] Mark a part as done; topic shows parts done / total.
-- [ ] Parts open one by one with "Önceki" / "Sonraki"; bodies show paragraphs and highlighted code blocks.
-- [ ] Tests: lesson merge by part title, progress count.
-- [ ] `tech-stack.md` is updated.
+- [x] Topic list and lesson pages split into parts (title, summary, body, optional exercises).
+- [x] Mark a part as done; topic shows parts done / total.
+- [x] Parts open one by one with "Önceki" / "Sonraki"; bodies show paragraphs and highlighted code blocks.
+- [x] Tests: lesson merge by part title, progress count.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -45,7 +45,7 @@ Run `npm run dev` with no lessons.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M6 done with the expected results
-- [ ] `roadmap.md` phase 5.4 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M6 done with the expected results
+- [x] `roadmap.md` phase 5.4 ticked and set to `done`

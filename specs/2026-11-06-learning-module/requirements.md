@@ -21,6 +21,9 @@ The Öğrenme page lists the user's lessons (topics). A lesson page lists its pa
 | Reading | **Part by part.** The lesson page lists the parts; a part opens on its own page with "Önceki" / "Sonraki" links. |
 | Body | **Paragraphs and code blocks.** Blank lines separate paragraphs (single line breaks are kept); lines between ```` ``` ```` fences are a code block shown with the 5.3 C# `CodeSample`. Nothing else is interpreted and no HTML is ever rendered. |
 | Done | **A toggle.** "Tamamlandı" (`aria-pressed`) on the part page saves `done`, pressing again removes it. The lesson page shows a check on done parts and "3 / 8 parça" with a `<progress>` bar. |
+| Deviation: file name | The body parser is `parseLessonBody.ts`, not `lessonBody.ts`: on Windows it collided with `LessonBody.tsx` in imports. |
+| Addition: `useLesson` | The lesson and part pages share one small loading hook. |
+| Fix found in manual testing | The mark toggles ("Tamamlandı", and "Çalıştım" from 5.3) were `disabled` while saving, which dropped keyboard focus; they now use `aria-disabled` (`fix(content): keep focus on mark buttons while saving`). |
 
 ## User stories
 

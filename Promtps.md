@@ -554,4 +554,4 @@ Implement the spec in specs/2026-11-06-learning-module/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 5.4 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** lesson mark `done`; the shared `CodeSample`; the Öğrenme lesson list, the lesson page with parts and progress, and the part page with paragraphs, C# code blocks, exercises, "Tamamlandı" and previous/next; focus fix for the mark buttons; `ContentEmptyPage` removed; tech-stack and specs updated; phase 5.4 done.
