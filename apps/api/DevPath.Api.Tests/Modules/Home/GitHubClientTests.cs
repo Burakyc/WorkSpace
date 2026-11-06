@@ -106,7 +106,7 @@ public class GitHubClientTests
             ],
             stats.RecentCommits);
         var search = github.Handler.Requests.Last().RequestUri!;
-        Assert.Equal("?q=author%3Aocto%20author-date%3A%3E%3D2026-10-07&sort=author-date&order=desc&per_page=5", search.Query);
+        Assert.Equal("?q=author%3Aocto%20author-date%3A2026-10-07..2026-11-07&sort=author-date&order=desc&per_page=5", search.Query);
         Assert.Equal(4, github.Handler.Requests.Count);
     }
 

@@ -25,6 +25,7 @@ Ana Sayfa shows the user's public GitHub numbers (stars, followers, public repos
 | Refresh | **Like YouTube.** On start and every 6 hours in the background, "Yenile" on the card, and right after the username is saved. |
 | Token change (implementation) | As `tech-stack.md` already describes: saving or deleting the token restarts the API with the new environment and reloads the window (a second, like a data folder change). |
 | Empty token variable (implementation) | Without a saved token main passes `DEVPATH_GITHUB_TOKEN` as an empty string instead of leaving it out, so a variable set in the developer's shell cannot reach the API. |
+| Commit date range (fix, found in M2) | The search first used `author-date:>=`; GitHub then returned commits with forged future dates (year 2100) at the top and in the count. A closed range up to tomorrow (UTC) leaves them out. Separate `fix(github)` commit. |
 | One background loop (implementation) | `YouTubeRefresher` from 6.2 is renamed `HomeRefresher` and refreshes YouTube, then GitHub, each failure logged on its own. |
 
 ## User stories
@@ -47,7 +48,7 @@ Ana Sayfa shows the user's public GitHub numbers (stars, followers, public repos
 - Requests (all public data):
   1. `GET users/{user}` → `followers`, `public_repos`.
   2. `GET users/{user}/repos?type=owner&per_page=100&page=N` → the sum of `stargazers_count`; stops at a page with fewer than 100 repos, at most 5 pages. ponytail: 500 repos at most; more pages if ever needed.
-  3. `GET search/commits?q=author:{user}+author-date:>={today−30 days}&sort=author-date&order=desc&per_page=5` → `total_count` and the items (`repository.full_name`, `sha`, first line of `commit.message` up to 200 characters, `commit.author.date`, `html_url` kept only when it starts with `https://github.com/`).
+  3. `GET search/commits?q=author:{user}+author-date:{today−30 days}..{tomorrow}&sort=author-date&order=desc&per_page=5` → `total_count` and the items (`repository.full_name`, `sha`, first line of `commit.message` up to 200 characters, `commit.author.date`, `html_url` kept only when it starts with `https://github.com/`).
 - Errors (Turkish, the first failing request decides):
   - `404` on the user → "GitHub kullanıcısı bulunamadı."
   - `401` → "GitHub token geçersiz. Ayarlar'dan sil ya da yenile."

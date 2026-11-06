@@ -53,8 +53,11 @@ public sealed class GitHubClient(
                 }
             }
 
-            var since = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime).AddDays(-30).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-            var query = Uri.EscapeDataString($"author:{username} author-date:>={since}");
+            // A closed range: commits with forged future dates (e.g. year 2100) would otherwise top the list and the count.
+            var today = DateOnly.FromDateTime(time.GetUtcNow().UtcDateTime);
+            var since = today.AddDays(-30).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            var until = today.AddDays(1).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            var query = Uri.EscapeDataString($"author:{username} author-date:{since}..{until}");
             using var search = await GetJsonAsync(client, $"search/commits?q={query}&sort=author-date&order=desc&per_page=5", false, cancellationToken);
             var total = search.RootElement.GetProperty("total_count").GetInt32();
             var commits = search.RootElement.GetProperty("items").EnumerateArray().Select(ReadCommit).ToList();
