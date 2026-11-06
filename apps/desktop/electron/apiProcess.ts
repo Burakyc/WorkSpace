@@ -29,7 +29,20 @@ export interface StartApiOptions {
   /** Absolute data folder, passed as DEVPATH_DATA_DIR. */
   dataDir: string;
   development: boolean;
+  /** Extra environment variables, e.g. from `apiEnvironment`. */
+  env?: Record<string, string>;
   timeoutMs?: number;
+}
+
+/**
+ * The secret and session variables for the API: the GitHub token (empty when none is saved, so an inherited value never
+ * leaks in) and the id of this app launch, which keeps "since your last visit" stable across API restarts.
+ */
+export function apiEnvironment(
+  githubToken: string | undefined,
+  launchId: string,
+): Record<string, string> {
+  return { DEVPATH_GITHUB_TOKEN: githubToken ?? '', DEVPATH_LAUNCH_ID: launchId };
 }
 
 // ponytail: the port can be taken between close() and the API binding it; start-up then fails with the error window.
@@ -106,6 +119,7 @@ export async function startApi({
   origin,
   dataDir,
   development,
+  env = {},
   timeoutMs = 10_000,
 }: StartApiOptions): Promise<ApiHandle> {
   const port = await findFreePort();
@@ -123,6 +137,7 @@ export async function startApi({
       DEVPATH_ORIGIN: origin,
       DEVPATH_DATA_DIR: dataDir,
       DEVPATH_PARENT_PID: String(process.pid),
+      ...env,
     },
     stdio: 'inherit',
     windowsHide: true,

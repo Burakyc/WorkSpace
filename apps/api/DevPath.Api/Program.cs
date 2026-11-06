@@ -5,6 +5,7 @@ using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Calendar;
 using DevPath.Api.Modules.Content;
 using DevPath.Api.Modules.Goals;
+using DevPath.Api.Modules.Home;
 using DevPath.Api.Modules.Notes;
 using DevPath.Api.Modules.Pomodoro;
 using DevPath.Api.Modules.Projects;
@@ -33,6 +34,9 @@ builder.Services.AddContent();
 builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<DayService>();
+builder.Services.AddSingleton<FeedService>();
+builder.Services.AddYouTube();
+builder.Services.AddGitHub();
 
 var app = builder.Build();
 

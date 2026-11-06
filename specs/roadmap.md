@@ -170,26 +170,26 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Milestone 6 — Home dashboard
 
-#### 6.1 Dashboard, reminders and feed — `todo`
-- [ ] Home page grid: one column under 900 px, multi-column on large screens.
-- [ ] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
-- [ ] Feed card reads `feed.json` (agent-written X summaries); validated; error card if missing or invalid.
-- [ ] Reminders card lists today's English and tech reminders (times from 7.2 settings, defaults until then).
-- [ ] Home renders from cached data first; nothing on it blocks on the network.
+#### 6.1 Dashboard, reminders and feed — `done`
+- [x] Home page grid: one column under 900 px, multi-column on large screens.
+- [x] Today card: pomodoros today, active goals, quick "start pomodoro" (two clicks).
+- [x] Feed card reads `feed.json` (agent-written X summaries); validated; error card if missing or invalid.
+- [x] Reminders card lists today's English and tech reminders (times from 7.2 settings, defaults until then).
+- [x] Home renders from cached data first; nothing on it blocks on the network.
 
-#### 6.2 YouTube RSS — `todo`
-- [ ] Settings: add/remove YouTube channels (channel ID or URL).
-- [ ] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
-- [ ] "New videos" card with thumbnail, title, date; click opens in the default browser.
-- [ ] Offline or failed fetch shows the cached list plus an error card.
-- [ ] Tests: RSS parsing, failure falls back to cache (stub HTTP handler).
+#### 6.2 YouTube RSS — `done`
+- [x] Settings: add/remove YouTube channels (channel ID or URL).
+- [x] API fetches channel RSS in the background on start and every 6 hours; caches to `cache/youtube.json`.
+- [x] "New videos" card with thumbnail, title, date; click opens in the default browser.
+- [x] Offline or failed fetch shows the cached list plus an error card.
+- [x] Tests: RSS parsing, failure falls back to cache (stub HTTP handler).
 
-#### 6.3 GitHub stats and "what changed" — `todo`
-- [ ] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
-- [ ] API fetches public stars, followers and recent public commits; uses the token if present; caches to `cache/github.json`.
-- [ ] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
-- [ ] Offline or rate-limited fetch shows cached numbers plus an error card.
-- [ ] Tests: diff since last visit, token never appears in logs or responses.
+#### 6.3 GitHub stats and "what changed" — `done`
+- [x] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
+- [x] API fetches public stars, followers and recent public commits; uses the token if present; caches to `cache/github.json`.
+- [x] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
+- [x] Offline or rate-limited fetch shows cached numbers plus an error card.
+- [x] Tests: diff since last visit, token never appears in logs or responses.
 
 ### Milestone 7 — MVP polish and release
 

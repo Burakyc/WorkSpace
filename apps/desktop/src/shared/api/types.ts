@@ -281,8 +281,95 @@ export interface NoteNode {
   updatedAt: string;
 }
 
+/** One X summary from feed.json (mirrors FeedItem). */
+export interface FeedItem {
+  title: string;
+  summary: string;
+  url: string | null;
+  source: string | null;
+  publishedAt: string | null;
+}
+
+/** GET /api/home/feed. `errors` are Turkish lines with a JSON path; an invalid file has no items. */
+export interface FeedResponse {
+  status: 'ok' | 'missing' | 'invalid';
+  generatedAt: string | null;
+  items: FeedItem[];
+  errors: string[];
+}
+
+/** A followed YouTube channel (mirrors YouTubeChannel). */
+export interface YouTubeChannel {
+  id: string;
+  title: string;
+}
+
+/** A cached video; `thumbnailUrl` and `url` are built by the API from the video id. */
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  channelId: string;
+  channelTitle: string;
+  publishedAt: string;
+  thumbnailUrl: string;
+  url: string;
+}
+
+/** GET /api/youtube/videos, POST /api/youtube/refresh: the 10 newest videos and how the last refresh went. */
+export interface YouTubeVideos {
+  videos: YouTubeVideo[];
+  lastRefreshAt: string | null;
+  error: string | null;
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
+
+/** GET/PUT /api/github/settings. */
+export interface GitHubSettings {
+  username: string | null;
+}
+
+/** One recent public commit; `url` is a github.com link or null. */
+export interface GitHubCommit {
+  repo: string;
+  sha: string;
+  message: string;
+  date: string;
+  url: string | null;
+}
+
+export interface GitHubStats {
+  stars: number;
+  followers: number;
+  publicRepos: number;
+  commitsLast30Days: number;
+  recentCommits: GitHubCommit[];
+}
+
+/** GET /api/github/stats, POST /api/github/refresh, PUT /api/github/settings: cached stats and the last refresh. */
+export interface GitHubStatus {
+  username: string | null;
+  stats: GitHubStats | null;
+  fetchedAt: string | null;
+  lastRefreshAt: string | null;
+  error: string | null;
+}
+
+/** POST /api/home/visit: what changed since the previous app session; null when a side has no number. */
+export interface VisitChanges {
+  since: string | null;
+  newStars: number | null;
+  newFollowers: number | null;
+  newVideos: number | null;
+  streakDays: number;
+}
+
+/** The secrets the page may set (never read): stored encrypted by main with safeStorage. */
+export type SecretName = 'githubToken';
+
+/** What main answers to a secret change; the error is a Turkish message. */
+export type SecretResult = { ok: true } | { error: string };
 
 /** What the preload script exposes as `window.devpath`. */
 export interface DevPathBridge {
@@ -297,6 +384,13 @@ export interface DevPathBridge {
     /** Schedules the end-of-timer notification; replaces any earlier one. */
     scheduleEnd(endsAt: number, title: string, body: string): Promise<void>;
     cancelEnd(): Promise<void>;
+  };
+  /** Saving or deleting restarts the API with the new value and reloads the window. A secret is never readable here. */
+  secrets: {
+    has(name: SecretName): Promise<boolean>;
+    /** Rejects with a Turkish message (e.g. no OS encryption). */
+    set(name: SecretName, value: string): Promise<void>;
+    clear(name: SecretName): Promise<void>;
   };
   settings: {
     getDataDir(): Promise<string>;

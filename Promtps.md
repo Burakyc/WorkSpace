@@ -456,6 +456,81 @@ Implement the spec in specs/2026-11-06-notes-search/.
 - When every item in validation.md passes, mark Phase 4.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `NoteText` (plain text from BlockNote blocks), `SearchText` (Turkish-insensitive folding) and `NoteSearchService` with `GET /api/notes/search` (every word, title matches first, snippet and highlights); the search box above the tree with results, marks and clear; tech-stack and specs updated; phase 4.3 done.
 
+## 2026-11-06 – Plan phase 6.1 dashboard, reminders and feed
+**Phase:** 6.1 Dashboard, reminders and feed
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 6.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-06-home-dashboard/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-06 – Implement phase 6.1 dashboard, reminders and feed
+**Phase:** 6.1 Dashboard, reminders and feed
+**Prompt:**
+Implement the spec in specs/2026-11-06-home-dashboard/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 6.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `FeedValidator` (rules of the new `schemas/feed.schema.json`, no package) and `FeedService` with `GET /api/home/feed` (`ok` / `missing` / `invalid`, 10 newest items, never writes the file); Ana Sayfa as a card grid with Bugün (today's pomodoros, active goals, goal select + "Başlat"), Hatırlatmalar (09:00 / 20:00 defaults) and Akış (summaries with "Aç", error cards); tech-stack and specs updated; phase 6.1 done.
+
+## 2026-11-06 – Plan phase 6.2 YouTube RSS
+**Phase:** 6.2 YouTube RSS
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 6.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-06-youtube-rss/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-06 – Implement phase 6.2 YouTube RSS
+**Phase:** 6.2 YouTube RSS
+**Prompt:**
+Implement the spec in specs/2026-11-06-youtube-rss/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 6.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `YouTubeChannelId`, `YouTubeRss`, `YouTubeFeedClient` and `YouTubeService` (channels in `settings.json`, checked against their RSS; videos in `cache/youtube.json`; failed channels keep their cached videos) with `/api/youtube/channels`, `/videos` and `/refresh`, plus `YouTubeRefresher` (on start and every 6 hours); a network guard in `ApiFactory` and stub handlers; "YouTube kanalları" in Ayarlar and the "Yeni videolar" card with "Yenile" and the error inside the card; tech-stack and specs updated; phase 6.2 done.
+
+## 2026-11-06 – Plan phase 6.3 GitHub stats and what changed
+**Phase:** 6.3 GitHub stats and "what changed"
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 6.3 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-06-github-stats/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-06 – Implement phase 6.3 GitHub stats and what changed
+**Phase:** 6.3 GitHub stats and "what changed"
+**Prompt:**
+Implement the spec in specs/2026-11-06-github-stats/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 6.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `GitHubClient` (followers, repos, summed stars, 30-day commit count and the 5 latest commits; token only in the Authorization header, redacted in logs) and `GitHubService` (username in `settings.json`, `cache/github.json`, failed refresh keeps the numbers) with `/api/github/settings`, `/stats` and `/refresh`; `HomeRefresher` for YouTube and GitHub; `VisitService` + `Streak` with `POST /api/home/visit` (`visit.json`, per-launch baseline); Electron `secrets.ts` (safeStorage, `has`/`set`/`clear` bridge, API restart, token and launch id in the API environment); GitHub in Ayarlar and the GitHub and "Son ziyaretinden beri" cards; fix for forged future-dated commits; tech-stack and specs updated; phase 6.3 done.
+
 ## 2026-11-06 – Plan phase 5.1 import engine and validator
 **Phase:** 5.1 Import engine and validator
 **Prompt:**
