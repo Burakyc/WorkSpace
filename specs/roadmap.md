@@ -184,12 +184,12 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Offline or failed fetch shows the cached list plus an error card.
 - [x] Tests: RSS parsing, failure falls back to cache (stub HTTP handler).
 
-#### 6.3 GitHub stats and "what changed" — `todo`
-- [ ] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
-- [ ] API fetches public stars, followers and recent public commits; uses the token if present; caches to `cache/github.json`.
-- [ ] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
-- [ ] Offline or rate-limited fetch shows cached numbers plus an error card.
-- [ ] Tests: diff since last visit, token never appears in logs or responses.
+#### 6.3 GitHub stats and "what changed" — `done`
+- [x] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
+- [x] API fetches public stars, followers and recent public commits; uses the token if present; caches to `cache/github.json`.
+- [x] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
+- [x] Offline or rate-limited fetch shows cached numbers plus an error card.
+- [x] Tests: diff since last visit, token never appears in logs or responses.
 
 ### Milestone 7 — MVP polish and release
 

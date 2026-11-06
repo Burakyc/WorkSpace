@@ -529,4 +529,4 @@ Implement the spec in specs/2026-11-06-github-stats/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 6.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `GitHubClient` (followers, repos, summed stars, 30-day commit count and the 5 latest commits; token only in the Authorization header, redacted in logs) and `GitHubService` (username in `settings.json`, `cache/github.json`, failed refresh keeps the numbers) with `/api/github/settings`, `/stats` and `/refresh`; `HomeRefresher` for YouTube and GitHub; `VisitService` + `Streak` with `POST /api/home/visit` (`visit.json`, per-launch baseline); Electron `secrets.ts` (safeStorage, `has`/`set`/`clear` bridge, API restart, token and launch id in the API environment); GitHub in Ayarlar and the GitHub and "Son ziyaretinden beri" cards; fix for forged future-dated commits; tech-stack and specs updated; phase 6.3 done.

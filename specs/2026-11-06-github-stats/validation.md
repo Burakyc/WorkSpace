@@ -6,13 +6,13 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 6.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
-- [ ] API fetches public stars, followers and recent public commits (30-day count + 5 latest); uses the token if present; caches to `cache/github.json`.
-- [ ] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
-- [ ] Offline or rate-limited fetch shows cached numbers plus an error.
-- [ ] Tests: diff since last visit, token never appears in logs or responses.
-- [ ] The page can never read the token; it lives only in `secrets.bin` (encrypted) and in main's and the API's memory.
-- [ ] `tech-stack.md` is updated.
+- [x] Settings: GitHub username; optional token saved with `safeStorage` (only `has`/`clear` visible after saving).
+- [x] API fetches public stars, followers and recent public commits (30-day count + 5 latest); uses the token if present; caches to `cache/github.json`.
+- [x] "What changed since your last visit" card: new stars, new followers, pomodoro streak, new videos since the last app open.
+- [x] Offline or rate-limited fetch shows cached numbers plus an error.
+- [x] Tests: diff since last visit, token never appears in logs or responses.
+- [x] The page can never read the token; it lives only in `secrets.bin` (encrypted) and in main's and the API's memory.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -59,7 +59,7 @@ Run `npm run dev` (online). Use a real public GitHub username.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 6.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 6.3 ticked and set to `done`
