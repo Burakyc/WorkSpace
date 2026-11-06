@@ -14,6 +14,7 @@ import type { ReactNode } from 'react';
 import { CalendarPage } from '../modules/calendar/CalendarPage';
 import { ContentEmptyPage } from '../modules/content/ContentEmptyPage';
 import { EnglishPage } from '../modules/english/EnglishPage';
+import { InterviewPage } from '../modules/interview/InterviewPage';
 import { GoalsPage } from '../modules/goals/GoalsPage';
 import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
@@ -71,14 +72,7 @@ export const navigation: readonly NavEntry[] = [
     path: '/interview',
     label: 'Mülakat',
     icon: MessagesSquare,
-    element: (
-      <ContentEmptyPage
-        type="interview"
-        icon={MessagesSquare}
-        title="Mülakat"
-        description="Mülakat soruların ve cevapların kart olarak burada olacak."
-      />
-    ),
+    element: <InterviewPage />,
   },
   { path: '/settings', label: 'Ayarlar', icon: Settings, element: <SettingsPage /> },
 ];

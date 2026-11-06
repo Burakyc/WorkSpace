@@ -232,6 +232,18 @@ export interface VocabItem extends ContentItemBase {
   mark?: VocabMark;
 }
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
+/** An interview question; `code` is a C# sample, `tags` are the question's own tags. */
+export interface InterviewItem extends ContentItemBase {
+  question: string;
+  answer: string;
+  difficulty: Difficulty;
+  code?: string;
+  tags?: string[];
+  mark?: 'practised';
+}
+
 export type NoteKind = 'folder' | 'page';
 
 /** A marked part of a search snippet (positions in `snippet`). */
