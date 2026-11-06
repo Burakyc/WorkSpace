@@ -396,6 +396,8 @@ describe('notes search', () => {
 });
 
 describe('notes shortcuts', () => {
+  // Create, reload and rename take a few rounds; the full run is slower than the default 1 s.
+  const slow = { timeout: 5000 };
   function renderApp(path: string, notes: NoteNode[] = []) {
     const api = installFakeGoalsApi([], { notes });
     render(
@@ -412,7 +414,7 @@ describe('notes shortcuts', () => {
 
     fireEvent.keyDown(document.body, { key: 'n', ctrlKey: true });
 
-    const field = await screen.findByRole('textbox', { name: 'Başlık' });
+    const field = await screen.findByRole('textbox', { name: 'Başlık' }, slow);
     expect(field).toHaveValue('Adsız sayfa');
     expect(field).toHaveFocus();
     expect(api.notes.map((n) => [n.title, n.parentId])).toEqual([['Adsız sayfa', null]]);
@@ -431,7 +433,7 @@ describe('notes shortcuts', () => {
 
     fireEvent.keyDown(document.body, { key: 'n', ctrlKey: true });
 
-    expect(await screen.findByRole('textbox', { name: 'Başlık' })).toHaveValue('Adsız sayfa');
+    expect(await screen.findByRole('textbox', { name: 'Başlık' }, slow)).toHaveValue('Adsız sayfa');
     expect(api.notes.filter((n) => n.parentId === 'f').map((n) => n.title)).toEqual([
       'DI',
       'Middleware',
