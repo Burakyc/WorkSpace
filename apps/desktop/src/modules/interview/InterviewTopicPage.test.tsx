@@ -9,7 +9,7 @@ import {
 import { InterviewTopicPage } from './InterviewTopicPage';
 
 // Shiki is tested on its own; here the code stays plain.
-vi.mock('./highlight', () => ({ highlightCSharp: () => new Promise(() => undefined) }));
+vi.mock('../content/highlight', () => ({ highlightCSharp: () => new Promise(() => undefined) }));
 
 afterEach(() => {
   vi.unstubAllGlobals();

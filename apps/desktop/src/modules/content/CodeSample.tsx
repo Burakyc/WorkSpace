@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { highlightCSharp, type CodeToken } from './highlight';
-import styles from './Interview.module.css';
+import styles from './CodeSample.module.css';
 
 /** A C# sample: plain text at once, coloured once the highlighter is ready (plain text stays if it fails). */
 export function CodeSample({ code }: { code: string }) {

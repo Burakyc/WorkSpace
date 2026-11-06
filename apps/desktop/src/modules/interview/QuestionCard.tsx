@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import type { Difficulty, InterviewItem } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
-import { CodeSample } from './CodeSample';
+import { CodeSample } from '../content/CodeSample';
 import styles from './Interview.module.css';
 
 export const difficultyLabels: Readonly<Record<Difficulty, string>> = {
