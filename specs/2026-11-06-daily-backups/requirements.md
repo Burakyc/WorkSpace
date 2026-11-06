@@ -33,6 +33,7 @@ The API does not change.
 | Atomic backup | A backup is copied to `backups\<name>.partial\` and renamed when complete; a leftover `.partial` (crash) is deleted by the next backup and never listed. |
 | What is copied | Everything in the data folder except `backups\` and `*.tmp` files (half-written atomic writes). |
 | Confirmation | Inline panel like the note delete confirmation (`role="alertdialog"`), no native dialog. |
+| Pre-restore label shows seconds (found in M4) | Two restores in the same minute gave two identical "15:37" rows, so the label shows `HH:mm:ss` (separate `fix(settings)` commit). The confirmation also got spacing between its text and buttons (found in M3, separate `fix(settings)` commit). |
 | Failed restore message (implementation) | An unknown backup name is refused **before** the API is stopped and the page shows "Yedek bulunamadı.". A failed copy (rolled back) happens after the API restarted on a new port and token, so the page must reload anyway: main shows the message in an error message box (`dialog.showMessageBox`) and then reloads, instead of returning it to the page. |
 
 ## User stories
@@ -78,7 +79,7 @@ The API does not change.
 ### Renderer — "Yedekler" section on Ayarlar
 
 - Heading "Yedekler", note "Uygulama her gün ilk açılışta veri klasörünü yedekler; son 14 günün yedekleri saklanır."
-- List, newest first: daily backups as the long Turkish date ("6 Kasım 2026"); pre-restore backups as date and time with "· Geri yükleme öncesi" ("6 Kasım 2026 14:05 · Geri yükleme öncesi"). Each row has "Geri yükle".
+- List, newest first: daily backups as the long Turkish date ("6 Kasım 2026"); pre-restore backups as date and time with "· Geri yükleme öncesi" ("6 Kasım 2026 14:05:09 · Geri yükleme öncesi"). Each row has "Geri yükle".
 - "Geri yükle" opens an inline confirmation under the row: "<label> yedeği geri yüklensin mi? Mevcut veriler önce yedeklenir." with "Geri yükle" and "Vazgeç".
 - While restoring, every restore button is disabled and the confirm button reads "Geri yükleniyor…". On success the window reloads (main). On failure the message shows (`role="alert"`) and the list stays.
 - Empty: "Henüz yedek yok."; load failure: "Yedekler okunamadı.".

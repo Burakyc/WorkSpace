@@ -30,7 +30,7 @@ npm run check
 | T7 | Unknown backup | same | `../x`, `2026-11-99-junk`, a name that does not exist → "Yedek bulunamadı.", nothing changes, no backup made |
 | T8 | Rollback | same | A failing copy (injected) → data folder back to the pre-restore state, "Yedek geri yüklenemedi." |
 | T9 | API exit | `electron/apiProcess.test.ts` | `exited` resolves after `stop()` (only if the existing tests start a fake process; otherwise M3) |
-| T10 | List | `src/modules/settings/BackupsSection.test.tsx` | Daily → "6 Kasım 2026"; pre-restore → "6 Kasım 2026 14:05 · Geri yükleme öncesi"; empty → "Henüz yedek yok."; failure → "Yedekler okunamadı." |
+| T10 | List | `src/modules/settings/BackupsSection.test.tsx` | Daily → "6 Kasım 2026"; pre-restore → "6 Kasım 2026 14:05:09 · Geri yükleme öncesi"; empty → "Henüz yedek yok."; failure → "Yedekler okunamadı." |
 | T11 | Confirm and restore | same | "Geri yükle" → confirmation text; "Vazgeç" closes it; confirm → `restoreBackup('2026-11-04')`, buttons disabled, "Geri yükleniyor…" |
 | T12 | Restore error | same | Rejected restore → the message in `role="alert"`, list kept, buttons enabled |
 

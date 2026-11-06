@@ -10,13 +10,13 @@ const dateFormat = new Intl.DateTimeFormat('tr-TR', {
   year: 'numeric',
 });
 
-/** "6 Kasım 2026", or "6 Kasım 2026 14:05 · Geri yükleme öncesi" for `2026-11-06-140509`. */
+/** "6 Kasım 2026", or "6 Kasım 2026 14:05:09 · Geri yükleme öncesi" for `2026-11-06-140509`. */
 export function backupLabel({ name, kind }: BackupInfo): string {
   const [year = 0, month = 1, day = 1] = name.slice(0, 10).split('-').map(Number);
   const date = dateFormat.format(new Date(year, month - 1, day));
-  return kind === 'daily'
-    ? date
-    : `${date} ${name.slice(11, 13)}:${name.slice(13, 15)} · Geri yükleme öncesi`;
+  // Seconds included: two restores in the same minute would otherwise look the same.
+  const time = `${name.slice(11, 13)}:${name.slice(13, 15)}:${name.slice(15, 17)}`;
+  return kind === 'daily' ? date : `${date} ${time} · Geri yükleme öncesi`;
 }
 
 export function BackupsSection() {

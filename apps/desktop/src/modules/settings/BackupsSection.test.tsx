@@ -27,7 +27,9 @@ describe('BackupsSection', () => {
 
     render(<BackupsSection />);
 
-    expect(await screen.findByText('6 Kasım 2026 14:05 · Geri yükleme öncesi')).toBeInTheDocument();
+    expect(
+      await screen.findByText('6 Kasım 2026 14:05:09 · Geri yükleme öncesi'),
+    ).toBeInTheDocument();
     expect(screen.getByText('4 Kasım 2026')).toBeInTheDocument();
   });
 
