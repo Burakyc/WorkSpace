@@ -78,7 +78,11 @@ export function BackupsSection() {
                 </button>
               </div>
               {confirming === backup.name && (
-                <div role="alertdialog" aria-label="Geri yükleme onayı">
+                <div
+                  role="alertdialog"
+                  aria-label="Geri yükleme onayı"
+                  className={styles.backupConfirm}
+                >
                   <p className={styles.note}>
                     {backupLabel(backup)} yedeği geri yüklensin mi? Mevcut veriler önce yedeklenir.
                   </p>
