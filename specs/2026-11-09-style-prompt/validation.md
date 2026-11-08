@@ -6,9 +6,9 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 11.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] The style prompt is edited on Gönderiler and saved in `style.json`.
-- [ ] An English and a Turkish example are shown and can be taken into the box.
-- [ ] Each changed save keeps the old text; the last 10 versions are listed and can be taken into the box.
+- [x] The style prompt is edited on Gönderiler and saved in `style.json`.
+- [x] An English and a Turkish example are shown and can be taken into the box.
+- [x] Each changed save keeps the old text; the last 10 versions are listed and can be taken into the box.
 
 ## Automated tests
 
@@ -46,7 +46,7 @@ In the dev app (`%APPDATA%\DevPath\dev-data`). Delete `style.json` at the end if
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M6 done with the expected results
-- [ ] `roadmap.md` phase 11.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M6 done with the expected results
+- [x] `roadmap.md` phase 11.1 ticked and set to `done`

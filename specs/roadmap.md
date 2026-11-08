@@ -249,8 +249,8 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Post assistant
 
-#### 11.1 Style prompt — `todo`
-- [ ] Editor for the user's style prompt (`style.json`) with an example and version history (last 10).
+#### 11.1 Style prompt — `done`
+- [x] Editor for the user's style prompt (`style.json`) with an example and version history (last 10).
 
 #### 11.2 Drafts from a project — `todo`
 - [ ] Pick a project; the assistant builds a prompt from the project, its sessions and notes plus the style prompt.

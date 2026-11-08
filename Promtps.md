@@ -854,4 +854,4 @@ Implement the spec in specs/2026-11-09-style-prompt/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 11.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `Modules/Posts/` (`StyleService`, `GET`/`PUT /api/posts/style`, `style.json` with the last 10 versions); sidebar item Gönderiler (`/posts`) with the style box, the English and Turkish examples (`prompts/style-example-*.md`) and the version history; one flaky Pomodoro test fixed; tech-stack and specs updated; phase 11.1 done.
