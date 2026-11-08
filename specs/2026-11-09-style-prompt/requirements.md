@@ -24,6 +24,13 @@ The user writes the style prompt that later post drafts follow, sees two example
 | Example language | **Both**: one English and one Turkish example, each asking for posts in its language. |
 | History | **"Kaydet" makes a version** (only when the text changed; no autosave). An old version's "Kutuya al" puts its text in the box; saving it is a separate step. The last 10 old versions are kept. |
 
+### Deviations found while implementing
+
+| Topic | What happened |
+|---|---|
+| File name | `styleExamples.ts` in the plan clashes with `StyleExamples.tsx` on Windows, so it is `exampleTexts.ts`. |
+| Flaky test | `PomodoroPage.test.tsx` read `localStorage` before the effect that stores the timer had run and failed about one run in three. It now waits for it. Two `fix(pomodoro)` commits: the first was committed before the check and did not compile. |
+
 ## User stories
 
 1. **As the user**, I open Gönderiler, take an example into the box, change it and save it.
