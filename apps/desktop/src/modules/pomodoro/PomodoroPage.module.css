@@ -88,6 +88,10 @@
 .study > .panel {
   position: sticky;
   top: var(--space-4);
+  /* The column's width, not its content's; the save form scrolls inside instead of running off the screen. */
+  grid-template-columns: minmax(0, 1fr);
+  max-height: calc(100vh - 2 * var(--space-4));
+  overflow-y: auto;
 }
 
 @media (width < 900px) {
@@ -97,5 +101,6 @@
 
   .study > .panel {
     position: static;
+    max-height: none;
   }
 }
