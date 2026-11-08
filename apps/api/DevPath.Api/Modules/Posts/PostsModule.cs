@@ -19,6 +19,7 @@ public static class PostsModule
         services.AddSingleton<IRepository<PostDraft>>(provider =>
             new JsonRepository<PostDraft>(provider.GetRequiredService<JsonFileStore>(), DraftsFileName, DraftsSchema));
         services.AddSingleton<PostDraftService>();
+        services.AddSingleton<PostContextService>();
         return services;
     }
 }

@@ -34,6 +34,24 @@ public class PostDraftEndpointTests
     }
 
     [Fact]
+    public async Task The_project_context_answers_its_topic_and_text()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+        var goal = JsonDocument.Parse(await (await client.PostAsJsonAsync("/api/goals", new { title = "G" })).Content.ReadAsStringAsync()).RootElement;
+        var project = JsonDocument.Parse(await (await client.PostAsJsonAsync("/api/projects", new { goalId = goal.GetProperty("id").GetString(), title = "P" })).Content.ReadAsStringAsync()).RootElement;
+
+        var response = await client.PostAsJsonAsync("/api/posts/project-context", new { projectId = project.GetProperty("id").GetString(), noteIds = Array.Empty<string>() });
+
+        var context = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        Assert.Equal("P", context.GetProperty("topic").GetString());
+        Assert.StartsWith("Project: P", context.GetProperty("text").GetString(), StringComparison.Ordinal);
+
+        var bad = await client.PostAsJsonAsync("/api/posts/project-context", new { projectId = "x" });
+        Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);
+    }
+
+    [Fact]
     public async Task A_bad_edit_is_a_validation_problem_and_an_unknown_id_is_not_found()
     {
         await using var factory = new ApiFactory();
