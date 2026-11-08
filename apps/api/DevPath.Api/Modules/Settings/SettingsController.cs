@@ -16,4 +16,8 @@ public sealed class SettingsController(SettingsService settings) : ControllerBas
     [HttpPut("reminders")]
     public Task<ReminderSettings> SaveReminders(ReminderSettingsInput input, CancellationToken cancellationToken) =>
         settings.SaveRemindersAsync(input, cancellationToken);
+
+    [HttpPut("ai-modes/{module}")]
+    public Task<IReadOnlyDictionary<string, string>> SaveAiMode(string module, AiModeInput input, CancellationToken cancellationToken) =>
+        settings.SaveAiModeAsync(module, input.Mode, cancellationToken);
 }

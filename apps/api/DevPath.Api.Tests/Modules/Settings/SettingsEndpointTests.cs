@@ -35,6 +35,30 @@ public class SettingsEndpointTests
     }
 
     [Fact]
+    public async Task Put_ai_mode_saves_and_refuses_what_is_not_available()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+
+        var saved = await client.PutAsJsonAsync("/api/settings/ai-modes/english", new { mode = "copyPaste" });
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        var modes = JsonDocument.Parse(await saved.Content.ReadAsStringAsync()).RootElement;
+        Assert.Equal("copyPaste", modes.GetProperty("interview").GetString());
+
+        var module = await client.PutAsJsonAsync("/api/settings/ai-modes/calendar", new { mode = "copyPaste" });
+        Assert.Equal(HttpStatusCode.BadRequest, module.StatusCode);
+        Assert.Contains("module", await module.Content.ReadAsStringAsync());
+
+        foreach (var mode in new[] { "x", "file", "api" })
+        {
+            var bad = await client.PutAsJsonAsync("/api/settings/ai-modes/english", new { mode });
+            Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);
+            var errors = JsonDocument.Parse(await bad.Content.ReadAsStringAsync()).RootElement.GetProperty("errors");
+            Assert.Equal("Bu mod kullanılamıyor.", errors.GetProperty("mode")[0].GetString());
+        }
+    }
+
+    [Fact]
     public async Task Put_reminders_saves_and_get_returns_them()
     {
         await using var factory = new ApiFactory();

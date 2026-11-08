@@ -122,10 +122,19 @@ export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   tech: { time: '20:00', enabled: true },
 };
 
+/** How a module gets AI content. */
+export type AiMode = 'copyPaste' | 'file' | 'api';
+
+/** The modules with an AI mode setting; a later module adds its name (also in the API's `AiModes`). */
+export type AiModule = 'english' | 'learning' | 'interview';
+
+export type AiModes = Record<AiModule, AiMode>;
+
 /** GET /api/settings. */
 export interface AppSettings {
   pomodoro: PomodoroSettings;
   reminders: ReminderSettings;
+  aiModes: AiModes;
 }
 
 export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {

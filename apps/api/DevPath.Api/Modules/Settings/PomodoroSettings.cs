@@ -10,4 +10,4 @@ public sealed record PomodoroSettings(int FocusMinutes, int ShortBreakMinutes, i
 public sealed record PomodoroSettingsInput(int? FocusMinutes, int? ShortBreakMinutes, int? LongBreakMinutes, int? LongBreakInterval);
 
 /// <summary>GET /api/settings: one section per area; later phases add sections.</summary>
-public sealed record AppSettings(PomodoroSettings Pomodoro, ReminderSettings Reminders);
+public sealed record AppSettings(PomodoroSettings Pomodoro, ReminderSettings Reminders, IReadOnlyDictionary<string, string> AiModes);

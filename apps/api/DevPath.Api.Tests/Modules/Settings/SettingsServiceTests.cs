@@ -20,6 +20,35 @@ public sealed class SettingsServiceTests : IDisposable
 
     private string SettingsFile => _folder.File(SettingsService.FileName);
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("""{ "schemaVersion": 1 }""")]
+    [InlineData("""{ "schemaVersion": 1, "aiModes": "api" }""")]
+    [InlineData("""{ "schemaVersion": 1, "aiModes": { "english": "x", "learning": 7 } }""")]
+    public async Task Ai_modes_default_to_copy_paste(string? file)
+    {
+        if (file is not null) await File.WriteAllTextAsync(SettingsFile, file);
+
+        var settings = await _settings.GetAsync(CancellationToken.None);
+
+        Assert.Equal(["english", "interview", "learning"], settings.AiModes.Keys.Order());
+        Assert.All(settings.AiModes.Values, mode => Assert.Equal(AiModes.CopyPaste, mode));
+    }
+
+    [Fact]
+    public async Task Saving_an_ai_mode_keeps_the_other_sections()
+    {
+        await _settings.SavePomodoroAsync(new PomodoroSettingsInput(50, 10, 20, 3), CancellationToken.None);
+
+        var modes = await _settings.SaveAiModeAsync("english", AiModes.CopyPaste, CancellationToken.None);
+
+        Assert.Equal(3, modes.Count);
+        var read = await _settings.GetAsync(CancellationToken.None);
+        Assert.Equal(50, read.Pomodoro.FocusMinutes);
+        var saved = JsonNode.Parse(await File.ReadAllTextAsync(SettingsFile))!;
+        Assert.Equal(AiModes.CopyPaste, saved["aiModes"]!["english"]!.GetValue<string>());
+    }
+
     [Fact]
     public async Task Defaults_without_a_file()
     {

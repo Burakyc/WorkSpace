@@ -14,6 +14,7 @@ public sealed class SettingsService(JsonFileStore store)
     public const string FileName = "settings.json";
     private const string PomodoroSection = "pomodoro";
     private const string RemindersSection = "reminders";
+    private const string AiModesSection = "aiModes";
     private const string TimeMessage = "Saat SS:DD biçiminde olmalı (00:00–23:59).";
 
     public static readonly DocumentSchema Schema = new(1, []);
@@ -22,7 +23,7 @@ public sealed class SettingsService(JsonFileStore store)
     public async Task<AppSettings> GetAsync(CancellationToken cancellationToken)
     {
         var document = await store.ReadAsync(FileName, Schema, cancellationToken);
-        return new AppSettings(ReadPomodoro(document), ReadReminders(document));
+        return new AppSettings(ReadPomodoro(document), ReadReminders(document), ReadAiModes(document));
     }
 
     public async Task<PomodoroSettings> SavePomodoroAsync(PomodoroSettingsInput input, CancellationToken cancellationToken)
@@ -69,6 +70,43 @@ public sealed class SettingsService(JsonFileStore store)
             return document;
         }, cancellationToken);
         return settings;
+    }
+
+    /// <summary>Saves one module's mode and answers with every module's mode.</summary>
+    public async Task<IReadOnlyDictionary<string, string>> SaveAiModeAsync(string module, string? mode, CancellationToken cancellationToken)
+    {
+        if (!AiModes.Modules.Contains(module))
+        {
+            throw new ValidationException(new Dictionary<string, string[]> { ["module"] = ["Bilinmeyen modül."] });
+        }
+        if (mode is null || !AiModes.Available.Contains(mode))
+        {
+            throw new ValidationException(new Dictionary<string, string[]> { ["mode"] = ["Bu mod kullanılamıyor."] });
+        }
+
+        IReadOnlyDictionary<string, string> modes = new Dictionary<string, string>();
+        await store.UpdateAsync(FileName, Schema, document =>
+        {
+            document ??= new JsonObject();
+            if (document[AiModesSection] is not JsonObject section)
+            {
+                section = new JsonObject();
+                document[AiModesSection] = section;
+            }
+            section[module] = mode;
+            modes = ReadAiModes(document);
+            return document;
+        }, cancellationToken);
+        return modes;
+    }
+
+    private static IReadOnlyDictionary<string, string> ReadAiModes(JsonObject? document)
+    {
+        var section = document?[AiModesSection] as JsonObject;
+        return AiModes.Modules.ToDictionary(module => module, module =>
+            section?[module] is JsonValue value && value.TryGetValue<string>(out var mode) && AiModes.Available.Contains(mode)
+                ? mode
+                : AiModes.CopyPaste);
     }
 
     private static Reminder? ToReminder(Dictionary<string, string[]> errors, string field, ReminderInput? input)
