@@ -233,10 +233,10 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Choose an inbox folder (one per module); JSON files dropped there are validated and imported on demand ("İçe aktar" button lists new files).
 - [x] Imported files move to `done/` inside the inbox folder; invalid ones stay with an error report.
 
-#### 9.3 API mode — `todo`
-- [ ] AI API key stored with `safeStorage`; the API process calls the provider and feeds the output through the same validator and merge.
-- [ ] A clear cost/usage note before each call; nothing is called automatically.
-- [ ] Tests: provider client with stub HTTP; invalid AI output is not saved.
+#### 9.3 API mode — `done`
+- [x] AI API keys (Claude, Gemini) stored with `safeStorage`; the API process calls the provider and feeds the output through the same validator and merge.
+- [x] A clear cost/usage note and a confirmation before each call; nothing is called automatically.
+- [x] Tests: provider clients with stub HTTP; invalid AI output is not saved.
 
 ### AI teacher
 

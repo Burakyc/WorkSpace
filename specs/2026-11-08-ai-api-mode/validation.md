@@ -6,9 +6,9 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 9.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] AI API keys (Claude, Gemini) are stored with `safeStorage`; the API process calls the provider and feeds the output through the same validator and merge.
-- [ ] A clear cost/usage note and a confirmation come before each call; nothing is called automatically, and nothing is retried.
-- [ ] Tests: provider clients with stub HTTP; invalid AI output is not saved.
+- [x] AI API keys (Claude, Gemini) are stored with `safeStorage`; the API process calls the provider and feeds the output through the same validator and merge.
+- [x] A clear cost/usage note and a confirmation come before each call; nothing is called automatically, and nothing is retried.
+- [x] Tests: provider clients with stub HTTP; invalid AI output is not saved.
 
 ## Automated tests
 
@@ -62,9 +62,11 @@ Never on the real `%APPDATA%\DevPath\data`, never a real key and never a paid ca
 | U1 | Enter your real Claude key in Ayarlar; send a small prompt under Öğrenme or İngilizce | A real answer is saved; the usage line matches the Anthropic console |
 | U2 | Same with your Gemini key | Same, against Google's console |
 
+U1 and U2 were not run: they need real keys and cost money. Everything else used a local stub, so no real provider has answered this code yet.
+
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M11 done with the expected results
-- [ ] `roadmap.md` phase 9.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M11 done with the expected results
+- [x] `roadmap.md` phase 9.3 ticked and set to `done`

@@ -35,6 +35,7 @@ In the "API" mode a module's panel sends the prompt to an AI provider from the A
 | Commits | Tasks 1–6 of `plan.md` landed in one commit (`feat(ai): add the API mode with a cost note`), checked once with `npm run check`, instead of one commit per task. History is not rewritten to split them. |
 | Test race, same commit | `InboxServiceTests` (9.2) wrote `x.json` into the shared temp parent, which `JsonFileStoreTests` asserts is absent. The file is now `inbox-outside.json`. It should have been a separate `fix(...)` commit. |
 | Claude key header | SDK 13.x sends an API key as `Authorization: Bearer` (documented on `ClientOptions.ApiKey`), not `x-api-key`. Tests assert what the SDK sends. Whether Anthropic accepts it can only be confirmed with a real key (U1). |
+| Provider save answer, found in M8 | `PUT /api/settings/ai-provider` answered a bare string as `text/plain`, so the panel took a saved change for a failure and went back. The fake API hid it. It now answers `{ provider }`, with an endpoint test (separate `fix(ai)` commit). |
 | Prompt box reset | A changed `prompt` prop remounts `ApiRunBody` (`key={prompt}`) instead of an effect, which the lint rules refuse. |
 
 ## User stories

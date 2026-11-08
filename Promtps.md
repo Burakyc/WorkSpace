@@ -829,4 +829,4 @@ Implement the spec in specs/2026-11-08-ai-api-mode/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 9.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `anthropicApiKey` and `geminiApiKey` in `safeStorage`; `Modules/Ai/` (provider table with prices, `ClaudeClient` on `Anthropic` 13.6.0 with retries off, `GeminiClient` on `HttpClient`, `AiService`, `GET /api/ai/providers`, `POST /api/ai/run`, `aiProvider` setting); `ApiRunBody` with the editable prompt, cost note, confirmation and usage line; Ayarlar → "Yapay zekâ API'leri"; validated against a local stub, no paid call; one fix; tech-stack and specs updated; phase 9.3 done.
