@@ -7,6 +7,7 @@ import { getApiClient } from '../../shared/api/getApiClient';
 import {
   DEFAULT_POMODORO_SETTINGS,
   type Goal,
+  type LessonItem,
   type PomodoroSettings,
   type Project,
   type SessionInput,
@@ -19,12 +20,20 @@ import { StudyPartPanel } from '../learning/StudyPartPanel';
 import { usePomodoro } from './PomodoroContext';
 import styles from './PomodoroPage.module.css';
 import { TagInput } from './TagInput';
-import { focusedMs, formatClock, remainingMs } from './timer';
+import { focusedMs, formatClock, remainingMs, type LessonPartRef } from './timer';
 
 /** The goal, project and tags of the last started focus session, for Ctrl+Shift+P. */
 export const LAST_KEY = 'devpath.pomodoro.last';
 interface LastSelection {
   goalId: string;
+  projectId: string | null;
+  tags: string[];
+}
+
+/** The next part of a saved study session: what "Sonraki parça" starts. */
+interface NextPart {
+  part: LessonPartRef;
+  goal: { id: string; title: string };
   projectId: string | null;
   tags: string[];
 }
@@ -72,7 +81,10 @@ export function PomodoroPage() {
     goal: { id: string; title: string };
     projectId: string | null;
   } | null>(null);
-  const [note, setNote] = useState('');
+  const [nextPart, setNextPart] = useState<NextPart | null>(null);
+  // Null until edited: the save form starts with the part's name.
+  const [note, setNote] = useState<string | null>(null);
+  const [markPart, setMarkPart] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [noteError, setNoteError] = useState<string | null>(null);
@@ -117,6 +129,7 @@ export function PomodoroPage() {
   const shownTags = idle ? tags : state.tags;
   // The save form starts with the session's tags; edits there are kept in savedTags.
   const tagsToSave = savedTags ?? (idle ? [] : state.tags);
+  const noteToSave = note ?? (lessonPart ? `${lessonPart.topic} — ${lessonPart.title}` : '');
   const goalOptions =
     !idle && goals && !goals.some((g) => g.id === state.goalId)
       ? [{ id: state.goalId, title: state.goalTitle }, ...goals]
@@ -194,6 +207,30 @@ export function PomodoroPage() {
     }
   }
 
+  /** After a saved session: marks the part if asked and offers the next unfinished one. The session is already safe. */
+  async function finishPart(session: Omit<NextPart, 'part'>, ref: LessonPartRef, mark: boolean) {
+    try {
+      const client = await getApiClient();
+      const lesson = await client.getTopic<LessonItem>('lesson', ref.slug);
+      const index = lesson.items.findIndex((item) => item.id === ref.partId);
+      const current = lesson.items[index];
+      if (mark && current && current.mark !== 'done') {
+        await client.markItem('lesson', ref.slug, ref.partId, 'done');
+      }
+      const next = current && lesson.items.slice(index + 1).find((item) => item.mark !== 'done');
+      setNextPart(
+        next
+          ? {
+              ...session,
+              part: { ...ref, partId: next.id, title: next.title, topic: lesson.topic },
+            }
+          : null,
+      );
+    } catch {
+      if (mark) setSaveError('Oturum kaydedildi ama parça işaretlenemedi.');
+    }
+  }
+
   async function saveFinished() {
     if (state.status !== 'finished') return;
     const saved = await saveSession(
@@ -204,14 +241,26 @@ export function PomodoroPage() {
         endedAt: new Date(state.endedAt).toISOString(),
         durationMinutes: Math.round(state.durationMs / 60_000),
         completed: true,
-        note: note.trim() === '' ? null : note,
+        note: noteToSave.trim() === '' ? null : noteToSave,
         tags: tagsToSave,
       },
       state.goalTitle,
     );
     if (saved) {
+      if (state.lessonPart) {
+        void finishPart(
+          {
+            goal: { id: state.goalId, title: state.goalTitle },
+            projectId: state.projectId,
+            tags: tagsToSave,
+          },
+          state.lessonPart,
+          markPart,
+        );
+      }
       keepSessionSelection();
-      setNote('');
+      setNote(null);
+      setMarkPart(true);
       setSavedTags(null);
       setLastFocus({
         goal: { id: state.goalId, title: state.goalTitle },
@@ -241,13 +290,19 @@ export function PomodoroPage() {
     pomodoro.reset();
   }
 
-  function start(goal = selectedGoal, chosenProjectId = projectId || null, chosenTags = tags) {
+  function start(
+    goal: { id: string; title: string } | undefined = selectedGoal,
+    chosenProjectId = projectId || null,
+    chosenTags = tags,
+    part: LessonPartRef | null = null,
+  ) {
     if (!goal) return;
     setFeedback(null);
     setSaveError(null);
     setBreakOffer(null);
+    setNextPart(null);
     saveLast({ goalId: goal.id, projectId: chosenProjectId, tags: chosenTags });
-    pomodoro.start(goal, chosenProjectId, chosenTags, settings.focusMinutes * 60_000);
+    pomodoro.start(goal, chosenProjectId, chosenTags, settings.focusMinutes * 60_000, part);
   }
 
   // Ctrl+Shift+P: stop what runs, or start with the last selection while its goal is still active.
@@ -421,6 +476,17 @@ export function PomodoroPage() {
                 </button>
               </>
             )}
+            {idle && nextPart && (
+              <button
+                type="button"
+                className={buttons.primary}
+                onClick={() =>
+                  start(nextPart.goal, nextPart.projectId, nextPart.tags, nextPart.part)
+                }
+              >
+                Sonraki parça: {nextPart.part.title}
+              </button>
+            )}
           </div>
 
           {state.status === 'finished' && !onBreak && (
@@ -437,7 +503,7 @@ export function PomodoroPage() {
                 <textarea
                   id={`${id}-note`}
                   className={form.input}
-                  value={note}
+                  value={noteToSave}
                   onChange={(event) => setNote(event.target.value)}
                   maxLength={500}
                   rows={3}
@@ -456,6 +522,16 @@ export function PomodoroPage() {
                 onChange={setSavedTags}
                 suggestions={suggestions}
               />
+              {lessonPart && (
+                <label className={styles.check}>
+                  <input
+                    type="checkbox"
+                    checked={markPart}
+                    onChange={(event) => setMarkPart(event.target.checked)}
+                  />
+                  Bu parçayı tamamlandı işaretle
+                </label>
+              )}
               <div>
                 <button type="submit" className={buttons.primary} disabled={saving}>
                   Kaydet

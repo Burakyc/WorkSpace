@@ -29,6 +29,8 @@ A lesson part has "Bu parçayı çalış". It starts a focus timer with the goal
 | Next part | "Sonraki parça: <title>", next to the break buttons. It starts the next part after this one that is not done, with the same goal, project and tags. |
 | Note | Prefilled with "<lesson> — <part>", editable. |
 | Tags | The session starts with the lesson's tags (at most 10). |
+| Addition: unreadable lesson | `StudyPartPanel` shows "Parça yüklenemedi." when the lesson read fails, apart from "Parça bulunamadı." for a gone lesson or part. |
+| Deviation: test fake | `learning/testing/studyApi.ts` puts the two existing fakes behind one `fetch`, instead of adding goals and settings to `fakeContentApi`. Less change in a shared file. |
 
 ## User stories
 

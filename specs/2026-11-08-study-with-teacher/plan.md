@@ -24,7 +24,7 @@ Every task ends with `npm run check`. A task is committed only when it passes. N
 
 **Commit:** `feat(learning): start a pomodoro from a lesson part`
 
-- `StudyPartForm.tsx`, shown on `LessonPartPage`; `fakeContentApi` answers goals and settings.
+- `StudyPartForm.tsx`, shown on `LessonPartPage`; `learning/testing/studyApi.ts` for the tests.
 - `StudyPartForm.test.tsx` (T3–T5), `LessonPartPage.test.tsx` updated.
 - Check: `npm run check`.
 
