@@ -9,7 +9,7 @@ import { StyleExamples } from './StyleExamples';
 import { StyleHistory } from './StyleHistory';
 
 /** The style prompt the drafts follow: the box, the examples and the old versions. */
-export function StylePromptSection() {
+export function StylePromptSection({ onSaved }: { onSaved?(): void }) {
   const [saved, setSaved] = useState<StylePrompt | null>(null);
   const [text, setText] = useState('');
   const [loadFailed, setLoadFailed] = useState(false);
@@ -55,6 +55,7 @@ export function StylePromptSection() {
       setSaved(style);
       setText(style.text);
       setJustSaved(true);
+      onSaved?.();
     } catch (e) {
       if (e instanceof ApiError && e.errors?.text) {
         setFieldError(e.errors.text.join(' '));

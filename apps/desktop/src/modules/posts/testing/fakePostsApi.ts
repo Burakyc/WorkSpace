@@ -1,5 +1,13 @@
 import { vi } from 'vitest';
-import type { PostDraft, PostDraftInput, StylePrompt } from '../../../shared/api/types';
+import type {
+  Goal,
+  ImportReport,
+  NoteNode,
+  PostDraft,
+  PostDraftInput,
+  Project,
+  StylePrompt,
+} from '../../../shared/api/types';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -20,6 +28,12 @@ export function installFakePostsApi(
     failDrafts?: boolean;
     /** Field errors of PUT /api/posts/drafts/{id}. */
     draftError?: Record<string, string[]>;
+    goals?: Goal[];
+    projects?: Project[];
+    notes?: NoteNode[];
+    failContext?: boolean;
+    /** Answer of POST /api/import. */
+    importReport?: ImportReport;
   } = {},
 ) {
   const requests: { method: string; path: string; body: unknown }[] = [];
@@ -67,6 +81,26 @@ export function installFakePostsApi(
     if (pathname === '/api/posts/style') return Promise.resolve(styleRoute(method, body));
     if (pathname.startsWith('/api/posts/drafts')) {
       return Promise.resolve(draftsRoute(method, pathname.split('/')[4], body));
+    }
+    if (pathname === '/api/goals') return Promise.resolve(json(options.goals ?? []));
+    if (pathname === '/api/projects') return Promise.resolve(json(options.projects ?? []));
+    if (pathname === '/api/notes') return Promise.resolve(json(options.notes ?? []));
+    if (pathname === '/api/settings') {
+      return Promise.resolve(
+        json({
+          aiModes: { posts: 'copyPaste' },
+          aiInbox: { posts: null },
+          aiProvider: 'claude',
+        }),
+      );
+    }
+    if (pathname === '/api/posts/project-context') {
+      if (options.failContext) return Promise.resolve(json({}, 500));
+      const title = options.projects?.[0]?.title;
+      return Promise.resolve(json({ topic: title, text: `Project: ${title}` }));
+    }
+    if (pathname === '/api/import') {
+      return Promise.resolve(json({ errors: [], report: options.importReport ?? null }));
     }
     return Promise.resolve(notFound());
   });

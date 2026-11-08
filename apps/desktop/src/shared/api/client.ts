@@ -17,6 +17,7 @@ import type {
   ContentTopic,
   ContentType,
   DayDetail,
+  DraftContext,
   FeedResponse,
   GitHubSettings,
   GitHubStatus,
@@ -97,6 +98,8 @@ export interface ApiClient {
   listDrafts(): Promise<PostDraft[]>;
   saveDraft(id: string, input: PostDraftInput): Promise<PostDraft>;
   deleteDraft(id: string): Promise<void>;
+  /** The source text of a draft: the project, its sessions and the chosen pages. */
+  getProjectContext(projectId: string, noteIds: readonly string[]): Promise<DraftContext>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
   getDay(date: string, timeZone: string): Promise<DayDetail>;
@@ -235,6 +238,8 @@ export function createApiClient(
     saveDraft: (id, input) =>
       request<PostDraft>('PUT', `/api/posts/drafts/${encodeURIComponent(id)}`, input),
     deleteDraft: (id) => request<void>('DELETE', `/api/posts/drafts/${encodeURIComponent(id)}`),
+    getProjectContext: (projectId, noteIds) =>
+      request<DraftContext>('POST', '/api/posts/project-context', { projectId, noteIds }),
     getCalendar: (month, timeZone) =>
       request<CalendarMonth>(
         'GET',

@@ -180,6 +180,12 @@ export interface PostDraft {
   updatedAt: string;
 }
 
+/** What a draft prompt is built from. */
+export interface DraftContext {
+  topic: string;
+  text: string;
+}
+
 export type PostDraftInput = Pick<
   PostDraft,
   'title' | 'body' | 'hashtags' | 'sourceLink' | 'imageSuggestion'
