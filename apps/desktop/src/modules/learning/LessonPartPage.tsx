@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router';
 import { getApiClient } from '../../shared/api/getApiClient';
 import buttons from '../../shared/ui/buttons.module.css';
 import styles from './Learning.module.css';
-import { LessonBody } from './LessonBody';
+import { PartContent } from './PartContent';
 import { StudyPartForm } from './StudyPartForm';
 import { useLesson } from './useLesson';
 
@@ -88,19 +88,7 @@ export function LessonPartPage() {
         <p className={styles.muted}>{part.summary}</p>
       </header>
       <StudyPartForm lesson={lesson} part={part} />
-      <LessonBody body={part.body} />
-      {part.exercises && part.exercises.length > 0 && (
-        <section className={styles.exercises} aria-labelledby="exercises-title">
-          <h2 id="exercises-title" className={styles.subtitle}>
-            Alıştırmalar
-          </h2>
-          <ol>
-            {part.exercises.map((exercise, i) => (
-              <li key={i}>{exercise}</li>
-            ))}
-          </ol>
-        </section>
-      )}
+      <PartContent part={part} />
       <div className={styles.actions}>
         <button
           type="button"

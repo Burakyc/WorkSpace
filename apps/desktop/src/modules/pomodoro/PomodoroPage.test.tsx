@@ -3,6 +3,8 @@ import { MemoryRouter } from 'react-router';
 import { AppRoutes } from '../../app/AppRoutes';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { goal, installFakeGoalsApi, project } from '../goals/testing/fakeGoalsApi';
+import { diLesson } from '../learning/testing/lesson';
+import { installStudyApi } from '../learning/testing/studyApi';
 import { CYCLE_KEY, PomodoroProvider, STORAGE_KEY } from './PomodoroContext';
 import { LAST_KEY, PomodoroPage } from './PomodoroPage';
 import { startTimer } from './timer';
@@ -110,6 +112,31 @@ describe('PomodoroPage start', () => {
 
     expect(goalSelect()).toHaveDisplayValue('Learn ASP.NET Core');
     expect(goalSelect()).toBeDisabled();
+  });
+});
+
+describe('PomodoroPage lesson part', () => {
+  const part = { slug: 'di', partId: 'di-2', topic: 'Dependency injection', title: 'Lifetimes' };
+
+  it('shows the part next to a timer that studies one, and nothing for a plain timer', async () => {
+    installStudyApi([aspnet], { content: { topics: [diLesson] } });
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(startTimer(aspnet, null, 25 * MIN, Date.now(), [], part)),
+    );
+    const { unmount } = renderPage();
+
+    expect(await screen.findByRole('heading', { name: 'Lifetimes' })).toBeInTheDocument();
+    expect(screen.getByRole('timer')).toBeInTheDocument();
+    unmount();
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(startTimer(aspnet, null, 25 * MIN, Date.now())),
+    );
+    renderPage();
+    await screen.findByRole('timer');
+    expect(screen.queryByRole('heading', { name: 'Lifetimes' })).not.toBeInTheDocument();
   });
 });
 

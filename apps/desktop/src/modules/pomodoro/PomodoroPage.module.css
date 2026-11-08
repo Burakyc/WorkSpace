@@ -70,3 +70,26 @@
   width: 100%;
   max-width: 600px;
 }
+
+/* The timer stays in view while the part next to it scrolls. */
+.study {
+  display: grid;
+  grid-template-columns: minmax(20rem, 26rem) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.study > .panel {
+  position: sticky;
+  top: var(--space-4);
+}
+
+@media (width < 900px) {
+  .study {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .study > .panel {
+    position: static;
+  }
+}

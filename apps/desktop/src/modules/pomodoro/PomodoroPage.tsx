@@ -15,6 +15,7 @@ import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
 import form from '../../shared/ui/form.module.css';
 import { progressText } from '../goals/progressText';
+import { StudyPartPanel } from '../learning/StudyPartPanel';
 import { usePomodoro } from './PomodoroContext';
 import styles from './PomodoroPage.module.css';
 import { TagInput } from './TagInput';
@@ -109,6 +110,7 @@ export function PomodoroPage() {
 
   const idle = state.status === 'idle';
   const onBreak = !idle && state.kind !== 'focus';
+  const lessonPart = idle ? null : state.lessonPart;
   // While a session exists, the pickers show (and lock) its goal and project.
   const shownGoalId = idle ? goalId : state.goalId;
   const shownProjectId = idle ? projectId : (state.projectId ?? '');
@@ -301,176 +303,180 @@ export function PomodoroPage() {
   return (
     <>
       <h1 className={styles.title}>Pomodoro</h1>
-      <section className={styles.panel}>
-        <div className={styles.pickers}>
-          <div className={form.field}>
-            <label htmlFor={`${id}-goal`}>Hedef</label>
-            <select
-              ref={goalPicker}
-              id={`${id}-goal`}
-              className={form.input}
-              value={shownGoalId}
+      {/* One tree with or without a part, so the timer keeps focus and input when a part starts. */}
+      <div className={lessonPart ? styles.study : undefined}>
+        <section className={styles.panel}>
+          <div className={styles.pickers}>
+            <div className={form.field}>
+              <label htmlFor={`${id}-goal`}>Hedef</label>
+              <select
+                ref={goalPicker}
+                id={`${id}-goal`}
+                className={form.input}
+                value={shownGoalId}
+                disabled={!idle}
+                required
+                onChange={(event) => {
+                  setGoalId(event.target.value);
+                  setProjectId('');
+                }}
+              >
+                <option value="">Hedef seç</option>
+                {goalOptions.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={form.field}>
+              <label htmlFor={`${id}-project`}>Proje (isteğe bağlı)</label>
+              <select
+                id={`${id}-project`}
+                className={form.input}
+                value={shownProjectId}
+                disabled={!idle || shownGoalId === ''}
+                onChange={(event) => setProjectId(event.target.value)}
+              >
+                <option value="">Proje yok</option>
+                {projectOptions.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className={styles.tags}>
+            <TagInput
+              label="Etiketler (isteğe bağlı)"
+              tags={shownTags}
+              onChange={setTags}
+              suggestions={suggestions}
               disabled={!idle}
-              required
-              onChange={(event) => {
-                setGoalId(event.target.value);
-                setProjectId('');
-              }}
-            >
-              <option value="">Hedef seç</option>
-              {goalOptions.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.title}
-                </option>
-              ))}
-            </select>
+            />
           </div>
-          <div className={form.field}>
-            <label htmlFor={`${id}-project`}>Proje (isteğe bağlı)</label>
-            <select
-              id={`${id}-project`}
-              className={form.input}
-              value={shownProjectId}
-              disabled={!idle || shownGoalId === ''}
-              onChange={(event) => setProjectId(event.target.value)}
-            >
-              <option value="">Proje yok</option>
-              {projectOptions.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className={styles.tags}>
-          <TagInput
-            label="Etiketler (isteğe bağlı)"
-            tags={shownTags}
-            onChange={setTags}
-            suggestions={suggestions}
-            disabled={!idle}
-          />
-        </div>
 
-        <p role="timer" aria-label="Kalan süre" className={styles.clock}>
-          {clock}
-        </p>
+          <p role="timer" aria-label="Kalan süre" className={styles.clock}>
+            {clock}
+          </p>
 
-        {onBreak && state.status !== 'finished' && (
-          <p className={styles.state}>{state.kind === 'longBreak' ? 'Uzun mola' : 'Mola'}</p>
-        )}
-        {state.status === 'paused' && <p className={styles.state}>Duraklatıldı</p>}
-        {state.status === 'finished' && (
-          <p className={styles.state}>{onBreak ? 'Mola bitti.' : 'Süre doldu.'}</p>
-        )}
+          {onBreak && state.status !== 'finished' && (
+            <p className={styles.state}>{state.kind === 'longBreak' ? 'Uzun mola' : 'Mola'}</p>
+          )}
+          {state.status === 'paused' && <p className={styles.state}>Duraklatıldı</p>}
+          {state.status === 'finished' && (
+            <p className={styles.state}>{onBreak ? 'Mola bitti.' : 'Süre doldu.'}</p>
+          )}
 
-        <div className={styles.controls}>
-          {idle && (
-            <button
-              type="button"
-              className={buttons.primary}
-              disabled={!selectedGoal}
-              onClick={() => start()}
-            >
-              Başlat
-            </button>
-          )}
-          {state.status === 'running' && (
-            <button type="button" className={buttons.primary} onClick={pomodoro.pause}>
-              Duraklat
-            </button>
-          )}
-          {state.status === 'paused' && (
-            <button type="button" className={buttons.primary} onClick={pomodoro.resume}>
-              Devam et
-            </button>
-          )}
-          {(state.status === 'running' || state.status === 'paused') && (
-            <button
-              type="button"
-              className={buttons.secondary}
-              onClick={() => void stop()}
-              disabled={saving}
-            >
-              {onBreak ? 'Molayı bitir' : 'Durdur'}
-            </button>
-          )}
-          {state.status === 'finished' && onBreak && (
-            <button type="button" className={buttons.primary} onClick={endBreak}>
-              Tamam
-            </button>
-          )}
-          {idle && breakOffer && lastFocus && (
-            <>
+          <div className={styles.controls}>
+            {idle && (
+              <button
+                type="button"
+                className={buttons.primary}
+                disabled={!selectedGoal}
+                onClick={() => start()}
+              >
+                Başlat
+              </button>
+            )}
+            {state.status === 'running' && (
+              <button type="button" className={buttons.primary} onClick={pomodoro.pause}>
+                Duraklat
+              </button>
+            )}
+            {state.status === 'paused' && (
+              <button type="button" className={buttons.primary} onClick={pomodoro.resume}>
+                Devam et
+              </button>
+            )}
+            {(state.status === 'running' || state.status === 'paused') && (
               <button
                 type="button"
                 className={buttons.secondary}
-                onClick={() => startBreak(breakOffer)}
+                onClick={() => void stop()}
+                disabled={saving}
               >
-                {breakOffer === 'longBreak'
-                  ? `Uzun molaya başla (${settings.longBreakMinutes} dk)`
-                  : `Molaya başla (${settings.shortBreakMinutes} dk)`}
+                {onBreak ? 'Molayı bitir' : 'Durdur'}
               </button>
-              <button type="button" className={buttons.secondary} onClick={skipBreak}>
-                Molayı atla
+            )}
+            {state.status === 'finished' && onBreak && (
+              <button type="button" className={buttons.primary} onClick={endBreak}>
+                Tamam
               </button>
-            </>
-          )}
-        </div>
+            )}
+            {idle && breakOffer && lastFocus && (
+              <>
+                <button
+                  type="button"
+                  className={buttons.secondary}
+                  onClick={() => startBreak(breakOffer)}
+                >
+                  {breakOffer === 'longBreak'
+                    ? `Uzun molaya başla (${settings.longBreakMinutes} dk)`
+                    : `Molaya başla (${settings.shortBreakMinutes} dk)`}
+                </button>
+                <button type="button" className={buttons.secondary} onClick={skipBreak}>
+                  Molayı atla
+                </button>
+              </>
+            )}
+          </div>
 
-        {state.status === 'finished' && !onBreak && (
-          <form
-            className={styles.saveForm}
-            aria-label="Oturumu kaydet"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void saveFinished();
-            }}
-          >
-            <div className={form.field}>
-              <label htmlFor={`${id}-note`}>Not (isteğe bağlı)</label>
-              <textarea
-                id={`${id}-note`}
-                className={form.input}
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                maxLength={500}
-                rows={3}
-                aria-invalid={noteError ? true : undefined}
-                aria-describedby={noteError ? `${id}-note-error` : undefined}
+          {state.status === 'finished' && !onBreak && (
+            <form
+              className={styles.saveForm}
+              aria-label="Oturumu kaydet"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void saveFinished();
+              }}
+            >
+              <div className={form.field}>
+                <label htmlFor={`${id}-note`}>Not (isteğe bağlı)</label>
+                <textarea
+                  id={`${id}-note`}
+                  className={form.input}
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                  maxLength={500}
+                  rows={3}
+                  aria-invalid={noteError ? true : undefined}
+                  aria-describedby={noteError ? `${id}-note-error` : undefined}
+                />
+                {noteError && (
+                  <p id={`${id}-note-error`} className={form.fieldError}>
+                    {noteError}
+                  </p>
+                )}
+              </div>
+              <TagInput
+                label="Oturumun etiketleri"
+                tags={tagsToSave}
+                onChange={setSavedTags}
+                suggestions={suggestions}
               />
-              {noteError && (
-                <p id={`${id}-note-error`} className={form.fieldError}>
-                  {noteError}
-                </p>
-              )}
-            </div>
-            <TagInput
-              label="Oturumun etiketleri"
-              tags={tagsToSave}
-              onChange={setSavedTags}
-              suggestions={suggestions}
-            />
-            <div>
-              <button type="submit" className={buttons.primary} disabled={saving}>
-                Kaydet
-              </button>
-            </div>
-          </form>
-        )}
+              <div>
+                <button type="submit" className={buttons.primary} disabled={saving}>
+                  Kaydet
+                </button>
+              </div>
+            </form>
+          )}
 
-        {saveError && (
-          <p role="alert" className={styles.error}>
-            {saveError}
-          </p>
-        )}
-        {feedback && idle && (
-          <p role="status" className={styles.feedback}>
-            {feedback}
-          </p>
-        )}
-      </section>
+          {saveError && (
+            <p role="alert" className={styles.error}>
+              {saveError}
+            </p>
+          )}
+          {feedback && idle && (
+            <p role="status" className={styles.feedback}>
+              {feedback}
+            </p>
+          )}
+        </section>
+        {lessonPart && <StudyPartPanel part={lessonPart} />}
+      </div>
     </>
   );
 }
