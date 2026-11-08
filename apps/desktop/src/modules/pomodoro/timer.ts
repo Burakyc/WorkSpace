@@ -1,5 +1,14 @@
 export type TimerKind = 'focus' | 'shortBreak' | 'longBreak';
 
+/** The lesson part a focus session studies. */
+export interface LessonPartRef {
+  slug: string;
+  partId: string;
+  /** Kept for the note, so saving does not depend on the lesson still being readable. */
+  topic: string;
+  title: string;
+}
+
 interface SessionInfo {
   /** Breaks keep the last focus session's goal for display; they are never saved. */
   kind: TimerKind;
@@ -9,6 +18,7 @@ interface SessionInfo {
   projectId: string | null;
   /** Normalized tags chosen at start. */
   tags: string[];
+  lessonPart: LessonPartRef | null;
   startedAt: number;
   durationMs: number;
 }
@@ -31,6 +41,7 @@ export function startTimer(
   durationMs: number,
   now: number,
   tags: string[] = [],
+  lessonPart: LessonPartRef | null = null,
 ): RunningTimer {
   return {
     status: 'running',
@@ -39,6 +50,7 @@ export function startTimer(
     goalTitle: goal.title,
     projectId,
     tags,
+    lessonPart,
     startedAt: now,
     durationMs,
     endsAt: now + durationMs,
@@ -100,6 +112,17 @@ export function formatClock(ms: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+function parseLessonPart(value: unknown): LessonPartRef | null {
+  if (typeof value !== 'object' || value === null) return null;
+  const { slug, partId, topic, title } = value as Record<string, unknown>;
+  return typeof slug === 'string' &&
+    typeof partId === 'string' &&
+    typeof topic === 'string' &&
+    typeof title === 'string'
+    ? { slug, partId, topic, title }
+    : null;
+}
+
 /** Stored data (localStorage) is untrusted: anything that is not a complete, valid timer is idle. */
 export function parseStoredTimer(value: unknown): TimerState {
   if (typeof value !== 'object' || value === null) return IDLE;
@@ -130,6 +153,8 @@ export function parseStoredTimer(value: unknown): TimerState {
     projectId: v['projectId'],
     // Timers stored before tags existed have none.
     tags: (v['tags'] as string[] | undefined) ?? [],
+    // A session is worth more than its link: a broken part only loses the part.
+    lessonPart: parseLessonPart(v['lessonPart']),
     startedAt: v['startedAt'],
     durationMs: v['durationMs'],
   };

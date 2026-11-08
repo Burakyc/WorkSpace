@@ -4,13 +4,27 @@ import buttons from '../../shared/ui/buttons.module.css';
 import styles from './Content.module.css';
 import { promptTemplates } from './prompts';
 
-/** Copies the prompt (the type's template by default) to the clipboard, to paste into any AI chat. */
-export function CopyPromptButton({ type, prompt }: { type: ContentType; prompt?: string }) {
+interface CopyPromptButtonProps {
+  type: ContentType;
+  /** Builds the text when pressed; by default the type's template. */
+  getText?(): string | Promise<string>;
+  label?: string;
+  disabled?: boolean;
+}
+
+/** Copies a prompt to the clipboard, to paste into any AI chat. */
+export function CopyPromptButton({
+  type,
+  getText = () => promptTemplates[type],
+  label = 'Promptu kopyala',
+  disabled = false,
+}: CopyPromptButtonProps) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   function copy() {
     Promise.resolve()
-      .then(() => navigator.clipboard.writeText(prompt ?? promptTemplates[type]))
+      .then(getText)
+      .then((text) => navigator.clipboard.writeText(text))
       .then(
         () => setState('copied'),
         () => setState('failed'),
@@ -19,8 +33,8 @@ export function CopyPromptButton({ type, prompt }: { type: ContentType; prompt?:
 
   return (
     <div className={styles.row}>
-      <button type="button" className={buttons.primary} onClick={copy}>
-        Promptu kopyala
+      <button type="button" className={buttons.primary} disabled={disabled} onClick={copy}>
+        {label}
       </button>
       <span role="status" className={styles.muted}>
         {state === 'copied' && 'Kopyalandı.'}

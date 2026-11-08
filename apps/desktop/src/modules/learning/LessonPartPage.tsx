@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router';
 import { getApiClient } from '../../shared/api/getApiClient';
 import buttons from '../../shared/ui/buttons.module.css';
 import styles from './Learning.module.css';
-import { LessonBody } from './LessonBody';
+import { PartContent } from './PartContent';
+import { StudyPartForm } from './StudyPartForm';
 import { useLesson } from './useLesson';
 
 /** One part of a lesson: body, exercises, the done toggle and links to the neighbouring parts. */
@@ -86,19 +87,8 @@ export function LessonPartPage() {
         <h1 className={styles.title}>{part.title}</h1>
         <p className={styles.muted}>{part.summary}</p>
       </header>
-      <LessonBody body={part.body} />
-      {part.exercises && part.exercises.length > 0 && (
-        <section className={styles.exercises} aria-labelledby="exercises-title">
-          <h2 id="exercises-title" className={styles.subtitle}>
-            Alıştırmalar
-          </h2>
-          <ol>
-            {part.exercises.map((exercise, i) => (
-              <li key={i}>{exercise}</li>
-            ))}
-          </ol>
-        </section>
-      )}
+      <StudyPartForm lesson={lesson} part={part} />
+      <PartContent part={part} />
       <div className={styles.actions}>
         <button
           type="button"

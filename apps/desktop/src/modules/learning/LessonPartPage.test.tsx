@@ -1,8 +1,10 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { installFakeContentApi } from '../content/testing/fakeContentApi';
+import { goal } from '../goals/testing/fakeGoalsApi';
+import { PomodoroProvider } from '../pomodoro/PomodoroContext';
 import { LessonPartPage } from './LessonPartPage';
+import { installStudyApi } from './testing/studyApi';
 import { diLesson } from './testing/lesson';
 
 // Shiki is tested on its own; here code stays plain.
@@ -13,12 +15,16 @@ afterEach(() => {
 });
 
 function renderPart(partId: string, options = {}) {
-  const api = installFakeContentApi({ topics: [diLesson], ...options });
+  const { contentApi: api } = installStudyApi([goal({ id: 'a', title: 'ASP.NET' })], {
+    content: { topics: [diLesson], ...options },
+  });
   render(
     <MemoryRouter initialEntries={[`/learning/di/${partId}`]}>
-      <Routes>
-        <Route path="/learning/:slug/:partId" element={<LessonPartPage />} />
-      </Routes>
+      <PomodoroProvider>
+        <Routes>
+          <Route path="/learning/:slug/:partId" element={<LessonPartPage />} />
+        </Routes>
+      </PomodoroProvider>
     </MemoryRouter>,
   );
   return api;

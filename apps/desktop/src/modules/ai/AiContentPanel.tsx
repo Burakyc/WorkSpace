@@ -29,7 +29,7 @@ export function AiContentPanel({ module, type, prompt, onImported }: AiContentPa
           <p className={styles.muted}>
             Promptu kopyala, yapay zekâya yapıştır ve aldığın JSON&apos;u aşağıya ekle.
           </p>
-          <CopyPromptButton type={type} prompt={prompt} />
+          <CopyPromptButton type={type} getText={prompt === undefined ? undefined : () => prompt} />
           <ImportPanel type={type} onImported={onImported} />
         </>
       )}

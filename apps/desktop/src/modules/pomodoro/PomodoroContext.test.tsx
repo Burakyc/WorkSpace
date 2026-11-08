@@ -5,6 +5,7 @@ import { formatClock, remainingMs, startTimer } from './timer';
 
 const MIN = 60_000;
 const goal = { id: 'g', title: 'Learn ASP.NET Core' };
+const part = { slug: 'di', partId: 'p1', topic: 'DI', title: 'Why DI' };
 
 function Probe() {
   const { state, now, start, startBreak, pause, resume, stop } = usePomodoro();
@@ -13,6 +14,7 @@ function Probe() {
       <p data-testid="status">{state.status}</p>
       <p data-testid="clock">{formatClock(remainingMs(state, now))}</p>
       <button onClick={() => start(goal, null, [], 25 * MIN)}>start</button>
+      <button onClick={() => start(goal, null, ['di'], 25 * MIN, part)}>study</button>
       <button onClick={() => startBreak('shortBreak', goal, null, 5 * MIN)}>break</button>
       <button onClick={pause}>pause</button>
       <button onClick={resume}>resume</button>
@@ -60,6 +62,17 @@ describe('PomodoroProvider', () => {
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
       status: 'running',
       goalId: 'g',
+    });
+  });
+
+  it('stores the lesson part of a study session', () => {
+    setup();
+
+    fireEvent.click(screen.getByText('study'));
+
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
+      tags: ['di'],
+      lessonPart: part,
     });
   });
 

@@ -830,3 +830,54 @@ Implement the spec in specs/2026-11-08-ai-api-mode/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 9.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `anthropicApiKey` and `geminiApiKey` in `safeStorage`; `Modules/Ai/` (provider table with prices, `ClaudeClient` on `Anthropic` 13.6.0 with retries off, `GeminiClient` on `HttpClient`, `AiService`, `GET /api/ai/providers`, `POST /api/ai/run`, `aiProvider` setting); `ApiRunBody` with the editable prompt, cost note, confirmation and usage line; Ayarlar → "Yapay zekâ API'leri"; validated against a local stub, no paid call; one fix; tech-stack and specs updated; phase 9.3 done.
+
+
+## 2026-11-08 – Plan phase 10.1 lesson plan
+**Phase:** 10.1 Lesson plan
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 10.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-08-lesson-plan/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-08 – Implement phase 10.1 lesson plan
+**Phase:** 10.1 Lesson plan
+**Prompt:**
+Implement the spec in specs/2026-11-08-lesson-plan/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 10.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `prompts/lesson-plan.md` and `buildLessonPlanPrompt`; `LessonPlanPanel` on Öğrenme (topic with existing-lesson suggestions, level, part count, language, background) with the usual import box; optional `extra` on `TopicListPage`, `getText`/`label`/`disabled` on `CopyPromptButton`; copy-paste mode only, no API change; tech-stack and specs updated; phase 10.1 done.
+
+## 2026-11-08 – Plan phase 10.2 study with the teacher
+**Phase:** 10.2 Study with the teacher
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 10.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-08-study-with-teacher/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-08 – Implement phase 10.2 study with the teacher
+**Phase:** 10.2 Study with the teacher
+**Prompt:**
+Implement the spec in specs/2026-11-08-study-with-teacher/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 10.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `lessonPart` on the timer state; `StudyPartForm` on the part page (goal remembered per lesson, lesson tags, opens Pomodoro); `StudyPartPanel` and shared `PartContent` next to the timer in two columns; prefilled note, ticked "Bu parçayı tamamlandı işaretle", marking after the save and "Sonraki parça"; a layout fix and a racy test fix; no API change; tech-stack and specs updated; phase 10.2 done.

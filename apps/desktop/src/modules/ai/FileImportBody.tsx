@@ -67,7 +67,7 @@ export function FileImportBody({ module, type, prompt, onImported }: FileImportB
       <p className={styles.muted}>
         Promptu kopyala, yapay zekânın cevabını klasöre .json dosyası olarak kaydet.
       </p>
-      <CopyPromptButton type={type} prompt={prompt} />
+      <CopyPromptButton type={type} getText={prompt === undefined ? undefined : () => prompt} />
       <InboxFolderField
         module={module}
         onChange={(next) => {

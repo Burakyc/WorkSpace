@@ -17,6 +17,7 @@ const MIN = 60_000;
 const T0 = 1_800_000_000_000;
 const goal = { id: 'g', title: 'Learn ASP.NET Core' };
 const start = () => startTimer(goal, 'p', 25 * MIN, T0);
+const part = { slug: 'di', partId: 'p1', topic: 'DI', title: 'Why DI' };
 
 describe('timer', () => {
   it('starts running with the end time', () => {
@@ -29,6 +30,7 @@ describe('timer', () => {
       goalTitle: 'Learn ASP.NET Core',
       projectId: 'p',
       tags: [],
+      lessonPart: null,
       startedAt: T0,
       durationMs: 25 * MIN,
       endsAt: T0 + 25 * MIN,
@@ -115,4 +117,24 @@ describe('timer', () => {
 
     expect(parseStoredTimer(stored)).toEqual(start());
   });
+});
+
+describe('lesson part', () => {
+  const withPart = startTimer(goal, null, 25 * MIN, T0, [], part);
+
+  it('stays with the timer and survives storage', () => {
+    expect(withPart.lessonPart).toEqual(part);
+    expect(parseStoredTimer(JSON.parse(JSON.stringify(withPart)))).toEqual(withPart);
+    expect(start().lessonPart).toBeNull();
+    expect(startBreak('shortBreak', goal, null, 5 * MIN, T0).lessonPart).toBeNull();
+  });
+
+  it.each([undefined, 'di', { ...part, title: 3 }])(
+    'reads %j as no part, keeping the timer',
+    (v) => {
+      const stored = { ...withPart, lessonPart: v };
+
+      expect(parseStoredTimer(stored)).toEqual({ ...withPart, lessonPart: null });
+    },
+  );
 });

@@ -1,8 +1,11 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { AppRoutes } from '../../app/AppRoutes';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { goal, installFakeGoalsApi, project } from '../goals/testing/fakeGoalsApi';
+import { fakeTopic } from '../content/testing/fakeContentApi';
+import { diLesson } from '../learning/testing/lesson';
+import { installStudyApi } from '../learning/testing/studyApi';
 import { CYCLE_KEY, PomodoroProvider, STORAGE_KEY } from './PomodoroContext';
 import { LAST_KEY, PomodoroPage } from './PomodoroPage';
 import { startTimer } from './timer';
@@ -110,6 +113,201 @@ describe('PomodoroPage start', () => {
 
     expect(goalSelect()).toHaveDisplayValue('Learn ASP.NET Core');
     expect(goalSelect()).toBeDisabled();
+  });
+});
+
+describe('PomodoroPage lesson part', () => {
+  const part = { slug: 'di', partId: 'di-2', topic: 'Dependency injection', title: 'Lifetimes' };
+
+  it('shows the part next to a timer that studies one, and nothing for a plain timer', async () => {
+    installStudyApi([aspnet], { content: { topics: [diLesson] } });
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(startTimer(aspnet, null, 25 * MIN, Date.now(), [], part)),
+    );
+    const { unmount } = renderPage();
+
+    expect(await screen.findByRole('heading', { name: 'Lifetimes' })).toBeInTheDocument();
+    expect(screen.getByRole('timer')).toBeInTheDocument();
+    unmount();
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(startTimer(aspnet, null, 25 * MIN, Date.now())),
+    );
+    renderPage();
+    await screen.findByRole('timer');
+    expect(screen.queryByRole('heading', { name: 'Lifetimes' })).not.toBeInTheDocument();
+  });
+});
+
+describe('PomodoroPage study session', () => {
+  const part = { slug: 'di', partId: 'di-1', topic: 'Dependency injection', title: 'Why DI' };
+  const store = (p: typeof part) =>
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(startTimer(aspnet, 'p1', 25 * MIN, Date.now() - 25 * MIN - 1, ['di'], p)),
+    );
+
+  function lesson(firstMark?: 'done') {
+    return fakeTopic(
+      { type: 'lesson', slug: 'di', topic: 'Dependency injection', level: 'beginner' },
+      [
+        { title: 'Why DI', summary: 's', body: 'b', ...(firstMark && { mark: firstMark }) },
+        { title: 'Lifetimes', summary: 's', body: 'b', mark: 'done' },
+        { title: 'Testing', summary: 's', body: 'b' },
+        { title: 'Scopes', summary: 's', body: 'b' },
+      ],
+    );
+  }
+
+  async function finished(options: Parameters<typeof installStudyApi>[1] = {}, p = part) {
+    const api = installStudyApi([aspnet], {
+      goals: { projects: [todo], ...options.goals },
+      content: { topics: [lesson()], ...options.content },
+    });
+    store(p);
+    renderPage();
+    await screen.findByRole('form', { name: 'Oturumu kaydet' });
+    return api;
+  }
+
+  const marks = (api: Awaited<ReturnType<typeof finished>>) =>
+    api.contentApi.requests.filter((r) => r.method === 'PUT');
+  const save = () => fireEvent.click(screen.getByRole('button', { name: 'Kaydet' }));
+  const box = () => screen.getByLabelText('Bu parçayı tamamlandı işaretle');
+
+  it('saves with the part as the note, then marks the part', async () => {
+    const api = await finished();
+    expect(screen.getByLabelText('Not (isteğe bağlı)')).toHaveValue(
+      'Dependency injection — Why DI',
+    );
+    expect(box()).toBeChecked();
+
+    save();
+
+    await waitFor(() =>
+      expect(marks(api)).toEqual([
+        { method: 'PUT', path: '/api/content/lesson/di/items/di-1/mark', body: { mark: 'done' } },
+      ]),
+    );
+    expect(api.goalsApi.sessions).toEqual([
+      expect.objectContaining({
+        completed: true,
+        note: 'Dependency injection — Why DI',
+        tags: ['di'],
+      }),
+    ]);
+  });
+
+  it('keeps an emptied note', async () => {
+    const api = await finished();
+    fireEvent.change(screen.getByLabelText('Not (isteğe bağlı)'), { target: { value: '' } });
+
+    save();
+
+    await screen.findByRole('button', { name: 'Sonraki parça: Testing' });
+    expect(api.goalsApi.sessions[0]?.note).toBeNull();
+  });
+
+  it('does not mark with the box off', async () => {
+    const api = await finished();
+    fireEvent.click(box());
+    save();
+    await screen.findByRole('button', { name: 'Sonraki parça: Testing' });
+    expect(marks(api)).toEqual([]);
+  });
+
+  it('does not touch a part already done', async () => {
+    const api = await finished({ content: { topics: [lesson('done')] } });
+    save();
+    await screen.findByRole('button', { name: 'Sonraki parça: Testing' });
+    expect(marks(api)).toEqual([]);
+  });
+
+  it('marks nothing and keeps the timer when the session does not save', async () => {
+    const api = await finished({ goals: { failSessions: true } });
+
+    save();
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Oturum kaydedilemedi');
+    expect(marks(api)).toEqual([]);
+    expect(screen.getByRole('form', { name: 'Oturumu kaydet' })).toBeInTheDocument();
+  });
+
+  it('says so when the mark fails, with the session saved and the timer reset', async () => {
+    const api = await finished({ content: { failMark: true } });
+
+    save();
+
+    expect(await screen.findByText('Oturum kaydedildi ama parça işaretlenemedi.')).toHaveAttribute(
+      'role',
+      'alert',
+    );
+    expect(api.goalsApi.sessions).toHaveLength(1);
+    expect(screen.queryByRole('form', { name: 'Oturumu kaydet' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Başlat' })).toBeInTheDocument();
+  });
+
+  it('does not mark or offer a next part after stopping early', async () => {
+    const api = installStudyApi([aspnet], {
+      goals: { projects: [todo] },
+      content: { topics: [lesson()] },
+    });
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(startTimer(aspnet, 'p1', 25 * MIN, Date.now() - 2 * MIN, ['di'], part)),
+    );
+    renderPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Durdur' }));
+
+    expect(await screen.findByRole('button', { name: 'Başlat' })).toBeInTheDocument();
+    expect(api.goalsApi.sessions).toEqual([
+      expect.objectContaining({ completed: false, note: null }),
+    ]);
+    expect(marks(api)).toEqual([]);
+    expect(screen.queryByRole('button', { name: /^Sonraki parça/ })).not.toBeInTheDocument();
+  });
+
+  it('starts the next unfinished part with the same goal, project and tags', async () => {
+    await finished();
+    save();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Sonraki parça: Testing' }));
+
+    await waitFor(() =>
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
+        status: 'running',
+        goalId: 'a',
+        projectId: 'p1',
+        tags: ['di'],
+        lessonPart: { slug: 'di', partId: 'di-3', title: 'Testing' },
+      }),
+    );
+    expect(screen.queryByRole('button', { name: /^Sonraki parça/ })).not.toBeInTheDocument();
+  });
+
+  it('still offers the next part after a break', async () => {
+    await finished();
+    save();
+
+    await screen.findByRole('button', { name: 'Sonraki parça: Testing' });
+    fireEvent.click(screen.getByRole('button', { name: /^Molaya başla/ }));
+    expect(screen.queryByRole('button', { name: /^Sonraki parça/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Molayı bitir' }));
+
+    expect(screen.getByRole('button', { name: 'Sonraki parça: Testing' })).toBeInTheDocument();
+  });
+
+  it('offers nothing after the last part', async () => {
+    const api = await finished({}, { ...part, partId: 'di-4', title: 'Scopes' });
+
+    save();
+
+    await waitFor(() => expect(marks(api)).toHaveLength(1));
+    await screen.findByRole('button', { name: /^Molaya başla/ });
+    expect(screen.queryByRole('button', { name: /^Sonraki parça/ })).not.toBeInTheDocument();
   });
 });
 
@@ -472,13 +670,16 @@ describe('PomodoroPage shortcut', () => {
     pressShortcut();
 
     expect(await screen.findByRole('button', { name: 'Duraklat' })).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
-      status: 'running',
-      kind: 'focus',
-      goalId: 'a',
-      projectId: 'p1',
-      tags: ['di'],
-    });
+    // The provider stores the timer in an effect, after the button shows.
+    await waitFor(() =>
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
+        status: 'running',
+        kind: 'focus',
+        goalId: 'a',
+        projectId: 'p1',
+        tags: ['di'],
+      }),
+    );
     expect(goalSelect()).toHaveValue('a');
   });
 

@@ -39,6 +39,47 @@ describe('LearningPage', () => {
     expect(link.closest('li')).toHaveTextContent('2 parça');
   });
 
+  it('imports through the lesson plan panel and keeps the summary', async () => {
+    installFakeContentApi({
+      importTopic: fakeTopic(
+        { type: 'lesson', slug: 'di', topic: 'Dependency injection', level: 'beginner' },
+        [{ title: 'Why DI', summary: 's', body: 'b' }],
+      ),
+    });
+    renderPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ders planı' }));
+    expect(screen.getByRole('heading', { name: 'Ders planı' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'İçe aktar' })).toHaveLength(1);
+
+    fireEvent.change(screen.getByLabelText('İçe aktarılacak JSON'), { target: { value: '{}' } });
+    fireEvent.click(screen.getByRole('button', { name: 'İçe aktar' }));
+
+    expect(await screen.findByRole('link', { name: 'Dependency injection' })).toBeInTheDocument();
+    expect(screen.getByText(/1 öğe eklendi/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ders planı' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    // The new lesson is now offered as a topic to continue.
+    expect(document.querySelector('datalist option')).toHaveValue('Dependency injection');
+  });
+
+  it('opens one panel at a time', async () => {
+    installFakeContentApi({
+      topics: [fakeTopic({ type: 'lesson', slug: 'di', topic: 'DI', level: 'advanced' })],
+    });
+    renderPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ders planı' }));
+    fireEvent.click(screen.getByRole('button', { name: 'İçerik ekle' }));
+    expect(screen.queryByRole('heading', { name: 'Ders planı' })).not.toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Promptu kopyala' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ders planı' }));
+    expect(screen.queryByRole('button', { name: 'Promptu kopyala' })).not.toBeInTheDocument();
+  });
+
   it('counts done parts', async () => {
     installFakeContentApi({
       topics: [
