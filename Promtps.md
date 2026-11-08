@@ -855,3 +855,17 @@ Implement the spec in specs/2026-11-09-style-prompt/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 11.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `Modules/Posts/` (`StyleService`, `GET`/`PUT /api/posts/style`, `style.json` with the last 10 versions); sidebar item Gönderiler (`/posts`) with the style box, the English and Turkish examples (`prompts/style-example-*.md`) and the version history; one flaky Pomodoro test fixed; tech-stack and specs updated; phase 11.1 done.
+
+## 2026-11-09 – Plan phase 11.2 drafts from a project
+**Phase:** 11.2 Drafts from a project
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 11.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-09-project-drafts/` (`requirements.md`, `plan.md`, `validation.md`).
