@@ -91,7 +91,7 @@ public sealed class PostContextServiceTests : IDisposable
             Note page "DI notes":
             Scoped lives per request.
             """.ReplaceLineEndings("\n"),
-            context.Text.ReplaceLineEndings("\n"));
+            context.Text);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class PostContextServiceTests : IDisposable
 
         var context = await Build();
 
-        Assert.Equal("Project: Todo API\nGoal: Learn ASP.NET Core", context.Text.ReplaceLineEndings("\n"));
+        Assert.Equal("Project: Todo API\nGoal: Learn ASP.NET Core", context.Text);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public sealed class PostContextServiceTests : IDisposable
         var context = await Build(page);
 
         Assert.Contains(": n51", context.Text, StringComparison.Ordinal);
-        Assert.DoesNotContain(": n1\n", context.Text.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+        Assert.DoesNotContain(": n1\n", context.Text, StringComparison.Ordinal);
         Assert.Contains(new string('a', PostContextService.MaxPageText) + "…", context.Text, StringComparison.Ordinal);
         Assert.DoesNotContain(new string('a', PostContextService.MaxPageText + 1), context.Text, StringComparison.Ordinal);
     }

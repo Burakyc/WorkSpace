@@ -66,7 +66,7 @@ public sealed class PostContextService(
             text.AppendLine(pageText.Length > MaxPageText ? pageText[..MaxPageText] + "…" : pageText);
         }
 
-        return new DraftContext(project.Title, text.ToString().TrimEnd());
+        return new DraftContext(project.Title, text.ToString().TrimEnd().ReplaceLineEndings("\n"));
     }
 
     private async Task<List<NoteNode>> FindPagesAsync(IReadOnlyList<string> ids, CancellationToken cancellationToken)
