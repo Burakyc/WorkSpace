@@ -13,6 +13,7 @@ public static class ContentModule
     {
         services.AddSingleton<ImportService>();
         services.AddSingleton<ContentService>();
+        services.AddSingleton<InboxService>();
         return services;
     }
 }

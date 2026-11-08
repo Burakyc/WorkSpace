@@ -78,6 +78,21 @@ public static partial class ImportValidator
         }
     }
 
+    /// <summary>The <c>type</c> of a JSON object (a surrounding fence is ignored), or null when there is none to read.</summary>
+    public static string? ReadType(string text)
+    {
+        try
+        {
+            return JsonNode.Parse(BlankFence(text)) is JsonObject root
+                && root["type"] is JsonValue value
+                && value.TryGetValue<string>(out var type) ? type : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
     private static ValidatedImport Fail(int? line, string message) => new(null, [new ImportError("", line, message)]);
 
     /// <summary>Replaces a surrounding code fence with spaces, keeping every line break, so line numbers stay right.</summary>

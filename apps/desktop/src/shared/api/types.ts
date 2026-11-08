@@ -133,6 +133,21 @@ export type AiModes = Record<AiModule, AiMode>;
 /** Each module's inbox folder for the file mode; null when none is chosen. */
 export type AiInbox = Record<AiModule, string | null>;
 
+/** POST /api/inbox/{module}/scan. No errors means the file can be imported. */
+export interface InboxFile {
+  name: string;
+  errors: ImportError[];
+}
+
+export interface InboxScan {
+  /** Null when no folder is chosen. */
+  folder: string | null;
+  error: string | null;
+  files: InboxFile[];
+  /** Files of another content type, left alone. */
+  otherTypeCount: number;
+}
+
 /** GET /api/settings. */
 export interface AppSettings {
   pomodoro: PomodoroSettings;
