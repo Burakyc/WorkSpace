@@ -8,6 +8,7 @@ import {
   resumeTimer,
   startBreak,
   startTimer,
+  type LessonPartRef,
   type TimerState,
 } from './timer';
 
@@ -25,6 +26,7 @@ export interface Pomodoro {
     projectId: string | null,
     tags: string[],
     durationMs: number,
+    lessonPart?: LessonPartRef | null,
   ): void;
   startBreak(
     kind: 'shortBreak' | 'longBreak',
@@ -127,9 +129,9 @@ export function PomodoroProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       now,
-      start(goal, projectId, tags, durationMs) {
+      start(goal, projectId, tags, durationMs, lessonPart = null) {
         const t = Date.now();
-        const next = startTimer(goal, projectId, durationMs, t, tags);
+        const next = startTimer(goal, projectId, durationMs, t, tags, lessonPart);
         setNow(t);
         setState(next);
         scheduleEnd(next);
