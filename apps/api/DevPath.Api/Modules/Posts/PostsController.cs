@@ -10,6 +10,9 @@ public sealed class PostsController(StyleService style, PostDraftService drafts,
     public Task<LinkRead> ReadLink(LinkReadInput input, CancellationToken cancellationToken) =>
         links.ReadAsync(input, cancellationToken);
 
+    [HttpPost("link/context")]
+    public DraftContext LinkContext(LinkContextInput input) => LinkAnalysisService.Build(input);
+
     [HttpPost("project-context")]
     public Task<DraftContext> ProjectContext(ProjectContextInput input, CancellationToken cancellationToken) =>
         contexts.BuildAsync(input, cancellationToken);
