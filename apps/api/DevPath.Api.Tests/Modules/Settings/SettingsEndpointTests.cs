@@ -90,6 +90,8 @@ public class SettingsEndpointTests
 
         var saved = await client.PutAsJsonAsync("/api/settings/ai-provider", new { provider = "gemini" });
         Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        Assert.Equal("application/json", saved.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("gemini", JsonDocument.Parse(await saved.Content.ReadAsStringAsync()).RootElement.GetProperty("provider").GetString());
         var settings = JsonDocument.Parse(await client.GetStringAsync("/api/settings")).RootElement;
         Assert.Equal("gemini", settings.GetProperty("aiProvider").GetString());
 

@@ -26,6 +26,6 @@ public sealed class SettingsController(SettingsService settings) : ControllerBas
         settings.SaveAiInboxAsync(module, input.Folder, cancellationToken);
 
     [HttpPut("ai-provider")]
-    public Task<string> SaveAiProvider(AiProviderInput input, CancellationToken cancellationToken) =>
-        settings.SaveAiProviderAsync(input.Provider, cancellationToken);
+    public async Task<AiProviderInput> SaveAiProvider(AiProviderInput input, CancellationToken cancellationToken) =>
+        new(await settings.SaveAiProviderAsync(input.Provider, cancellationToken));
 }

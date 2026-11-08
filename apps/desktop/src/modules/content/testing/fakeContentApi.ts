@@ -141,7 +141,7 @@ export function installFakeContentApi(
       if (method === 'GET') return Promise.resolve(json({ aiModes, aiInbox, aiProvider }));
       if (pathname.endsWith('/ai-provider')) {
         aiProvider = (body as { provider: AiProviderId }).provider;
-        return Promise.resolve(json(aiProvider));
+        return Promise.resolve(json({ provider: aiProvider }));
       }
       if (pathname.includes('/ai-inbox/')) {
         const owner = pathname.split('/').pop() as AiModule;

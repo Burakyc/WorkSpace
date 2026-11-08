@@ -78,7 +78,7 @@ export interface ApiClient {
   saveAiMode(module: AiModule, mode: AiMode): Promise<AiModes>;
   saveAiInbox(module: AiModule, folder: string | null): Promise<AiInbox>;
   listAiProviders(): Promise<AiProviderInfo[]>;
-  saveAiProvider(provider: AiProviderId): Promise<AiProviderId>;
+  saveAiProvider(provider: AiProviderId): Promise<{ provider: AiProviderId }>;
   /** One paid call; only a user's confirmation may send it. */
   runAi(provider: AiProviderId, type: ContentType, prompt: string): Promise<AiRunResult>;
   scanInbox(module: AiModule, type: ContentType): Promise<InboxScan>;
@@ -210,7 +210,7 @@ export function createApiClient(
       request<AiInbox>('PUT', `/api/settings/ai-inbox/${module}`, { folder }),
     listAiProviders: () => request<AiProviderInfo[]>('GET', '/api/ai/providers'),
     saveAiProvider: (provider) =>
-      request<AiProviderId>('PUT', '/api/settings/ai-provider', { provider }),
+      request<{ provider: AiProviderId }>('PUT', '/api/settings/ai-provider', { provider }),
     runAi: (provider, type, prompt) =>
       request<AiRunResult>('POST', '/api/ai/run', { provider, type, prompt }),
     scanInbox: (module, type) => request<InboxScan>('POST', `/api/inbox/${module}/scan`, { type }),

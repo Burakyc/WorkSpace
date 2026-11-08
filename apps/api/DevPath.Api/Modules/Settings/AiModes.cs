@@ -19,5 +19,5 @@ public sealed record AiModeInput(string? Mode);
 /// <summary>PUT /api/settings/ai-inbox/{module}. Null or empty clears the folder.</summary>
 public sealed record AiInboxInput(string? Folder);
 
-/// <summary>PUT /api/settings/ai-provider.</summary>
+/// <summary>PUT /api/settings/ai-provider, request and answer: a bare string would go out as text/plain, which the client can't read.</summary>
 public sealed record AiProviderInput(string? Provider);
