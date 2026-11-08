@@ -779,4 +779,4 @@ Implement the spec in specs/2026-11-08-ai-mode-setting/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 9.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `aiModes` section in `settings.json` with `PUT /api/settings/ai-modes/{module}`; `modules/ai/` (`AiContentPanel`, `AiModeSelect`, `useAiMode`, lists); the topic lists add content through the panel; Ayarlar → "Yapay zekâ modları"; file and API listed but disabled; tech-stack and specs updated; phase 9.1 done.

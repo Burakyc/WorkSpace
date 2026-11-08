@@ -6,9 +6,9 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 9.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Each of İngilizce, Öğrenme and Mülakat has an AI mode setting: copy-paste (default), file import, API.
-- [ ] The mode is shown and can be changed in Ayarlar and in the module's panel; not-yet-built modes are disabled.
-- [ ] Copy-paste mode is the 5.1 flow, in every place AI content is used.
+- [x] Each of İngilizce, Öğrenme and Mülakat has an AI mode setting: copy-paste (default), file import, API.
+- [x] The mode is shown and can be changed in Ayarlar and in the module's panel; not-yet-built modes are disabled.
+- [x] Copy-paste mode is the 5.1 flow, in every place AI content is used.
 
 ## Automated tests
 
@@ -43,7 +43,7 @@ Never on the real `%APPDATA%\DevPath\data`. Use a temporary user-data folder wit
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M5 done with the expected results
-- [ ] `roadmap.md` phase 9.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M5 done with the expected results
+- [x] `roadmap.md` phase 9.1 ticked and set to `done`
