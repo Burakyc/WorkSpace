@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { linkAnalysisTemplate, promptTemplates } from '../content/prompts';
 import { buildDraftPrompt } from './buildDraftPrompt';
 
 describe('buildDraftPrompt', () => {
   it('fills the placeholders', () => {
-    const prompt = buildDraftPrompt({
+    const prompt = buildDraftPrompt(promptTemplates.post, {
       topic: 'Todo API',
       style: 'Be short.',
       source: 'Project: X',
@@ -15,16 +16,38 @@ describe('buildDraftPrompt', () => {
     expect(prompt).not.toContain('{{');
   });
 
+  it('fills the link template', () => {
+    const prompt = buildDraftPrompt(linkAnalysisTemplate, {
+      topic: 'How DI works',
+      style: 'Be short.',
+      source: '{ "url": "https://x.test" }',
+    });
+
+    expect(prompt.startsWith('Topic: How DI works\n')).toBe(true);
+    expect(prompt).toContain('<analysis>\n{ "url": "https://x.test" }\n</analysis>');
+    expect(prompt).not.toContain('{{');
+  });
+
   it('marks an empty style', () => {
-    expect(buildDraftPrompt({ topic: 'T', style: '', source: 'S' })).toContain(
-      '<style>\n(none)\n</style>',
-    );
+    expect(
+      buildDraftPrompt(promptTemplates.post, { topic: 'T', style: '', source: 'S' }),
+    ).toContain('<style>\n(none)\n</style>');
   });
 
   it('leaves placeholders and $ patterns inside values alone', () => {
-    const prompt = buildDraftPrompt({ topic: 'T', style: '$&', source: 'Note: {{style}}' });
+    const prompt = buildDraftPrompt(promptTemplates.post, {
+      topic: 'T',
+      style: '$&',
+      source: 'Note: {{style}}',
+    });
 
     expect(prompt).toContain('<style>\n$&\n</style>');
     expect(prompt).toContain('<source>\nNote: {{style}}\n</source>');
+  });
+
+  it('makes line ends LF', () => {
+    expect(buildDraftPrompt('a\r\nb {{topic}}', { topic: 'T', style: '', source: '' })).toBe(
+      'a\nb T',
+    );
   });
 });

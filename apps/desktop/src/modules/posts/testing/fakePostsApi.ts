@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import type {
   Goal,
   ImportReport,
+  LinkRead,
   NoteNode,
   PostDraft,
   PostDraftInput,
@@ -34,6 +35,12 @@ export function installFakePostsApi(
     failContext?: boolean;
     /** Answer of POST /api/import. */
     importReport?: ImportReport;
+    /** Answer of POST /api/posts/link/read. */
+    linkRead?: LinkRead;
+    failLinkRead?: boolean;
+    linkReadErrors?: Record<string, string[]>;
+    linkContextErrors?: Record<string, string[]>;
+    failLinkContext?: boolean;
   } = {},
 ) {
   const requests: { method: string; path: string; body: unknown }[] = [];
@@ -98,6 +105,20 @@ export function installFakePostsApi(
       if (options.failContext) return Promise.resolve(json({}, 500));
       const title = options.projects?.[0]?.title;
       return Promise.resolve(json({ topic: title, text: `Project: ${title}` }));
+    }
+    if (pathname === '/api/posts/link/read') {
+      if (options.linkReadErrors) {
+        return Promise.resolve(json({ errors: options.linkReadErrors }, 400));
+      }
+      return Promise.resolve(options.failLinkRead ? json({}, 500) : json(options.linkRead));
+    }
+    if (pathname === '/api/posts/link/context') {
+      if (options.linkContextErrors) {
+        return Promise.resolve(json({ errors: options.linkContextErrors }, 400));
+      }
+      if (options.failLinkContext) return Promise.resolve(json({}, 500));
+      const { title } = body as { title: string };
+      return Promise.resolve(json({ topic: title, text: 'link analysis' }));
     }
     if (pathname === '/api/import') {
       return Promise.resolve(json({ errors: [], report: options.importReport ?? null }));

@@ -186,6 +186,24 @@ export interface DraftContext {
   text: string;
 }
 
+/** POST /api/posts/link/read. `error` says why nothing could be read; the user then fills in the fields. */
+export interface LinkRead {
+  url: string;
+  source: 'youtube' | 'page';
+  title: string | null;
+  author: string | null;
+  description: string | null;
+  error: string | null;
+}
+
+export interface LinkContextInput {
+  url: string;
+  title: string;
+  author: string;
+  description: string;
+  note: string;
+}
+
 export type PostDraftInput = Pick<
   PostDraft,
   'title' | 'body' | 'hashtags' | 'sourceLink' | 'imageSuggestion'

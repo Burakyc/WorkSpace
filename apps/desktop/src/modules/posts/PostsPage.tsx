@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DraftList } from './DraftList';
+import { LinkDraftSection } from './LinkDraftSection';
 import styles from './Posts.module.css';
 import { ProjectDraftSection } from './ProjectDraftSection';
 import { StylePromptSection } from './StylePromptSection';
@@ -8,6 +9,7 @@ import { StylePromptSection } from './StylePromptSection';
 export function PostsPage() {
   const [draftsVersion, setDraftsVersion] = useState(0);
   const [styleVersion, setStyleVersion] = useState(0);
+  const reloadDrafts = () => setDraftsVersion((version) => version + 1);
   return (
     <div className={styles.page}>
       <header className={styles.section}>
@@ -16,10 +18,8 @@ export function PostsPage() {
           Burada yalnızca taslak hazırlanır. Uygulama hiçbir platformda paylaşım yapmaz.
         </p>
       </header>
-      <ProjectDraftSection
-        styleVersion={styleVersion}
-        onImported={() => setDraftsVersion((version) => version + 1)}
-      />
+      <LinkDraftSection styleVersion={styleVersion} onImported={reloadDrafts} />
+      <ProjectDraftSection styleVersion={styleVersion} onImported={reloadDrafts} />
       <DraftList version={draftsVersion} />
       <StylePromptSection onSaved={() => setStyleVersion((version) => version + 1)} />
     </div>

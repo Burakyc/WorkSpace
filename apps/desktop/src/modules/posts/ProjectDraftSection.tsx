@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { getApiClient } from '../../shared/api/getApiClient';
 import type { Goal, ImportReport, Project } from '../../shared/api/types';
 import form from '../../shared/ui/form.module.css';
+import { promptTemplates } from '../content/prompts';
 import { buildDraftPrompt } from './buildDraftPrompt';
 import { DraftPromptPanel } from './DraftPromptPanel';
 import { NotePagePicker } from './NotePagePicker';
@@ -58,7 +59,7 @@ export function ProjectDraftSection({
           if (!active) return;
           setContextFailed(false);
           setBuilt({
-            prompt: buildDraftPrompt({
+            prompt: buildDraftPrompt(promptTemplates.post, {
               topic: context.topic,
               style: style.text,
               source: context.text,
