@@ -804,4 +804,4 @@ Implement the spec in specs/2026-11-08-file-import-mode/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 9.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `aiInbox` section in `settings.json` with `PUT /api/settings/ai-inbox/{module}`; `InboxService` with `POST /api/inbox/{module}/scan` and `/import` (only names from the folder listing, `.errors.txt` reports, merge then move to `done/` with a timestamp on a clash); `settings.pickFolder`; `FileImportBody` and `InboxFolderField` in the panel and Ayarlar; `file` mode enabled; tech-stack and specs updated; phase 9.2 done.

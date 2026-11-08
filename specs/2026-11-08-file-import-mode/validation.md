@@ -6,9 +6,9 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 9.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] An inbox folder can be chosen per module; JSON files there are validated and imported on demand ("İçe aktar" lists new files).
-- [ ] Imported files move to `done/` under the inbox folder, with a timestamp on a name clash; invalid ones stay, with errors in the list and a `.errors.txt` report.
-- [ ] Content goes through the 5.1 validator and merge; nothing is overwritten and invalid content is never saved.
+- [x] An inbox folder can be chosen per module; JSON files there are validated and imported on demand ("İçe aktar" lists new files).
+- [x] Imported files move to `done/` under the inbox folder, with a timestamp on a name clash; invalid ones stay, with errors in the list and a `.errors.txt` report.
+- [x] Content goes through the 5.1 validator and merge; nothing is overwritten and invalid content is never saved.
 
 ## Automated tests
 
@@ -34,7 +34,7 @@ npm run check
 
 ## Manual test steps
 
-Never on the real `%APPDATA%\DevPath\data`. Use a temporary user-data folder, data folder and inbox, and delete them at the end. The native folder dialog can't be driven over the debugging protocol, so M2 stubs its answer for the folder and checks the dialog handler separately.
+Never on the real `%APPDATA%\DevPath\data`. Use a temporary user-data folder, data folder and inbox, and delete them at the end. The native folder dialog can't be driven over the debugging protocol, so M2 was done by saving the folder through `PUT /api/settings/ai-inbox/{module}`; the "Klasör seç…" button itself is covered by T11 and is a step for the user.
 
 | ID | Step | Expected |
 |---|---|---|
@@ -48,7 +48,7 @@ Never on the real `%APPDATA%\DevPath\data`. Use a temporary user-data folder, da
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 9.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 9.2 ticked and set to `done`

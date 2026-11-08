@@ -229,9 +229,9 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Per-module AI mode setting: copy-paste (default), file import, API.
 - [x] Copy-paste mode reuses the 5.1 flow everywhere AI content is used.
 
-#### 9.2 File import mode — `todo`
-- [ ] Choose an inbox folder; JSON files dropped there are validated and imported on demand ("İçe aktar" button lists new files).
-- [ ] Imported files move to `inbox/done/`; invalid ones stay with an error report.
+#### 9.2 File import mode — `done`
+- [x] Choose an inbox folder (one per module); JSON files dropped there are validated and imported on demand ("İçe aktar" button lists new files).
+- [x] Imported files move to `done/` inside the inbox folder; invalid ones stay with an error report.
 
 #### 9.3 API mode — `todo`
 - [ ] AI API key stored with `safeStorage`; the API process calls the provider and feeds the output through the same validator and merge.
