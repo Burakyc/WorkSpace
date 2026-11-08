@@ -6,11 +6,11 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 11.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Picking a project builds a prompt from the project, its sessions and notes and the style prompt.
-- [ ] A draft has title, body, hashtags, source link and image suggestion, and is saved in `posts.json`.
-- [ ] Invalid AI output is never saved, in any AI mode.
-- [ ] "Kopyala" copies the text. There is no post button and no LinkedIn API call.
-- [ ] Drafts can be edited and deleted.
+- [x] Picking a project builds a prompt from the project, its sessions and notes and the style prompt.
+- [x] A draft has title, body, hashtags, source link and image suggestion, and is saved in `posts.json`.
+- [x] Invalid AI output is never saved, in any AI mode.
+- [x] "Kopyala" copies the text. There is no post button and no LinkedIn API call.
+- [x] Drafts can be edited and deleted.
 
 ## Automated tests
 
@@ -55,7 +55,7 @@ In the dev app (`%APPDATA%\DevPath\dev-data`). Delete only what the test created
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M10 done with the expected results
-- [ ] `roadmap.md` phase 11.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M10 done with the expected results
+- [x] `roadmap.md` phase 11.2 ticked and set to `done`

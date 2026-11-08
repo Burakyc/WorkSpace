@@ -33,6 +33,15 @@ The user picks a project on Gönderiler; the app builds a prompt from the projec
 | AI mode | A fourth row, "Gönderiler", in Ayarlar → "Yapay zekâ modları"; default copy-paste. |
 | Showing the prompt | The prompt carries the user's own notes, so it can be read in "Hazırlanan prompt" before it is copied or sent. |
 
+### Deviations found while implementing
+
+| Topic | What happened |
+|---|---|
+| Commit split | The controller routes of task 2 landed in task 3's commit (a staging mistake), so `feat(posts): list, edit and delete drafts` has tests whose routes come one commit later. History is not rewritten. |
+| Line ends, found in M3 | The source text used CRLF from `AppendLine`, and a checkout can give the template CRLF, so the copied prompt differed from the box. Both are LF now (separate `fix(posts)` commit). |
+| New file | `DraftPromptPanel` (the empty-style note, the prompt preview and the AI panel) is split from `ProjectDraftSection` so 11.3 can reuse it. |
+| Key for M8 | A made-up key in `safeStorage` against the local stub, removed afterwards. No real key and no paid call. |
+
 ## User stories
 
 1. **As the user**, I pick "Todo API" on Gönderiler, tick a note page, copy the prompt, paste the AI's JSON back, and a draft appears.

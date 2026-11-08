@@ -879,4 +879,4 @@ Implement the spec in specs/2026-11-09-project-drafts/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 11.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `schemas/post.schema.json`, `prompts/post.md`, content type `post` saved in `posts.json` (`PostDraftImport`, titles never overwritten); `PostDraftService` with `GET`, `PUT`, `DELETE /api/posts/drafts`; `POST /api/posts/project-context`; `posts` AI module; "Projeden taslak" (project, note pages, prompt preview, `AiContentPanel`) and "Taslaklar" (Kopyala, edit, delete) on Gönderiler; no post button, no LinkedIn call; validated in all three AI modes against a local stub, no paid call; one fix; tech-stack and specs updated; phase 11.2 done.
