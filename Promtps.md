@@ -780,3 +780,17 @@ Implement the spec in specs/2026-11-08-lesson-plan/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 10.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `prompts/lesson-plan.md` and `buildLessonPlanPrompt`; `LessonPlanPanel` on Öğrenme (topic with existing-lesson suggestions, level, part count, language, background) with the usual import box; optional `extra` on `TopicListPage`, `getText`/`label`/`disabled` on `CopyPromptButton`; copy-paste mode only, no API change; tech-stack and specs updated; phase 10.1 done.
+
+## 2026-11-08 – Plan phase 10.2 study with the teacher
+**Phase:** 10.2 Study with the teacher
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 10.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-08-study-with-teacher/` (`requirements.md`, `plan.md`, `validation.md`).
