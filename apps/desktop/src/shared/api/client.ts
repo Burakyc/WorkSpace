@@ -6,6 +6,7 @@ import type {
   AiModes,
   AiModule,
   AppSettings,
+  InboxImportResult,
   InboxScan,
   CalendarMonth,
   DevStatus,
@@ -74,6 +75,11 @@ export interface ApiClient {
   saveAiMode(module: AiModule, mode: AiMode): Promise<AiModes>;
   saveAiInbox(module: AiModule, folder: string | null): Promise<AiInbox>;
   scanInbox(module: AiModule, type: ContentType): Promise<InboxScan>;
+  importInbox(
+    module: AiModule,
+    type: ContentType,
+    names: string[],
+  ): Promise<{ results: InboxImportResult[] }>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
   getDay(date: string, timeZone: string): Promise<DayDetail>;
@@ -196,6 +202,11 @@ export function createApiClient(
     saveAiInbox: (module, folder) =>
       request<AiInbox>('PUT', `/api/settings/ai-inbox/${module}`, { folder }),
     scanInbox: (module, type) => request<InboxScan>('POST', `/api/inbox/${module}/scan`, { type }),
+    importInbox: (module, type, names) =>
+      request<{ results: InboxImportResult[] }>('POST', `/api/inbox/${module}/import`, {
+        type,
+        names,
+      }),
     getCalendar: (month, timeZone) =>
       request<CalendarMonth>(
         'GET',

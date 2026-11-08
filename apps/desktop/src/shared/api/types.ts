@@ -148,6 +148,14 @@ export interface InboxScan {
   otherTypeCount: number;
 }
 
+/** One file of POST /api/inbox/{module}/import. */
+export interface InboxImportResult {
+  name: string;
+  report: ImportReport | null;
+  errors: ImportError[];
+  moved: boolean;
+}
+
 /** GET /api/settings. */
 export interface AppSettings {
   pomodoro: PomodoroSettings;

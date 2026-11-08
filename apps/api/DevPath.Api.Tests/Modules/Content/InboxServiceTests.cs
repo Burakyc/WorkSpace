@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Nodes;
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
 using DevPath.Api.Modules.Content;
@@ -16,8 +17,10 @@ public sealed class InboxServiceTests : IDisposable
 
     public InboxServiceTests()
     {
-        _settings = new SettingsService(new JsonFileStore(new DataDirectory(_data.Path)));
-        _service = new InboxService(_settings);
+        var store = new JsonFileStore(new DataDirectory(_data.Path));
+        _settings = new SettingsService(store);
+        var time = new FixedTimeProvider(new DateTimeOffset(2026, 11, 8, 14, 30, 5, TimeSpan.Zero));
+        _service = new InboxService(_settings, new ImportService(store, time), time);
     }
 
     public void Dispose()
@@ -119,5 +122,107 @@ public sealed class InboxServiceTests : IDisposable
         await ScanAsync();
 
         Assert.False(File.Exists(_inbox.File("bad.json.errors.txt")));
+    }
+
+    private async Task<InboxImport> ImportAsync(params string[] names)
+    {
+        await _settings.SaveAiInboxAsync("english", _inbox.Path, default);
+        return await _service.ImportAsync("english", "vocab", names, default);
+    }
+
+    [Fact]
+    public async Task Imports_a_valid_file_and_moves_it_to_done()
+    {
+        Drop("a.json", ImportSamples.Vocab(terms: ["follow up on"]));
+        Drop("a.json.errors.txt", "old");
+
+        var result = Assert.Single((await ImportAsync("a.json")).Results);
+
+        Assert.True(result.Moved);
+        Assert.Equal(1, result.Report!.Added);
+        Assert.Empty(result.Errors);
+        Assert.False(File.Exists(_inbox.File("a.json")));
+        Assert.False(File.Exists(_inbox.File("a.json.errors.txt")));
+        Assert.True(File.Exists(_inbox.File("done/a.json")));
+        Assert.True(File.Exists(_data.File("content/english/phrasal-verbs-for-meetings.json")));
+    }
+
+    [Fact]
+    public async Task Merges_into_an_existing_topic_without_touching_old_items()
+    {
+        Drop("a.json", ImportSamples.Vocab(terms: ["follow up on"]));
+        await ImportAsync("a.json");
+        var topic = _data.File("content/english/phrasal-verbs-for-meetings.json");
+        var firstId = JsonNode.Parse(File.ReadAllText(topic))!["items"]![0]!["id"]!.GetValue<string>();
+
+        Drop("b.json", ImportSamples.Vocab(terms: ["follow up on", "touch base"]));
+        var result = Assert.Single((await ImportAsync("b.json")).Results);
+
+        Assert.Equal(1, result.Report!.Added);
+        Assert.Equal(1, result.Report.Skipped);
+        var items = JsonNode.Parse(File.ReadAllText(topic))!["items"]!.AsArray();
+        Assert.Equal(2, items.Count);
+        Assert.Equal(firstId, items[0]!["id"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task An_invalid_file_stays_with_its_report_and_the_others_still_import()
+    {
+        Drop("bad.json", "{\n  oops\n}");
+        Drop("good.json", ImportSamples.Vocab());
+
+        var results = (await ImportAsync("bad.json", "good.json")).Results;
+
+        Assert.Null(results[0].Report);
+        Assert.False(results[0].Moved);
+        Assert.NotEmpty(results[0].Errors);
+        Assert.True(File.Exists(_inbox.File("bad.json")));
+        Assert.True(File.Exists(_inbox.File("bad.json.errors.txt")));
+        Assert.True(results[1].Moved);
+    }
+
+    [Theory]
+    [InlineData("../x.json")]
+    [InlineData("..\\x.json")]
+    [InlineData("sub/x.json")]
+    [InlineData("x.txt")]
+    [InlineData("missing.json")]
+    public async Task Refuses_any_name_outside_the_folder_listing(string name)
+    {
+        Directory.CreateDirectory(_inbox.File("sub"));
+        Drop("sub/x.json", ImportSamples.Vocab());
+        Drop("x.txt", ImportSamples.Vocab());
+        File.WriteAllText(Path.Combine(_inbox.Path, "..", "x.json"), ImportSamples.Vocab());
+
+        try
+        {
+            var result = Assert.Single((await ImportAsync(name)).Results);
+
+            Assert.Equal("Dosya bulunamadı.", result.Errors[0].Message);
+            Assert.Null(result.Report);
+            Assert.False(Directory.Exists(_data.File("content")));
+        }
+        finally
+        {
+            File.Delete(Path.Combine(_inbox.Path, "..", "x.json"));
+        }
+    }
+
+    [Fact]
+    public async Task A_name_clash_in_done_gets_a_timestamp_and_never_overwrites()
+    {
+        Directory.CreateDirectory(_inbox.File("done"));
+        Drop("done/a.json", "first");
+        var stamp = new DateTimeOffset(2026, 11, 8, 14, 30, 5, TimeSpan.Zero).ToLocalTime();
+        var stamped = $"a-{stamp:yyyyMMdd-HHmmss}";
+
+        Drop("a.json", ImportSamples.Vocab());
+        await ImportAsync("a.json");
+        Drop("a.json", ImportSamples.Vocab());
+        await ImportAsync("a.json");
+
+        Assert.Equal("first", File.ReadAllText(_inbox.File("done/a.json")));
+        Assert.True(File.Exists(_inbox.File($"done/{stamped}.json")));
+        Assert.True(File.Exists(_inbox.File($"done/{stamped}-2.json")));
     }
 }
