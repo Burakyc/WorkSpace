@@ -1,3 +1,4 @@
+import { DraftList } from './DraftList';
 import styles from './Posts.module.css';
 import { StylePromptSection } from './StylePromptSection';
 
@@ -11,6 +12,7 @@ export function PostsPage() {
           Burada yalnızca taslak hazırlanır. Uygulama hiçbir platformda paylaşım yapmaz.
         </p>
       </header>
+      <DraftList version={0} />
       <StylePromptSection />
     </div>
   );

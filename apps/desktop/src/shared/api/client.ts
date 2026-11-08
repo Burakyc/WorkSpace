@@ -30,6 +30,8 @@ import type {
   NoteNode,
   NoteSearchResult,
   PomodoroSettings,
+  PostDraft,
+  PostDraftInput,
   ReminderSettings,
   Project,
   ProjectCreateInput,
@@ -91,6 +93,10 @@ export interface ApiClient {
   getStylePrompt(): Promise<StylePrompt>;
   /** Saves the text; a changed text moves the old one to the history. */
   saveStylePrompt(text: string): Promise<StylePrompt>;
+  /** Newest first. New drafts arrive through the import with type `post`. */
+  listDrafts(): Promise<PostDraft[]>;
+  saveDraft(id: string, input: PostDraftInput): Promise<PostDraft>;
+  deleteDraft(id: string): Promise<void>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
   getDay(date: string, timeZone: string): Promise<DayDetail>;
@@ -225,6 +231,10 @@ export function createApiClient(
       }),
     getStylePrompt: () => request<StylePrompt>('GET', '/api/posts/style'),
     saveStylePrompt: (text) => request<StylePrompt>('PUT', '/api/posts/style', { text }),
+    listDrafts: () => request<PostDraft[]>('GET', '/api/posts/drafts'),
+    saveDraft: (id, input) =>
+      request<PostDraft>('PUT', `/api/posts/drafts/${encodeURIComponent(id)}`, input),
+    deleteDraft: (id) => request<void>('DELETE', `/api/posts/drafts/${encodeURIComponent(id)}`),
     getCalendar: (month, timeZone) =>
       request<CalendarMonth>(
         'GET',

@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { StylePrompt } from '../../../shared/api/types';
+import type { PostDraft, PostDraftInput, StylePrompt } from '../../../shared/api/types';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -16,10 +16,15 @@ export function installFakePostsApi(
     failStyle?: boolean;
     failStyleSave?: boolean;
     styleError?: string;
+    drafts?: PostDraft[];
+    failDrafts?: boolean;
+    /** Field errors of PUT /api/posts/drafts/{id}. */
+    draftError?: Record<string, string[]>;
   } = {},
 ) {
   const requests: { method: string; path: string; body: unknown }[] = [];
   let style: StylePrompt = options.style ?? { text: '', updatedAt: null, history: [] };
+  const drafts: PostDraft[] = structuredClone(options.drafts ?? []);
 
   function styleRoute(method: string, body: unknown): Response {
     if (method === 'GET') return options.failStyle ? json({}, 500) : json(style);
@@ -38,18 +43,39 @@ export function installFakePostsApi(
     return json(style);
   }
 
+  function draftsRoute(method: string, id: string | undefined, body: unknown): Response {
+    if (options.failDrafts) return json({}, 500);
+    if (method === 'GET') return json(drafts);
+    const index = drafts.findIndex((draft) => draft.id === id);
+    if (method === 'PUT') {
+      if (options.draftError) return json({ errors: options.draftError }, 400);
+      const draft = drafts[index];
+      if (!draft) return notFound();
+      Object.assign(draft, body as PostDraftInput);
+      return json(draft);
+    }
+    if (index < 0) return notFound();
+    drafts.splice(index, 1);
+    return new Response(null, { status: 204 });
+  }
+
   const fetchFn = vi.fn<typeof fetch>((url, init) => {
     const { pathname } = new URL(String(url));
     const method = init?.method ?? 'GET';
     const body: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
     requests.push({ method, path: pathname, body });
     if (pathname === '/api/posts/style') return Promise.resolve(styleRoute(method, body));
+    if (pathname.startsWith('/api/posts/drafts')) {
+      return Promise.resolve(draftsRoute(method, pathname.split('/')[4], body));
+    }
     return Promise.resolve(notFound());
   });
 
+  const openExternal = vi.fn<(url: string) => Promise<void>>(() => Promise.resolve());
   vi.stubGlobal('devpath', {
     getApiConfig: () => Promise.resolve({ baseUrl: 'http://api.test', token: 't' }),
+    openExternal,
   });
   vi.stubGlobal('fetch', fetchFn);
-  return { fetchFn, requests };
+  return { fetchFn, requests, drafts, openExternal };
 }
