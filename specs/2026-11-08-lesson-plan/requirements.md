@@ -20,6 +20,7 @@ On Öğrenme, "Ders planı" opens a small form: the topic, its level, and option
 | Topic | Decision |
 |---|---|
 | AI mode | **Copy-paste through the 5.1 flow.** Phase 9.1 is not on `main` yet. The seam for the other modes is the split that already exists: `buildLessonPlanPrompt` gives the prompt, `ImportPanel` takes the answer. A later mode replaces the copy and paste steps and keeps both. |
+| AI modes (after 9.x reached `main`) | "Promptu oluştur" builds the prompt, then the shared `AiContentPanel` (module `learning`) runs it in the chosen mode: copy-paste, file import or API. This replaces "Plan promptunu kopyala" and the panel's own `ImportPanel`. The panel appears only after the prompt is built, and a form change hides it ("Form değişti; promptu yeniden oluştur."), so a stale prompt is never copied or sent. A prompt that cannot be built shows "Prompt oluşturulamadı.". |
 | Place | **A panel on Öğrenme.** "Ders planı" sits next to "İçerik ekle", and in the empty state. There is no new route. |
 | Form | Topic and level, plus **number of parts** (optional, 1–50), **language** (the last choice is remembered) and **what I know / my aim** (optional). |
 | Continuing a lesson | The topic box suggests the existing lessons. Choosing one fixes the level to the lesson's and adds its part titles to the prompt, so the AI does not repeat them. |

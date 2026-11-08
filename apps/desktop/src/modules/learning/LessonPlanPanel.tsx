@@ -5,10 +5,10 @@ import {
   type LessonItem,
   type TopicSummary,
 } from '../../shared/api/types';
+import buttons from '../../shared/ui/buttons.module.css';
 import form from '../../shared/ui/form.module.css';
+import { AiContentPanel } from '../ai/AiContentPanel';
 import styles from '../content/Content.module.css';
-import { CopyPromptButton } from '../content/CopyPromptButton';
-import { ImportPanel } from '../content/ImportPanel';
 import { levelLabel } from '../content/levelLabel';
 import { buildLessonPlanPrompt, type PlanLanguage } from './lessonPlanPrompt';
 
@@ -36,7 +36,7 @@ interface LessonPlanPanelProps {
   onImported(): void;
 }
 
-/** The AI teacher: a form that builds the prompt for a topic, and the import box for the AI's answer. */
+/** The AI teacher: a form that builds the prompt for a topic, then runs it through the Learning module's AI mode. */
 export function LessonPlanPanel({ topics, onImported }: LessonPlanPanelProps) {
   const id = useId();
   const [topic, setTopic] = useState('');
@@ -44,6 +44,10 @@ export function LessonPlanPanel({ topics, onImported }: LessonPlanPanelProps) {
   const [parts, setParts] = useState('');
   const [language, setLanguage] = useState(loadLanguage);
   const [background, setBackground] = useState('');
+  // The built prompt and the form values it was built from; it only applies while they still match.
+  const [built, setBuilt] = useState<{ inputs: string; prompt: string } | null>(null);
+  const [building, setBuilding] = useState(false);
+  const [buildFailed, setBuildFailed] = useState(false);
 
   const existing = topics.find((t) => t.topic === topic.trim());
   const partCount = parts === '' ? null : Number(parts);
@@ -63,6 +67,19 @@ export function LessonPlanPanel({ topics, onImported }: LessonPlanPanelProps) {
       focusMinutes: (settings?.pomodoro ?? DEFAULT_POMODORO_SETTINGS).focusMinutes,
       existingParts: lesson ? lesson.items.map((item) => item.title) : [],
     });
+  }
+
+  const inputs = JSON.stringify([topic.trim(), level, parts, language, background]);
+
+  function build() {
+    setBuilding(true);
+    setBuildFailed(false);
+    buildPrompt()
+      .then(
+        (prompt) => setBuilt({ inputs, prompt }),
+        () => setBuildFailed(true),
+      )
+      .finally(() => setBuilding(false));
   }
 
   return (
@@ -154,14 +171,33 @@ export function LessonPlanPanel({ topics, onImported }: LessonPlanPanelProps) {
             onChange={(event) => setBackground(event.target.value)}
           />
         </div>
-        <CopyPromptButton
-          type="lesson"
-          label="Plan promptunu kopyala"
-          disabled={topic.trim() === '' || !partsValid}
-          getText={buildPrompt}
-        />
+        <div>
+          <button
+            type="button"
+            className={buttons.primary}
+            disabled={topic.trim() === '' || !partsValid || building}
+            onClick={build}
+          >
+            Promptu oluştur
+          </button>
+        </div>
+        {buildFailed && (
+          <p role="alert" className={styles.error}>
+            Prompt oluşturulamadı.
+          </p>
+        )}
+        {built && built.inputs !== inputs && (
+          <p className={styles.muted}>Form değişti; promptu yeniden oluştur.</p>
+        )}
       </section>
-      <ImportPanel type="lesson" onImported={onImported} />
+      {built?.inputs === inputs && (
+        <AiContentPanel
+          module="learning"
+          type="lesson"
+          prompt={built.prompt}
+          onImported={() => onImported()}
+        />
+      )}
     </>
   );
 }

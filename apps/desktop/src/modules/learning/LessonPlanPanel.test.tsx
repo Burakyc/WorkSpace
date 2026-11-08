@@ -27,7 +27,7 @@ afterEach(() => {
 });
 
 /** Answers GET /api/settings on top of the fake content API. */
-function installApi(focusMinutes: number | null) {
+function installApi(focusMinutes: number | null, aiMode = 'copyPaste') {
   const fake = installFakeContentApi({
     topics: [
       fakeTopic({ type: 'lesson', slug: 'di', topic: 'DI', level: 'advanced' }, [
@@ -42,15 +42,16 @@ function installApi(focusMinutes: number | null) {
     return Promise.resolve(
       focusMinutes === null
         ? new Response('{}', { status: 500 })
-        : Response.json({ pomodoro: { focusMinutes } }),
+        : Response.json({ pomodoro: { focusMinutes }, aiModes: { learning: aiMode } }),
     );
   });
 }
 
-const copyButton = () => screen.getByRole('button', { name: 'Plan promptunu kopyala' });
+const buildButton = () => screen.getByRole('button', { name: 'Promptu oluştur' });
 
 async function copied(): Promise<string> {
-  fireEvent.click(copyButton());
+  fireEvent.click(buildButton());
+  fireEvent.click(await screen.findByRole('button', { name: 'Promptu kopyala' }));
   await screen.findByText('Kopyalandı.');
   return String(writeText.mock.calls[0]?.[0]);
 }
@@ -64,7 +65,7 @@ describe('LessonPlanPanel', () => {
     installApi(40);
     renderPanel();
 
-    expect(copyButton()).toBeDisabled();
+    expect(buildButton()).toBeDisabled();
     fireEvent.change(screen.getByLabelText('Konu'), { target: { value: 'Generics' } });
     fireEvent.change(screen.getByLabelText('Seviye'), { target: { value: 'intermediate' } });
     fireEvent.change(screen.getByLabelText('Parça sayısı (isteğe bağlı)'), {
@@ -98,7 +99,7 @@ describe('LessonPlanPanel', () => {
     fireEvent.change(screen.getByLabelText('Parça sayısı (isteğe bağlı)'), { target: { value } });
 
     expect(screen.getByText('1 ile 50 arasında olmalı.')).toBeInTheDocument();
-    expect(copyButton()).toBeDisabled();
+    expect(buildButton()).toBeDisabled();
   });
 
   it('remembers the language', async () => {
@@ -132,9 +133,34 @@ describe('LessonPlanPanel', () => {
     installApi(25);
     renderPanel([{ ...lessonSummary, slug: 'gone' }]);
     fireEvent.change(screen.getByLabelText('Konu'), { target: { value: 'DI' } });
-    fireEvent.click(copyButton());
+    fireEvent.click(buildButton());
 
-    expect(await screen.findByText('Kopyalanamadı.')).toBeInTheDocument();
-    expect(writeText).not.toHaveBeenCalled();
+    expect(await screen.findByText('Prompt oluşturulamadı.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Promptu kopyala' })).not.toBeInTheDocument();
+  });
+
+  it('runs the built prompt through the API mode, without calling on its own', async () => {
+    installApi(30, 'api');
+    renderPanel();
+    fireEvent.change(screen.getByLabelText('Konu'), { target: { value: 'Generics' } });
+    fireEvent.click(buildButton());
+
+    const prompt = await screen.findByLabelText('Prompt');
+    expect((prompt as HTMLTextAreaElement).value).toContain('Topic: Generics');
+    expect((prompt as HTMLTextAreaElement).value).toContain('one 30-minute pomodoro');
+    expect(screen.getByRole('button', { name: 'Yapay zekâya gönder' })).toBeDisabled();
+  });
+
+  it('hides the prompt when the form changes', async () => {
+    installApi(25);
+    renderPanel();
+    fireEvent.change(screen.getByLabelText('Konu'), { target: { value: 'Generics' } });
+    fireEvent.click(buildButton());
+    await screen.findByRole('button', { name: 'Promptu kopyala' });
+
+    fireEvent.change(screen.getByLabelText('Konu'), { target: { value: 'Async' } });
+
+    expect(screen.queryByRole('button', { name: 'Promptu kopyala' })).not.toBeInTheDocument();
+    expect(screen.getByText('Form değişti; promptu yeniden oluştur.')).toBeInTheDocument();
   });
 });

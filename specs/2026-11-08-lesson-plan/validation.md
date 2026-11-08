@@ -37,13 +37,14 @@ Run the dev app with no lessons.
 
 | ID | Step | Expected |
 |---|---|---|
-| M1 | Öğrenme | The empty state has "Promptu kopyala" and "Ders planı" |
-| M2 | "Ders planı" | The form and "İçe aktar" open; "Plan promptunu kopyala" is off |
-| M3 | Topic "Dependency injection", İleri, 3 parts, Türkçe, a background line, then copy | "Kopyalandı."; the clipboard holds all of them and the focus minutes from Ayarlar |
+| M1 | Öğrenme | The empty state has the AI panel and "Ders planı" |
+| M2 | "Ders planı" | The form opens; "Promptu oluştur" is off |
+| M3 | Topic "Dependency injection", İleri, 3 parts, Türkçe, a background line, then "Promptu oluştur" and "Promptu kopyala" | "Kopyalandı."; the clipboard holds all of them and the focus minutes from Ayarlar |
 | M4 | Paste an answer missing `summary` into "İçe aktar" and import | "Satır n · …" errors, nothing saved |
 | M5 | Fix it and import | "3 öğe eklendi, 0 öğe zaten vardı."; the lesson is listed with "3 parça"; its parts open |
-| M6 | "Ders planı" again, choose the lesson from the topic suggestions, copy, import one old and one new part | Level is disabled at İleri, the note shows, the prompt lists the 3 titles; "1 öğe eklendi, 1 öğe zaten vardı."; marks stay |
-| M7 | Keyboard only: open the panel, fill the form, copy | All reachable with a visible focus ring |
+| M6 | "Ders planı" again, choose the lesson from the topic suggestions, build, copy, import one old and one new part | Level is disabled at İleri, the note shows, the prompt lists the 3 titles; "1 öğe eklendi, 1 öğe zaten vardı."; marks stay |
+| M7 | Keyboard only: open the panel, fill the form, build, copy | All reachable with a visible focus ring |
+| M8 | After "Promptu oluştur", switch "Yapay zekâ modu" to API and to file import, then change the topic | API: the prompt box holds the plan, and nothing is sent without a key and a confirmation. File import: "Promptu kopyala" and the folder choice show. Topic change: the panel closes with "Form değişti; promptu yeniden oluştur." |
 
 ## Sign-off
 

@@ -50,7 +50,9 @@ describe('LearningPage', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: 'Ders planı' }));
     expect(screen.getByRole('heading', { name: 'Ders planı' })).toBeInTheDocument();
-    expect(screen.getAllByRole('heading', { name: 'İçe aktar' })).toHaveLength(1);
+    fireEvent.change(screen.getByLabelText('Konu'), { target: { value: 'Dependency injection' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Promptu oluştur' }));
+    expect(await screen.findAllByRole('heading', { name: 'İçe aktar' })).toHaveLength(1);
 
     fireEvent.change(screen.getByLabelText('İçe aktarılacak JSON'), { target: { value: '{}' } });
     fireEvent.click(screen.getByRole('button', { name: 'İçe aktar' }));
