@@ -473,7 +473,7 @@ describe('PomodoroPage shortcut', () => {
 
     expect(await screen.findByRole('button', { name: 'Duraklat' })).toBeInTheDocument();
     // The state is stored in an effect, which may run after the button appears.
-    await waitFor(() =>
+    await vi.waitFor(() =>
       expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
         status: 'running',
         kind: 'focus',
