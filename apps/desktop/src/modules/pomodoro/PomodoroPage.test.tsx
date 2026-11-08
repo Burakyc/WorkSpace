@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { AppRoutes } from '../../app/AppRoutes';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -472,13 +472,16 @@ describe('PomodoroPage shortcut', () => {
     pressShortcut();
 
     expect(await screen.findByRole('button', { name: 'Duraklat' })).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
-      status: 'running',
-      kind: 'focus',
-      goalId: 'a',
-      projectId: 'p1',
-      tags: ['di'],
-    });
+    // The provider stores the timer in an effect, after the button shows.
+    await waitFor(() =>
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
+        status: 'running',
+        kind: 'focus',
+        goalId: 'a',
+        projectId: 'p1',
+        tags: ['di'],
+      }),
+    );
     expect(goalSelect()).toHaveValue('a');
   });
 
