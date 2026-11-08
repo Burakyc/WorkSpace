@@ -880,3 +880,17 @@ Implement the spec in specs/2026-11-09-project-drafts/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 11.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `schemas/post.schema.json`, `prompts/post.md`, content type `post` saved in `posts.json` (`PostDraftImport`, titles never overwritten); `PostDraftService` with `GET`, `PUT`, `DELETE /api/posts/drafts`; `POST /api/posts/project-context`; `posts` AI module; "Projeden taslak" (project, note pages, prompt preview, `AiContentPanel`) and "Taslaklar" (Kopyala, edit, delete) on Gönderiler; no post button, no LinkedIn call; validated in all three AI modes against a local stub, no paid call; one fix; tech-stack and specs updated; phase 11.2 done.
+
+## 2026-11-09 – Plan phase 11.3 drafts from a YouTube video or link
+**Phase:** 11.3 Drafts from a YouTube video or link
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 11.3 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-09-link-drafts/` (`requirements.md`, `plan.md`, `validation.md`).
