@@ -5,9 +5,9 @@ import { getApiClient } from '../../shared/api/getApiClient';
 import type { ContentType, TopicSummary } from '../../shared/api/types';
 import buttons from '../../shared/ui/buttons.module.css';
 import { EmptyState } from '../../shared/ui/EmptyState';
+import { AiContentPanel } from '../ai/AiContentPanel';
+import { AI_MODULE_OF_TYPE } from '../ai/aiModes';
 import styles from './Content.module.css';
-import { CopyPromptButton } from './CopyPromptButton';
-import { ImportPanel } from './ImportPanel';
 import { levelLabel as defaultLevelLabel } from './levelLabel';
 
 type State = { kind: 'loading' } | { kind: 'failed' } | { kind: 'done'; topics: TopicSummary[] };
@@ -25,7 +25,7 @@ interface TopicListPageProps {
   levelLabel?(level: string): string;
 }
 
-/** A content module's topics, with the prompt and the import panel behind "İçerik ekle" (always shown while empty). */
+/** A content module's topics, with the AI content panel behind "İçerik ekle" (always shown while empty). */
 export function TopicListPage({
   type,
   basePath,
@@ -76,10 +76,8 @@ export function TopicListPage({
           icon={icon}
           title={title}
           description={description}
-          next="İlk içeriğini eklemek için promptu kopyala, yapay zekâya yapıştır ve aldığın JSON'u aşağıya ekle."
-        >
-          <CopyPromptButton type={type} />
-        </EmptyState>
+          next="İlk içeriğini aşağıdan ekle."
+        />
       ) : (
         <header className={styles.header}>
           <h1 className={styles.title}>{title}</h1>
@@ -96,8 +94,8 @@ export function TopicListPage({
       )}
       {(empty || open) && (
         <div id={panelId} className={styles.page}>
-          {!empty && <CopyPromptButton type={type} />}
-          <ImportPanel
+          <AiContentPanel
+            module={AI_MODULE_OF_TYPE[type]}
             type={type}
             onImported={() => {
               setOpen(true);

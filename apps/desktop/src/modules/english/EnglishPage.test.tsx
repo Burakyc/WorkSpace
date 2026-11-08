@@ -41,10 +41,8 @@ describe('EnglishPage', () => {
     });
     renderPage();
 
-    expect(
-      await screen.findByText(/İlk içeriğini eklemek için promptu kopyala/),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Promptu kopyala' })).toBeInTheDocument();
+    expect(await screen.findByText('İlk içeriğini aşağıdan ekle.')).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Promptu kopyala' })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('İçe aktarılacak JSON'), { target: { value: '{}' } });
     fireEvent.click(screen.getByRole('button', { name: 'İçe aktar' }));
 
@@ -63,6 +61,7 @@ describe('EnglishPage', () => {
     );
     expect(api.requests.map((r) => `${r.method} ${r.path}`)).toEqual([
       'GET /api/content/vocab',
+      'GET /api/settings',
       'POST /api/import',
       'GET /api/content/vocab',
     ]);
@@ -80,7 +79,7 @@ describe('EnglishPage', () => {
     fireEvent.click(toggle);
 
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByLabelText('İçe aktarılacak JSON')).toBeInTheDocument();
+    expect(await screen.findByLabelText('İçe aktarılacak JSON')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Promptu kopyala' })).toBeInTheDocument();
   });
 
