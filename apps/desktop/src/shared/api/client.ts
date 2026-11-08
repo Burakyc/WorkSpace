@@ -1,6 +1,7 @@
 import { maskPath, recordError } from '../errors/errorLog';
 import type {
   ApiConfig,
+  AiInbox,
   AiMode,
   AiModes,
   AiModule,
@@ -70,6 +71,7 @@ export interface ApiClient {
   savePomodoroSettings(settings: PomodoroSettings): Promise<PomodoroSettings>;
   saveReminderSettings(settings: ReminderSettings): Promise<ReminderSettings>;
   saveAiMode(module: AiModule, mode: AiMode): Promise<AiModes>;
+  saveAiInbox(module: AiModule, folder: string | null): Promise<AiInbox>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
   getDay(date: string, timeZone: string): Promise<DayDetail>;
@@ -189,6 +191,8 @@ export function createApiClient(
       request<ReminderSettings>('PUT', '/api/settings/reminders', settings),
     saveAiMode: (module, mode) =>
       request<AiModes>('PUT', `/api/settings/ai-modes/${module}`, { mode }),
+    saveAiInbox: (module, folder) =>
+      request<AiInbox>('PUT', `/api/settings/ai-inbox/${module}`, { folder }),
     getCalendar: (month, timeZone) =>
       request<CalendarMonth>(
         'GET',

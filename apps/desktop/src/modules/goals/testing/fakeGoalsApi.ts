@@ -235,7 +235,8 @@ export function installFakeGoalsApi(
     if (options.failSettings) return json({ title: 'Server Error' }, 500);
     if (method === 'GET') {
       const aiModes = { english: 'copyPaste', learning: 'copyPaste', interview: 'copyPaste' };
-      return json({ pomodoro: settings, reminders, aiModes });
+      const aiInbox = { english: null, learning: null, interview: null };
+      return json({ pomodoro: settings, reminders, aiModes, aiInbox });
     }
     if (id === 'reminders') {
       const input = body as ReminderSettings;

@@ -130,11 +130,15 @@ export type AiModule = 'english' | 'learning' | 'interview';
 
 export type AiModes = Record<AiModule, AiMode>;
 
+/** Each module's inbox folder for the file mode; null when none is chosen. */
+export type AiInbox = Record<AiModule, string | null>;
+
 /** GET /api/settings. */
 export interface AppSettings {
   pomodoro: PomodoroSettings;
   reminders: ReminderSettings;
   aiModes: AiModes;
+  aiInbox: AiInbox;
 }
 
 export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {

@@ -59,6 +59,24 @@ public class SettingsEndpointTests
     }
 
     [Fact]
+    public async Task Put_ai_inbox_saves_and_get_returns_it()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+        var folder = Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar);
+
+        var saved = await client.PutAsJsonAsync("/api/settings/ai-inbox/english", new { folder });
+
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        var inbox = JsonDocument.Parse(await client.GetStringAsync("/api/settings")).RootElement.GetProperty("aiInbox");
+        Assert.Equal(folder, inbox.GetProperty("english").GetString());
+        Assert.Equal(JsonValueKind.Null, inbox.GetProperty("learning").ValueKind);
+
+        var module = await client.PutAsJsonAsync("/api/settings/ai-inbox/calendar", new { folder });
+        Assert.Equal(HttpStatusCode.BadRequest, module.StatusCode);
+    }
+
+    [Fact]
     public async Task Put_reminders_saves_and_get_returns_them()
     {
         await using var factory = new ApiFactory();

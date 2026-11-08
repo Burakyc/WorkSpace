@@ -49,6 +49,48 @@ public sealed class SettingsServiceTests : IDisposable
         Assert.Equal(AiModes.CopyPaste, saved["aiModes"]!["english"]!.GetValue<string>());
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("""{ "schemaVersion": 1, "aiInbox": 3 }""")]
+    [InlineData("""{ "schemaVersion": 1, "aiInbox": { "english": 7, "learning": "" } }""")]
+    public async Task Inbox_folders_default_to_none(string? file)
+    {
+        if (file is not null) await File.WriteAllTextAsync(SettingsFile, file);
+
+        var settings = await _settings.GetAsync(CancellationToken.None);
+
+        Assert.Equal(3, settings.AiInbox.Count);
+        Assert.All(settings.AiInbox.Values, Assert.Null);
+    }
+
+    [Fact]
+    public async Task Saves_and_clears_an_inbox_folder_and_keeps_the_rest()
+    {
+        using var inbox = new TempFolder();
+        await _settings.SaveAiModeAsync("interview", AiModes.CopyPaste, CancellationToken.None);
+
+        var saved = await _settings.SaveAiInboxAsync("english", inbox.Path + Path.DirectorySeparatorChar, CancellationToken.None);
+
+        Assert.Equal(inbox.Path, saved["english"]);
+        Assert.Null(saved["learning"]);
+        Assert.Equal(inbox.Path, (await _settings.GetAsync(CancellationToken.None)).AiInbox["english"]);
+        Assert.Equal(AiModes.CopyPaste, (await _settings.GetAsync(CancellationToken.None)).AiModes["interview"]);
+
+        var cleared = await _settings.SaveAiInboxAsync("english", " ", CancellationToken.None);
+
+        Assert.Null(cleared["english"]);
+    }
+
+    [Theory]
+    [InlineData("relative\\folder")]
+    [InlineData("C:\\devpath-no-such-folder-at-all")]
+    public async Task A_missing_inbox_folder_is_refused(string folder)
+    {
+        var error = await Assert.ThrowsAsync<ValidationException>(() => _settings.SaveAiInboxAsync("english", folder, CancellationToken.None));
+
+        Assert.Equal("Klasör bulunamadı.", error.Errors["folder"][0]);
+    }
+
     [Fact]
     public async Task Defaults_without_a_file()
     {

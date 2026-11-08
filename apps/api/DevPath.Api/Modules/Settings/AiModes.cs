@@ -13,3 +13,6 @@ public static class AiModes
 
 /// <summary>PUT /api/settings/ai-modes/{module}.</summary>
 public sealed record AiModeInput(string? Mode);
+
+/// <summary>PUT /api/settings/ai-inbox/{module}. Null or empty clears the folder.</summary>
+public sealed record AiInboxInput(string? Folder);

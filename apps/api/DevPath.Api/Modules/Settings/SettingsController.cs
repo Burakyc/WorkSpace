@@ -20,4 +20,8 @@ public sealed class SettingsController(SettingsService settings) : ControllerBas
     [HttpPut("ai-modes/{module}")]
     public Task<IReadOnlyDictionary<string, string>> SaveAiMode(string module, AiModeInput input, CancellationToken cancellationToken) =>
         settings.SaveAiModeAsync(module, input.Mode, cancellationToken);
+
+    [HttpPut("ai-inbox/{module}")]
+    public Task<IReadOnlyDictionary<string, string?>> SaveAiInbox(string module, AiInboxInput input, CancellationToken cancellationToken) =>
+        settings.SaveAiInboxAsync(module, input.Folder, cancellationToken);
 }
