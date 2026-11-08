@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { getApiClient } from '../../shared/api/getApiClient';
 import type { ContentType, TopicSummary } from '../../shared/api/types';
@@ -23,6 +23,8 @@ interface TopicListPageProps {
   /** "12 kart · 5 biliyorum" for a topic row. */
   counts(topic: TopicSummary): string;
   levelLabel?(level: string): string;
+  /** Another way to add content: a button next to "İçerik ekle" and its panel. */
+  extra?: { label: string; render(topics: TopicSummary[], onImported: () => void): ReactNode };
 }
 
 /** A content module's topics, with the prompt and the import panel behind "İçerik ekle" (always shown while empty). */
@@ -34,11 +36,13 @@ export function TopicListPage({
   description,
   counts,
   levelLabel = defaultLevelLabel,
+  extra,
 }: TopicListPageProps) {
   const panelId = useId();
   const [state, setState] = useState<State>({ kind: 'loading' });
   const [version, setVersion] = useState(0);
-  const [open, setOpen] = useState(false);
+  // Which panel is open; only one, since each holds an import box.
+  const [open, setOpen] = useState<'import' | 'extra' | null>(null);
 
   // The list stays on screen while it reloads after an import, so the import summary is kept.
   useEffect(() => {
@@ -68,6 +72,18 @@ export function TopicListPage({
   }
 
   const empty = state.topics.length === 0;
+  const reload = () => setVersion((v) => v + 1);
+  const extraButton = extra && (
+    <button
+      type="button"
+      className={buttons.secondary}
+      aria-expanded={open === 'extra'}
+      aria-controls={panelId}
+      onClick={() => setOpen(open === 'extra' ? null : 'extra')}
+    >
+      {extra.label}
+    </button>
+  );
   // The panel keeps its place in the tree when the first import turns the empty state into the list.
   return (
     <div className={styles.page}>
@@ -79,32 +95,42 @@ export function TopicListPage({
           next="İlk içeriğini eklemek için promptu kopyala, yapay zekâya yapıştır ve aldığın JSON'u aşağıya ekle."
         >
           <CopyPromptButton type={type} />
+          {extraButton}
         </EmptyState>
       ) : (
         <header className={styles.header}>
           <h1 className={styles.title}>{title}</h1>
-          <button
-            type="button"
-            className={buttons.secondary}
-            aria-expanded={open}
-            aria-controls={panelId}
-            onClick={() => setOpen(!open)}
-          >
-            İçerik ekle
-          </button>
+          <div className={styles.row}>
+            {extraButton}
+            <button
+              type="button"
+              className={buttons.secondary}
+              aria-expanded={open === 'import'}
+              aria-controls={panelId}
+              onClick={() => setOpen(open === 'import' ? null : 'import')}
+            >
+              İçerik ekle
+            </button>
+          </div>
         </header>
       )}
-      {(empty || open) && (
+      {open === 'extra' && extra ? (
         <div id={panelId} className={styles.page}>
-          {!empty && <CopyPromptButton type={type} />}
-          <ImportPanel
-            type={type}
-            onImported={() => {
-              setOpen(true);
-              setVersion((v) => v + 1);
-            }}
-          />
+          {extra.render(state.topics, reload)}
         </div>
+      ) : (
+        (empty || open === 'import') && (
+          <div id={panelId} className={styles.page}>
+            {!empty && <CopyPromptButton type={type} />}
+            <ImportPanel
+              type={type}
+              onImported={() => {
+                setOpen('import');
+                reload();
+              }}
+            />
+          </div>
+        )
       )}
       {!empty && (
         <ul className={styles.topics}>
