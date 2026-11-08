@@ -28,6 +28,15 @@ In the "API" mode a module's panel sends the prompt to an AI provider from the A
 | Prompt | **An editable box** with the template (or the `prompt` prop). The user fills the `Topic:` and `Level:` lines. |
 | Cost note | **Estimate and confirmation.** Always visible: model, prices and an estimated upper bound. "Yapay zekâya gönder" opens an inline confirmation; "Ücretli çağrıyı onayla" calls. Afterwards the real tokens and cost are shown. The estimate is local and makes no call. |
 
+### Deviations found while implementing
+
+| Topic | What happened |
+|---|---|
+| Commits | Tasks 1–6 of `plan.md` landed in one commit (`feat(ai): add the API mode with a cost note`), checked once with `npm run check`, instead of one commit per task. History is not rewritten to split them. |
+| Test race, same commit | `InboxServiceTests` (9.2) wrote `x.json` into the shared temp parent, which `JsonFileStoreTests` asserts is absent. The file is now `inbox-outside.json`. It should have been a separate `fix(...)` commit. |
+| Claude key header | SDK 13.x sends an API key as `Authorization: Bearer` (documented on `ClientOptions.ApiKey`), not `x-api-key`. Tests assert what the SDK sends. Whether Anthropic accepts it can only be confirmed with a real key (U1). |
+| Prompt box reset | A changed `prompt` prop remounts `ApiRunBody` (`key={prompt}`) instead of an effect, which the lint rules refuse. |
+
 ## User stories
 
 1. **As the user**, I enter my Claude or Gemini key once in Ayarlar; it is never shown again.
