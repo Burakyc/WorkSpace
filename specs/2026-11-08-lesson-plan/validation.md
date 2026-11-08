@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 10.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Pick a topic; the teacher prompt splits it into pomodoro-sized parts and the answer is saved as a Learning topic (copy-paste mode; the other modes come with 9.x).
-- [ ] The prompt uses the focus length from the settings, the chosen language, the part count and the background.
-- [ ] Choosing an existing lesson lists its parts in the prompt; the import merges and never overwrites.
-- [ ] Invalid AI output is not saved.
-- [ ] Nothing calls an AI provider.
-- [ ] `tech-stack.md` is updated.
+- [x] Pick a topic; the teacher prompt splits it into pomodoro-sized parts and the answer is saved as a Learning topic (copy-paste mode; the other modes come with 9.x).
+- [x] The prompt uses the focus length from the settings, the chosen language, the part count and the background.
+- [x] Choosing an existing lesson lists its parts in the prompt; the import merges and never overwrites.
+- [x] Invalid AI output is not saved.
+- [x] Nothing calls an AI provider.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -47,7 +47,7 @@ Run the dev app with no lessons.
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 10.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 10.1 ticked and set to `done`

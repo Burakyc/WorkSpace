@@ -769,3 +769,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-08-lesson-plan/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-08 – Implement phase 10.1 lesson plan
+**Phase:** 10.1 Lesson plan
+**Prompt:**
+Implement the spec in specs/2026-11-08-lesson-plan/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 10.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `prompts/lesson-plan.md` and `buildLessonPlanPrompt`; `LessonPlanPanel` on Öğrenme (topic with existing-lesson suggestions, level, part count, language, background) with the usual import box; optional `extra` on `TopicListPage`, `getText`/`label`/`disabled` on `CopyPromptButton`; copy-paste mode only, no API change; tech-stack and specs updated; phase 10.1 done.

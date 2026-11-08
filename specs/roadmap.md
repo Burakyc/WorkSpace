@@ -240,8 +240,8 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### AI teacher
 
-#### 10.1 Lesson plan — `todo`
-- [ ] Pick a topic; the teacher prompt splits it into pomodoro-sized parts (via any AI mode) and saves them as a Learning topic.
+#### 10.1 Lesson plan — `done`
+- [x] Pick a topic; the teacher prompt splits it into pomodoro-sized parts (via any AI mode) and saves them as a Learning topic. Copy-paste for now; 9.x adds the other modes.
 
 #### 10.2 Study with the teacher — `todo`
 - [ ] Start a pomodoro from a lesson part (goal pre-selected); finishing the session can mark the part done.
