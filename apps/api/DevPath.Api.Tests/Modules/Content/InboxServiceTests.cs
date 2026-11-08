@@ -38,6 +38,22 @@ public sealed class InboxServiceTests : IDisposable
     private void Drop(string name, string text) => File.WriteAllText(_inbox.File(name), text);
 
     [Fact]
+    public async Task An_inbox_file_of_the_post_type_becomes_a_draft()
+    {
+        await _settings.SaveAiInboxAsync("posts", _inbox.Path, default);
+        Drop("draft.json", ImportSamples.Post());
+
+        var scan = await _service.ScanAsync("posts", "post", default);
+        Assert.Empty(Assert.Single(scan.Files).Errors);
+
+        var import = await _service.ImportAsync("posts", "post", ["draft.json"], default);
+
+        Assert.Equal(1, Assert.Single(import.Results).Report!.Added);
+        Assert.True(File.Exists(_data.File("posts.json")));
+        Assert.True(File.Exists(_inbox.File("done/draft.json")));
+    }
+
+    [Fact]
     public async Task Lists_the_modules_files_by_name_and_counts_other_types()
     {
         Drop("b.json", ImportSamples.Vocab());

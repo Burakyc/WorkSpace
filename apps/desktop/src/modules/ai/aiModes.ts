@@ -5,6 +5,7 @@ export const AI_MODULES: readonly { id: AiModule; label: string }[] = [
   { id: 'english', label: 'İngilizce' },
   { id: 'learning', label: 'Öğrenme' },
   { id: 'interview', label: 'Mülakat' },
+  { id: 'posts', label: 'Gönderiler' },
 ];
 
 export const AI_MODES: readonly { id: AiMode; label: string }[] = [
@@ -18,4 +19,5 @@ export const AI_MODULE_OF_TYPE: Readonly<Record<ContentType, AiModule>> = {
   vocab: 'english',
   lesson: 'learning',
   interview: 'interview',
+  post: 'posts',
 };

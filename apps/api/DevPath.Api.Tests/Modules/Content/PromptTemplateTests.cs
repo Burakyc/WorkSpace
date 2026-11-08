@@ -13,6 +13,7 @@ public sealed partial class PromptTemplateTests
     [InlineData("vocab")]
     [InlineData("lesson")]
     [InlineData("interview")]
+    [InlineData("post")]
     public void The_example_in_each_template_passes_its_schema(string type)
     {
         var template = File.ReadAllText(Path.Combine(RepoRoot(), "prompts", $"{type}.md"));

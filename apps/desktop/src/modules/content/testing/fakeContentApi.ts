@@ -66,12 +66,19 @@ export function installFakeContentApi(
   let inboxFiles = options.inboxFiles ?? [];
   let aiProvider = options.aiProvider ?? 'claude';
   const secrets = new Set(options.secrets ?? []);
-  const aiInbox: AiInbox = { english: null, learning: null, interview: null, ...options.aiInbox };
+  const aiInbox: AiInbox = {
+    english: null,
+    learning: null,
+    interview: null,
+    posts: null,
+    ...options.aiInbox,
+  };
   const topics: FakeTopic[] = structuredClone(options.topics ?? []);
   const aiModes: AiModes = {
     english: 'copyPaste',
     learning: 'copyPaste',
     interview: 'copyPaste',
+    posts: 'copyPaste',
     ...options.aiModes,
   };
 

@@ -9,6 +9,10 @@ public static class PostsModule
 
     public static readonly DocumentSchema StyleSchema = new(1, []);
 
+    public const string DraftsFileName = "posts.json";
+
+    public static readonly DocumentSchema DraftsSchema = new(1, []);
+
     public static IServiceCollection AddPosts(this IServiceCollection services)
     {
         services.AddSingleton<StyleService>();

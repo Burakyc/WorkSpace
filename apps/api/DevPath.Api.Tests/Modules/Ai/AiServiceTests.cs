@@ -43,6 +43,20 @@ public sealed class AiServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task A_post_answer_is_saved_as_a_draft_and_an_invalid_one_is_not()
+    {
+        _claude.Answer = new AiAnswer("""{ "type": "post" }""", 1, 1, null);
+        var invalid = await _service.RunAsync("claude", "post", "the prompt", default);
+        Assert.NotEmpty(invalid.Errors);
+        Assert.False(File.Exists(_data.File("posts.json")));
+
+        _claude.Answer = new AiAnswer(ImportSamples.Post(), 1, 1, null);
+        var valid = await _service.RunAsync("claude", "post", "the prompt", default);
+        Assert.Equal(1, valid.Report!.Added);
+        Assert.True(File.Exists(_data.File("posts.json")));
+    }
+
+    [Fact]
     public async Task A_valid_answer_is_saved_with_its_usage_and_cost()
     {
         _claude.Answer = new AiAnswer(ImportSamples.Vocab(terms: ["follow up on", "touch base"]), 1_000, 2_000, null);

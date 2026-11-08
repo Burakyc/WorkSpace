@@ -17,6 +17,25 @@ public static class ImportSamples
                 .Select(term => new { term, meaning = $"{term} anlamı", example = $"Let's {term}." }),
         });
 
+    public static string Post(string title = "What DI taught me", string body = "A post.") =>
+        Indent(new
+        {
+            schemaVersion = 1,
+            type = "post",
+            topic = "Todo API",
+            items = new[]
+            {
+                new
+                {
+                    title,
+                    body,
+                    hashtags = new[] { "#aspnetcore", "learning" },
+                    sourceLink = "https://github.com/me/todo",
+                    imageSuggestion = "A screenshot",
+                },
+            },
+        });
+
     public static string Lesson() =>
         Indent(new
         {

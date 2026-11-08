@@ -869,3 +869,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-09-project-drafts/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-09 – Implement phase 11.2 drafts from a project
+**Phase:** 11.2 Drafts from a project
+**Prompt:**
+Implement the spec in specs/2026-11-09-project-drafts/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 11.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:**

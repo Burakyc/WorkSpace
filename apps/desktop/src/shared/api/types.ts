@@ -126,7 +126,7 @@ export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
 export type AiMode = 'copyPaste' | 'file' | 'api';
 
 /** The modules with an AI mode setting; a later module adds its name (also in the API's `AiModes`). */
-export type AiModule = 'english' | 'learning' | 'interview';
+export type AiModule = 'english' | 'learning' | 'interview' | 'posts';
 
 export type AiModes = Record<AiModule, AiMode>;
 
@@ -166,6 +166,24 @@ export interface StylePrompt {
   updatedAt: string | null;
   history: StyleVersion[];
 }
+
+/** A saved LinkedIn draft; `topic` says what it was drafted from. Hashtags have no leading #. */
+export interface PostDraft {
+  id: string;
+  topic: string;
+  title: string;
+  body: string;
+  hashtags: string[];
+  sourceLink: string | null;
+  imageSuggestion: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PostDraftInput = Pick<
+  PostDraft,
+  'title' | 'body' | 'hashtags' | 'sourceLink' | 'imageSuggestion'
+>;
 
 /** POST /api/inbox/{module}/scan. No errors means the file can be imported. */
 export interface InboxFile {
@@ -271,7 +289,7 @@ export interface DayDetail {
 }
 
 /** A content type of the shared import format; each module imports one. */
-export type ContentType = 'vocab' | 'lesson' | 'interview';
+export type ContentType = 'vocab' | 'lesson' | 'interview' | 'post';
 
 /** One import problem: JSON pointer of the value, its 1-based line (null when unknown) and a Turkish message. */
 export interface ImportError {

@@ -234,8 +234,13 @@ export function installFakeGoalsApi(
   function settingsRoute(method: string, id: string | undefined, body: unknown) {
     if (options.failSettings) return json({ title: 'Server Error' }, 500);
     if (method === 'GET') {
-      const aiModes = { english: 'copyPaste', learning: 'copyPaste', interview: 'copyPaste' };
-      const aiInbox = { english: null, learning: null, interview: null };
+      const aiModes = {
+        english: 'copyPaste',
+        learning: 'copyPaste',
+        interview: 'copyPaste',
+        posts: 'copyPaste',
+      };
+      const aiInbox = { english: null, learning: null, interview: null, posts: null };
       return json({ pomodoro: settings, reminders, aiModes, aiInbox, aiProvider: 'claude' });
     }
     if (id === 'reminders') {
