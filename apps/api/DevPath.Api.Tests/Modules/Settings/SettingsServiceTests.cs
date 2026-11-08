@@ -91,6 +91,29 @@ public sealed class SettingsServiceTests : IDisposable
         Assert.Equal("Klasör bulunamadı.", error.Errors["folder"][0]);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("""{ "schemaVersion": 1, "aiProvider": "openai" }""")]
+    [InlineData("""{ "schemaVersion": 1, "aiProvider": 3 }""")]
+    public async Task The_ai_provider_defaults_to_claude(string? file)
+    {
+        if (file is not null) await File.WriteAllTextAsync(SettingsFile, file);
+
+        Assert.Equal("claude", (await _settings.GetAsync(CancellationToken.None)).AiProvider);
+    }
+
+    [Fact]
+    public async Task Saves_the_ai_provider_and_keeps_the_rest()
+    {
+        await _settings.SavePomodoroAsync(new PomodoroSettingsInput(50, 10, 20, 3), CancellationToken.None);
+
+        await _settings.SaveAiProviderAsync("gemini", CancellationToken.None);
+
+        var read = await _settings.GetAsync(CancellationToken.None);
+        Assert.Equal("gemini", read.AiProvider);
+        Assert.Equal(50, read.Pomodoro.FocusMinutes);
+    }
+
     [Fact]
     public async Task Defaults_without_a_file()
     {

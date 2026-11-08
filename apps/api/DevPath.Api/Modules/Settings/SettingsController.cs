@@ -24,4 +24,8 @@ public sealed class SettingsController(SettingsService settings) : ControllerBas
     [HttpPut("ai-inbox/{module}")]
     public Task<IReadOnlyDictionary<string, string?>> SaveAiInbox(string module, AiInboxInput input, CancellationToken cancellationToken) =>
         settings.SaveAiInboxAsync(module, input.Folder, cancellationToken);
+
+    [HttpPut("ai-provider")]
+    public Task<string> SaveAiProvider(AiProviderInput input, CancellationToken cancellationToken) =>
+        settings.SaveAiProviderAsync(input.Provider, cancellationToken);
 }

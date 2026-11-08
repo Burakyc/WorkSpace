@@ -236,7 +236,7 @@ export function installFakeGoalsApi(
     if (method === 'GET') {
       const aiModes = { english: 'copyPaste', learning: 'copyPaste', interview: 'copyPaste' };
       const aiInbox = { english: null, learning: null, interview: null };
-      return json({ pomodoro: settings, reminders, aiModes, aiInbox });
+      return json({ pomodoro: settings, reminders, aiModes, aiInbox, aiProvider: 'claude' });
     }
     if (id === 'reminders') {
       const input = body as ReminderSettings;

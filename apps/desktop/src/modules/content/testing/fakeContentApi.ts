@@ -4,6 +4,9 @@ import type {
   AiMode,
   AiModes,
   AiModule,
+  AiProviderId,
+  AiProviderInfo,
+  AiRunResult,
   ContentItemBase,
   ContentTopic,
   ImportError,
@@ -48,12 +51,21 @@ export function installFakeContentApi(
     /** Files of POST /api/inbox/{module}/scan; an import removes the named ones. */
     inboxFiles?: InboxFile[];
     inboxOtherTypes?: number;
+    /** GET /api/ai/providers (default: Claude with a key, Gemini without). */
+    aiProviders?: AiProviderInfo[];
+    aiProvider?: AiProviderId;
+    /** Answer of POST /api/ai/run. */
+    aiRun?: AiRunResult;
+    /** Secrets window.devpath.secrets starts with. */
+    secrets?: string[];
     /** Answer of window.devpath.settings.pickFolder. */
     pickedFolder?: string | null;
   } = {},
 ) {
   const requests: { method: string; path: string; body: unknown }[] = [];
   let inboxFiles = options.inboxFiles ?? [];
+  let aiProvider = options.aiProvider ?? 'claude';
+  const secrets = new Set(options.secrets ?? []);
   const aiInbox: AiInbox = { english: null, learning: null, interview: null, ...options.aiInbox };
   const topics: FakeTopic[] = structuredClone(options.topics ?? []);
   const aiModes: AiModes = {
@@ -126,7 +138,11 @@ export function installFakeContentApi(
 
     if (pathname.startsWith('/api/settings')) {
       if (options.failSettings) return Promise.resolve(json({ title: 'Error' }, 500));
-      if (method === 'GET') return Promise.resolve(json({ aiModes, aiInbox }));
+      if (method === 'GET') return Promise.resolve(json({ aiModes, aiInbox, aiProvider }));
+      if (pathname.endsWith('/ai-provider')) {
+        aiProvider = (body as { provider: AiProviderId }).provider;
+        return Promise.resolve(json(aiProvider));
+      }
       if (pathname.includes('/ai-inbox/')) {
         const owner = pathname.split('/').pop() as AiModule;
         aiInbox[owner] = (body as { folder: string | null }).folder;
@@ -137,6 +153,10 @@ export function installFakeContentApi(
       aiModes[module] = (body as { mode: AiMode }).mode;
       return Promise.resolve(json(aiModes));
     }
+    if (pathname === '/api/ai/providers') {
+      return Promise.resolve(json(options.aiProviders ?? FAKE_AI_PROVIDERS));
+    }
+    if (pathname === '/api/ai/run') return Promise.resolve(json(options.aiRun ?? {}));
     if (pathname.startsWith('/api/inbox/')) {
       const [, , , owner, action] = pathname.split('/');
       if (action === 'scan') {
@@ -186,10 +206,42 @@ export function installFakeContentApi(
   vi.stubGlobal('devpath', {
     getApiConfig: () => Promise.resolve({ baseUrl: 'http://api.test', token: 't' }),
     settings: { pickFolder: () => Promise.resolve(options.pickedFolder ?? null) },
+    secrets: {
+      has: (name: string) => Promise.resolve(secrets.has(name)),
+      set: vi.fn((name: string) => {
+        secrets.add(name);
+        return Promise.resolve();
+      }),
+      clear: vi.fn((name: string) => {
+        secrets.delete(name);
+        return Promise.resolve();
+      }),
+    },
   });
   vi.stubGlobal('fetch', fetchFn);
   return { fetchFn, requests, topics };
 }
+
+export const FAKE_AI_PROVIDERS: AiProviderInfo[] = [
+  {
+    id: 'claude',
+    label: 'Claude Opus 5.5',
+    model: 'claude-opus-5-5',
+    inputPerMillion: 4,
+    outputPerMillion: 20,
+    maxOutputTokens: 16000,
+    hasKey: true,
+  },
+  {
+    id: 'gemini',
+    label: 'Gemini 3.1 Pro',
+    model: 'gemini-3.1-pro-preview',
+    inputPerMillion: 2,
+    outputPerMillion: 12,
+    maxOutputTokens: 16000,
+    hasKey: false,
+  },
+];
 
 /** A topic for tests; items get ids and dates unless given. */
 export function fakeTopic(

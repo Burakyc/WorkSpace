@@ -37,14 +37,21 @@ export interface StartApiOptions {
 }
 
 /**
- * The secret and session variables for the API: the GitHub token (empty when none is saved, so an inherited value never
- * leaks in) and the id of this app launch, which keeps "since your last visit" stable across API restarts.
+ * The secret and session variables for the API: the GitHub token and AI API keys (empty when none is saved, so an
+ * inherited value never leaks in) and the id of this app launch, which keeps "since your last visit" stable across API
+ * restarts.
  */
 export function apiEnvironment(
   githubToken: string | undefined,
   launchId: string,
+  aiKeys: { anthropic?: string | undefined; gemini?: string | undefined } = {},
 ): Record<string, string> {
-  return { DEVPATH_GITHUB_TOKEN: githubToken ?? '', DEVPATH_LAUNCH_ID: launchId };
+  return {
+    DEVPATH_GITHUB_TOKEN: githubToken ?? '',
+    DEVPATH_ANTHROPIC_API_KEY: aiKeys.anthropic ?? '',
+    DEVPATH_GEMINI_API_KEY: aiKeys.gemini ?? '',
+    DEVPATH_LAUNCH_ID: launchId,
+  };
 }
 
 // ponytail: the port can be taken between close() and the API binding it; start-up then fails with the error window.

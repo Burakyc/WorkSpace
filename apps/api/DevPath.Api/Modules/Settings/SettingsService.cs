@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Infrastructure.Validation;
+using DevPath.Api.Modules.Ai;
 
 namespace DevPath.Api.Modules.Settings;
 
@@ -16,6 +17,7 @@ public sealed class SettingsService(JsonFileStore store)
     private const string RemindersSection = "reminders";
     private const string AiModesSection = "aiModes";
     private const string AiInboxSection = "aiInbox";
+    private const string AiProviderSection = "aiProvider";
     private const string TimeMessage = "Saat SS:DD biçiminde olmalı (00:00–23:59).";
 
     public static readonly DocumentSchema Schema = new(1, []);
@@ -24,7 +26,7 @@ public sealed class SettingsService(JsonFileStore store)
     public async Task<AppSettings> GetAsync(CancellationToken cancellationToken)
     {
         var document = await store.ReadAsync(FileName, Schema, cancellationToken);
-        return new AppSettings(ReadPomodoro(document), ReadReminders(document), ReadAiModes(document), ReadAiInbox(document));
+        return new AppSettings(ReadPomodoro(document), ReadReminders(document), ReadAiModes(document), ReadAiInbox(document), ReadAiProvider(document));
     }
 
     public async Task<PomodoroSettings> SavePomodoroAsync(PomodoroSettingsInput input, CancellationToken cancellationToken)
@@ -103,6 +105,28 @@ public sealed class SettingsService(JsonFileStore store)
         var document = await SaveModuleValueAsync(AiInboxSection, module, full, cancellationToken);
         return ReadAiInbox(document);
     }
+
+    /// <summary>Saves the provider of the API mode.</summary>
+    public async Task<string> SaveAiProviderAsync(string? provider, CancellationToken cancellationToken)
+    {
+        if (AiProviders.Find(provider) is null)
+        {
+            throw new ValidationException(new Dictionary<string, string[]> { ["provider"] = ["Bilinmeyen sağlayıcı."] });
+        }
+
+        await store.UpdateAsync(FileName, Schema, document =>
+        {
+            document ??= new JsonObject();
+            document[AiProviderSection] = provider;
+            return document;
+        }, cancellationToken);
+        return provider!;
+    }
+
+    private static string ReadAiProvider(JsonObject? document) =>
+        document?[AiProviderSection] is JsonValue value && value.TryGetValue<string>(out var provider) && AiProviders.Find(provider) is not null
+            ? provider
+            : AiProviders.Claude;
 
     private static void RequireModule(string module)
     {

@@ -3,6 +3,7 @@ import styles from '../content/Content.module.css';
 import { CopyPromptButton } from '../content/CopyPromptButton';
 import { ImportPanel } from '../content/ImportPanel';
 import { AiModeSelect } from './AiModeSelect';
+import { ApiRunBody } from './ApiRunBody';
 import { FileImportBody } from './FileImportBody';
 import { useAiMode } from './useAiMode';
 
@@ -34,6 +35,9 @@ export function AiContentPanel({ module, type, prompt, onImported }: AiContentPa
       )}
       {state.mode === 'file' && (
         <FileImportBody module={module} type={type} prompt={prompt} onImported={onImported} />
+      )}
+      {state.mode === 'api' && (
+        <ApiRunBody key={prompt} type={type} prompt={prompt} onImported={onImported} />
       )}
     </div>
   );

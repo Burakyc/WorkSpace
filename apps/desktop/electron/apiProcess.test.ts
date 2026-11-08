@@ -103,8 +103,10 @@ describe('waitForHealth', () => {
 
 describe('apiEnvironment', () => {
   it('passes the token when one is saved and always the launch id', () => {
-    expect(apiEnvironment('ghp_x', 'launch-1')).toEqual({
+    expect(apiEnvironment('ghp_x', 'launch-1', { anthropic: 'a', gemini: 'g' })).toEqual({
       DEVPATH_GITHUB_TOKEN: 'ghp_x',
+      DEVPATH_ANTHROPIC_API_KEY: 'a',
+      DEVPATH_GEMINI_API_KEY: 'g',
       DEVPATH_LAUNCH_ID: 'launch-1',
     });
   });
@@ -112,6 +114,8 @@ describe('apiEnvironment', () => {
   it('overrides an inherited token with an empty value when none is saved', () => {
     expect(apiEnvironment(undefined, 'launch-1')).toEqual({
       DEVPATH_GITHUB_TOKEN: '',
+      DEVPATH_ANTHROPIC_API_KEY: '',
+      DEVPATH_GEMINI_API_KEY: '',
       DEVPATH_LAUNCH_ID: 'launch-1',
     });
   });

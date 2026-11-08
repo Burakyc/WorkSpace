@@ -70,7 +70,10 @@ function startApiFor(dataDir: string): Promise<ApiHandle> {
     origin: appOrigin,
     dataDir,
     development: !app.isPackaged,
-    env: apiEnvironment(secrets.get('githubToken'), launchId),
+    env: apiEnvironment(secrets.get('githubToken'), launchId, {
+      anthropic: secrets.get('anthropicApiKey'),
+      gemini: secrets.get('geminiApiKey'),
+    }),
   });
 }
 

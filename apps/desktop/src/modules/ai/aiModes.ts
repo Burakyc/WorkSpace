@@ -7,10 +7,10 @@ export const AI_MODULES: readonly { id: AiModule; label: string }[] = [
   { id: 'interview', label: 'Mülakat' },
 ];
 
-export const AI_MODES: readonly { id: AiMode; label: string; disabled?: boolean }[] = [
+export const AI_MODES: readonly { id: AiMode; label: string }[] = [
   { id: 'copyPaste', label: 'Kopyala-yapıştır' },
   { id: 'file', label: 'Dosyadan içe aktar' },
-  { id: 'api', label: 'API (yakında)', disabled: true },
+  { id: 'api', label: 'API' },
 ];
 
 /** The module whose mode applies to a content type's topic list. */

@@ -1,7 +1,11 @@
 import type { SecretName } from '../src/shared/api/types';
 
 /** The only secrets the page may set; anything else is refused. */
-export const SECRET_NAMES: readonly SecretName[] = ['githubToken'];
+export const SECRET_NAMES: readonly SecretName[] = [
+  'githubToken',
+  'anthropicApiKey',
+  'geminiApiKey',
+];
 
 export function isSecretName(value: unknown): value is SecretName {
   return typeof value === 'string' && (SECRET_NAMES as readonly string[]).includes(value);

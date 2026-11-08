@@ -5,6 +5,9 @@ import type {
   AiMode,
   AiModes,
   AiModule,
+  AiProviderId,
+  AiProviderInfo,
+  AiRunResult,
   AppSettings,
   InboxImportResult,
   InboxScan,
@@ -74,6 +77,10 @@ export interface ApiClient {
   saveReminderSettings(settings: ReminderSettings): Promise<ReminderSettings>;
   saveAiMode(module: AiModule, mode: AiMode): Promise<AiModes>;
   saveAiInbox(module: AiModule, folder: string | null): Promise<AiInbox>;
+  listAiProviders(): Promise<AiProviderInfo[]>;
+  saveAiProvider(provider: AiProviderId): Promise<AiProviderId>;
+  /** One paid call; only a user's confirmation may send it. */
+  runAi(provider: AiProviderId, type: ContentType, prompt: string): Promise<AiRunResult>;
   scanInbox(module: AiModule, type: ContentType): Promise<InboxScan>;
   importInbox(
     module: AiModule,
@@ -201,6 +208,11 @@ export function createApiClient(
       request<AiModes>('PUT', `/api/settings/ai-modes/${module}`, { mode }),
     saveAiInbox: (module, folder) =>
       request<AiInbox>('PUT', `/api/settings/ai-inbox/${module}`, { folder }),
+    listAiProviders: () => request<AiProviderInfo[]>('GET', '/api/ai/providers'),
+    saveAiProvider: (provider) =>
+      request<AiProviderId>('PUT', '/api/settings/ai-provider', { provider }),
+    runAi: (provider, type, prompt) =>
+      request<AiRunResult>('POST', '/api/ai/run', { provider, type, prompt }),
     scanInbox: (module, type) => request<InboxScan>('POST', `/api/inbox/${module}/scan`, { type }),
     importInbox: (module, type, names) =>
       request<{ results: InboxImportResult[] }>('POST', `/api/inbox/${module}/import`, {

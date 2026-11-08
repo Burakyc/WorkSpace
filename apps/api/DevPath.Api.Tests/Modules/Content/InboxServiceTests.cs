@@ -182,7 +182,7 @@ public sealed class InboxServiceTests : IDisposable
     }
 
     [Theory]
-    [InlineData("../x.json")]
+    [InlineData("../inbox-outside.json")]
     [InlineData("..\\x.json")]
     [InlineData("sub/x.json")]
     [InlineData("x.txt")]
@@ -192,7 +192,7 @@ public sealed class InboxServiceTests : IDisposable
         Directory.CreateDirectory(_inbox.File("sub"));
         Drop("sub/x.json", ImportSamples.Vocab());
         Drop("x.txt", ImportSamples.Vocab());
-        File.WriteAllText(Path.Combine(_inbox.Path, "..", "x.json"), ImportSamples.Vocab());
+        File.WriteAllText(Path.Combine(_inbox.Path, "..", "inbox-outside.json"), ImportSamples.Vocab());
 
         try
         {
@@ -204,7 +204,7 @@ public sealed class InboxServiceTests : IDisposable
         }
         finally
         {
-            File.Delete(Path.Combine(_inbox.Path, "..", "x.json"));
+            File.Delete(Path.Combine(_inbox.Path, "..", "inbox-outside.json"));
         }
     }
 

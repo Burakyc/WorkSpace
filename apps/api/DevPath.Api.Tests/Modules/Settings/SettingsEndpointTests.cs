@@ -45,14 +45,17 @@ public class SettingsEndpointTests
         var modes = JsonDocument.Parse(await saved.Content.ReadAsStringAsync()).RootElement;
         Assert.Equal("copyPaste", modes.GetProperty("interview").GetString());
 
-        var file = await client.PutAsJsonAsync("/api/settings/ai-modes/learning", new { mode = "file" });
-        Assert.Equal(HttpStatusCode.OK, file.StatusCode);
+        foreach (var available in new[] { "file", "api" })
+        {
+            var ok = await client.PutAsJsonAsync("/api/settings/ai-modes/learning", new { mode = available });
+            Assert.Equal(HttpStatusCode.OK, ok.StatusCode);
+        }
 
         var module = await client.PutAsJsonAsync("/api/settings/ai-modes/calendar", new { mode = "copyPaste" });
         Assert.Equal(HttpStatusCode.BadRequest, module.StatusCode);
         Assert.Contains("module", await module.Content.ReadAsStringAsync());
 
-        foreach (var mode in new[] { "x", "api" })
+        foreach (var mode in new[] { "x", "gpt" })
         {
             var bad = await client.PutAsJsonAsync("/api/settings/ai-modes/english", new { mode });
             Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);
@@ -77,6 +80,22 @@ public class SettingsEndpointTests
 
         var module = await client.PutAsJsonAsync("/api/settings/ai-inbox/calendar", new { folder });
         Assert.Equal(HttpStatusCode.BadRequest, module.StatusCode);
+    }
+
+    [Fact]
+    public async Task Put_ai_provider_saves_and_refuses_an_unknown_one()
+    {
+        await using var factory = new ApiFactory();
+        var client = factory.CreateClient();
+
+        var saved = await client.PutAsJsonAsync("/api/settings/ai-provider", new { provider = "gemini" });
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        var settings = JsonDocument.Parse(await client.GetStringAsync("/api/settings")).RootElement;
+        Assert.Equal("gemini", settings.GetProperty("aiProvider").GetString());
+
+        var bad = await client.PutAsJsonAsync("/api/settings/ai-provider", new { provider = "openai" });
+        Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);
+        Assert.Contains("provider", await bad.Content.ReadAsStringAsync());
     }
 
     [Fact]

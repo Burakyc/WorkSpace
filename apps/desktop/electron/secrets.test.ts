@@ -23,6 +23,13 @@ function fakeDeps(available = true) {
   return { file, deps };
 }
 
+describe('secret names', () => {
+  it('allows the GitHub token and the AI API keys, nothing else', () => {
+    expect(['githubToken', 'anthropicApiKey', 'geminiApiKey'].every(isSecretName)).toBe(true);
+    expect(isSecretName('openaiApiKey')).toBe(false);
+  });
+});
+
 describe('createSecretStore', () => {
   it('saves, reads and clears a secret without keeping the plain value', () => {
     const { file, deps } = fakeDeps();

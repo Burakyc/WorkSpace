@@ -5,11 +5,12 @@ public static class AiModes
 {
     public const string CopyPaste = "copyPaste";
     public const string File = "file";
+    public const string Api = "api";
 
     public static readonly IReadOnlyList<string> Modules = ["english", "learning", "interview"];
 
     /// <summary>The modes that work; anything else is refused on save and reads as <see cref="CopyPaste"/>.</summary>
-    public static readonly IReadOnlyList<string> Available = [CopyPaste, File];
+    public static readonly IReadOnlyList<string> Available = [CopyPaste, File, Api];
 }
 
 /// <summary>PUT /api/settings/ai-modes/{module}.</summary>
@@ -17,3 +18,6 @@ public sealed record AiModeInput(string? Mode);
 
 /// <summary>PUT /api/settings/ai-inbox/{module}. Null or empty clears the folder.</summary>
 public sealed record AiInboxInput(string? Folder);
+
+/// <summary>PUT /api/settings/ai-provider.</summary>
+public sealed record AiProviderInput(string? Provider);

@@ -133,6 +133,28 @@ export type AiModes = Record<AiModule, AiMode>;
 /** Each module's inbox folder for the file mode; null when none is chosen. */
 export type AiInbox = Record<AiModule, string | null>;
 
+export type AiProviderId = 'claude' | 'gemini';
+
+/** GET /api/ai/providers. Prices are dollars per million tokens; a key is only `hasKey`. */
+export interface AiProviderInfo {
+  id: AiProviderId;
+  label: string;
+  model: string;
+  inputPerMillion: number;
+  outputPerMillion: number;
+  maxOutputTokens: number;
+  hasKey: boolean;
+}
+
+/** POST /api/ai/run: `error` when the call or its answer failed, `errors` for an invalid answer (nothing saved), `report` when saved. */
+export interface AiRunResult {
+  error: string | null;
+  errors: ImportError[];
+  report: ImportReport | null;
+  usage: { inputTokens: number; outputTokens: number; costUsd: number } | null;
+  output: string | null;
+}
+
 /** POST /api/inbox/{module}/scan. No errors means the file can be imported. */
 export interface InboxFile {
   name: string;
@@ -162,6 +184,7 @@ export interface AppSettings {
   reminders: ReminderSettings;
   aiModes: AiModes;
   aiInbox: AiInbox;
+  aiProvider: AiProviderId;
 }
 
 export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {
@@ -443,7 +466,7 @@ export interface VisitChanges {
 }
 
 /** The secrets the page may set (never read): stored encrypted by main with safeStorage. */
-export type SecretName = 'githubToken';
+export type SecretName = 'githubToken' | 'anthropicApiKey' | 'geminiApiKey';
 
 /** What main answers to a secret change; the error is a Turkish message. */
 export type SecretResult = { ok: true } | { error: string };

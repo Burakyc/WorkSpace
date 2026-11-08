@@ -19,8 +19,8 @@ export function AiModeSelect({ label, state }: { label: string; state: AiModeSta
         onChange={(event) => state.change(event.target.value as AiMode)}
       >
         {state.mode === null && <option value="">…</option>}
-        {AI_MODES.map(({ id: mode, label: text, disabled }) => (
-          <option key={mode} value={mode} disabled={disabled}>
+        {AI_MODES.map(({ id: mode, label: text }) => (
+          <option key={mode} value={mode}>
             {text}
           </option>
         ))}
