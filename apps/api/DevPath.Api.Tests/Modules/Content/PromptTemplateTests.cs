@@ -6,7 +6,8 @@ namespace DevPath.Api.Tests.Modules.Content;
 /// <summary>Keeps prompts/&lt;type&gt;.md in step with schemas/: the example each template shows must import.</summary>
 public sealed partial class PromptTemplateTests
 {
-    [GeneratedRegex("```json\\r?\\n(.*?)```", RegexOptions.Singleline)]
+    // Only a fence at a line start closes the block: an example's body may hold ``` inside its JSON string.
+    [GeneratedRegex("^```json\\r?\\n(.*?)^```", RegexOptions.Singleline | RegexOptions.Multiline)]
     private static partial Regex JsonBlock();
 
     [Theory]
@@ -21,6 +22,16 @@ public sealed partial class PromptTemplateTests
         Assert.StartsWith("Topic:", template, StringComparison.Ordinal);
         Assert.True(example.Success);
         Assert.Empty(ImportValidator.Validate(ContentType.Find(type)!, example.Groups[1].Value).Errors);
+    }
+
+    [Fact]
+    public void The_example_in_the_lesson_plan_template_passes_the_lesson_schema()
+    {
+        var template = File.ReadAllText(Path.Combine(RepoRoot(), "prompts", "lesson-plan.md"));
+        var example = JsonBlock().Match(template);
+
+        Assert.True(example.Success);
+        Assert.Empty(ImportValidator.Validate(ContentType.Find("lesson")!, example.Groups[1].Value).Errors);
     }
 
     private static string RepoRoot()
