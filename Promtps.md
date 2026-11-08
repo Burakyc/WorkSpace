@@ -780,3 +780,17 @@ Implement the spec in specs/2026-11-08-ai-mode-setting/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 9.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `aiModes` section in `settings.json` with `PUT /api/settings/ai-modes/{module}`; `modules/ai/` (`AiContentPanel`, `AiModeSelect`, `useAiMode`, lists); the topic lists add content through the panel; Ayarlar → "Yapay zekâ modları"; file and API listed but disabled; tech-stack and specs updated; phase 9.1 done.
+
+## 2026-11-08 – Plan phase 9.2 file import mode
+**Phase:** 9.2 File import mode
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 9.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-08-file-import-mode/` (`requirements.md`, `plan.md`, `validation.md`).
