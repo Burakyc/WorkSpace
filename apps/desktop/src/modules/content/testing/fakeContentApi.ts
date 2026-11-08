@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 import type {
+  AiInbox,
   AiMode,
   AiModes,
   AiModule,
@@ -7,6 +8,7 @@ import type {
   ContentTopic,
   ImportError,
   ImportResult,
+  InboxFile,
   TopicSummary,
 } from '../../../shared/api/types';
 
@@ -42,9 +44,17 @@ export function installFakeContentApi(
     failSettings?: boolean;
     /** Only PUT /api/settings/ai-modes fails. */
     failAiModeSave?: boolean;
+    aiInbox?: Partial<AiInbox>;
+    /** Files of POST /api/inbox/{module}/scan; an import removes the named ones. */
+    inboxFiles?: InboxFile[];
+    inboxOtherTypes?: number;
+    /** Answer of window.devpath.settings.pickFolder. */
+    pickedFolder?: string | null;
   } = {},
 ) {
   const requests: { method: string; path: string; body: unknown }[] = [];
+  let inboxFiles = options.inboxFiles ?? [];
+  const aiInbox: AiInbox = { english: null, learning: null, interview: null, ...options.aiInbox };
   const topics: FakeTopic[] = structuredClone(options.topics ?? []);
   const aiModes: AiModes = {
     english: 'copyPaste',
@@ -116,11 +126,46 @@ export function installFakeContentApi(
 
     if (pathname.startsWith('/api/settings')) {
       if (options.failSettings) return Promise.resolve(json({ title: 'Error' }, 500));
-      if (method === 'GET') return Promise.resolve(json({ aiModes }));
+      if (method === 'GET') return Promise.resolve(json({ aiModes, aiInbox }));
+      if (pathname.includes('/ai-inbox/')) {
+        const owner = pathname.split('/').pop() as AiModule;
+        aiInbox[owner] = (body as { folder: string | null }).folder;
+        return Promise.resolve(json(aiInbox));
+      }
       if (options.failAiModeSave) return Promise.resolve(json({ title: 'Error' }, 500));
       const module = pathname.split('/').pop() as AiModule;
       aiModes[module] = (body as { mode: AiMode }).mode;
       return Promise.resolve(json(aiModes));
+    }
+    if (pathname.startsWith('/api/inbox/')) {
+      const [, , , owner, action] = pathname.split('/');
+      if (action === 'scan') {
+        return Promise.resolve(
+          json({
+            folder: aiInbox[owner as AiModule],
+            error: null,
+            files: inboxFiles,
+            otherTypeCount: options.inboxOtherTypes ?? 0,
+          }),
+        );
+      }
+      const { names } = body as { names: string[] };
+      inboxFiles = inboxFiles.filter((file) => !names.includes(file.name));
+      const results = names.map((name) => ({
+        name,
+        report: {
+          type: 'vocab',
+          topic: name,
+          slug: name,
+          created: true,
+          added: 1,
+          skipped: 0,
+          levelKept: false,
+        },
+        errors: [],
+        moved: true,
+      }));
+      return Promise.resolve(json({ results }));
     }
     if (options.failImport && pathname.startsWith('/api/import')) {
       return Promise.resolve(json({ title: 'Error' }, 500));
@@ -140,6 +185,7 @@ export function installFakeContentApi(
 
   vi.stubGlobal('devpath', {
     getApiConfig: () => Promise.resolve({ baseUrl: 'http://api.test', token: 't' }),
+    settings: { pickFolder: () => Promise.resolve(options.pickedFolder ?? null) },
   });
   vi.stubGlobal('fetch', fetchFn);
   return { fetchFn, requests, topics };

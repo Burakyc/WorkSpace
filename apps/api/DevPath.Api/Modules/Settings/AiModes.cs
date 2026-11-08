@@ -4,11 +4,12 @@ namespace DevPath.Api.Modules.Settings;
 public static class AiModes
 {
     public const string CopyPaste = "copyPaste";
+    public const string File = "file";
 
     public static readonly IReadOnlyList<string> Modules = ["english", "learning", "interview"];
 
     /// <summary>The modes that work; anything else is refused on save and reads as <see cref="CopyPaste"/>.</summary>
-    public static readonly IReadOnlyList<string> Available = [CopyPaste];
+    public static readonly IReadOnlyList<string> Available = [CopyPaste, File];
 }
 
 /// <summary>PUT /api/settings/ai-modes/{module}.</summary>

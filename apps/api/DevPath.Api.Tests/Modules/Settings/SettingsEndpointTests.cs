@@ -45,11 +45,14 @@ public class SettingsEndpointTests
         var modes = JsonDocument.Parse(await saved.Content.ReadAsStringAsync()).RootElement;
         Assert.Equal("copyPaste", modes.GetProperty("interview").GetString());
 
+        var file = await client.PutAsJsonAsync("/api/settings/ai-modes/learning", new { mode = "file" });
+        Assert.Equal(HttpStatusCode.OK, file.StatusCode);
+
         var module = await client.PutAsJsonAsync("/api/settings/ai-modes/calendar", new { mode = "copyPaste" });
         Assert.Equal(HttpStatusCode.BadRequest, module.StatusCode);
         Assert.Contains("module", await module.Content.ReadAsStringAsync());
 
-        foreach (var mode in new[] { "x", "file", "api" })
+        foreach (var mode in new[] { "x", "api" })
         {
             var bad = await client.PutAsJsonAsync("/api/settings/ai-modes/english", new { mode });
             Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);

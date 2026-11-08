@@ -23,6 +23,19 @@
   max-width: 20rem;
 }
 
+.folder {
+  overflow-wrap: anywhere;
+}
+
+.inboxFiles,
+.inboxResults {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .panelTitle {
   margin: 0;
   font-size: var(--font-size-lg);

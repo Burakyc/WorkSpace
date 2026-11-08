@@ -5,6 +5,7 @@ import buttons from '../../shared/ui/buttons.module.css';
 import form from '../../shared/ui/form.module.css';
 import styles from './Content.module.css';
 import { formatImportError } from './formatImportError';
+import { formatImportReport } from './formatImportReport';
 
 export const MAX_IMPORT_BYTES = 2 * 1024 * 1024;
 
@@ -133,10 +134,7 @@ function ImportStatus({ status }: { status: Status }) {
     case 'saved':
       return (
         <div role="status" className={styles.success}>
-          <p>
-            {status.report.topic}: {status.report.added} öğe eklendi, {status.report.skipped} öğe
-            zaten vardı.
-          </p>
+          <p>{formatImportReport(status.report)}</p>
           {status.report.levelKept && <p>Konu zaten vardı; seviyesi değiştirilmedi.</p>}
         </div>
       );

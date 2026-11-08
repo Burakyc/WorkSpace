@@ -9,7 +9,7 @@ export const AI_MODULES: readonly { id: AiModule; label: string }[] = [
 
 export const AI_MODES: readonly { id: AiMode; label: string; disabled?: boolean }[] = [
   { id: 'copyPaste', label: 'Kopyala-yapıştır' },
-  { id: 'file', label: 'Dosyadan içe aktar (yakında)', disabled: true },
+  { id: 'file', label: 'Dosyadan içe aktar' },
   { id: 'api', label: 'API (yakında)', disabled: true },
 ];
 

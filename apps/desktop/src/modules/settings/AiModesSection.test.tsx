@@ -34,6 +34,30 @@ describe('AiModesSection', () => {
     );
   });
 
+  it('shows the folder only in file mode, and saves and clears it', async () => {
+    const api = installFakeContentApi({
+      aiModes: { interview: 'file' },
+      pickedFolder: 'D:\\Inbox',
+    });
+    render(<AiModesSection />);
+
+    expect(await screen.findByText('Klasör seçilmedi.')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'Klasör seç…' })).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Klasör seç…' }));
+
+    expect(await screen.findByText('D:\\Inbox')).toBeInTheDocument();
+    expect(api.requests).toContainEqual({
+      method: 'PUT',
+      path: '/api/settings/ai-inbox/interview',
+      body: { folder: 'D:\\Inbox' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Kaldır' }));
+
+    expect(await screen.findByText('Klasör seçilmedi.')).toBeInTheDocument();
+  });
+
   it('goes back and says so when the save fails', async () => {
     installFakeContentApi({ failAiModeSave: true });
     render(<AiModesSection />);
