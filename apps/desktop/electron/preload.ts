@@ -63,6 +63,8 @@ const bridge: DevPathBridge = {
   },
   settings: {
     getDataDir: () => ipcRenderer.invoke('devpath:get-data-dir') as Promise<string>,
+    pickFolder: (title) =>
+      ipcRenderer.invoke('devpath:pick-folder', title) as Promise<string | null>,
     // Main returns the error as data, so the page gets the plain Turkish message instead of an IPC-wrapped one.
     changeDataDir: async () => {
       const result = (await ipcRenderer.invoke('devpath:change-data-dir')) as ChangeDataDirResult;

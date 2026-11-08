@@ -484,6 +484,8 @@ export interface DevPathBridge {
   };
   settings: {
     getDataDir(): Promise<string>;
+    /** Opens the folder dialog and answers with the chosen folder, or null on cancel. Changes nothing itself. */
+    pickFolder(title: string): Promise<string | null>;
     /** Opens the folder dialog and switches to the chosen folder. Resolves null on cancel; rejects with a Turkish message. */
     changeDataDir(): Promise<string | null>;
     /** Backups of the current data folder, newest first. */

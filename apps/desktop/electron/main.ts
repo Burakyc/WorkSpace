@@ -298,6 +298,16 @@ if (!app.requestSingleInstanceLock()) {
       return { dataDir: current.dataDir };
     });
 
+    handle('devpath:pick-folder', async (_event, title): Promise<string | null> => {
+      if (typeof title !== 'string') throw new Error('Invalid title.');
+      const choice = await dialog.showOpenDialog(mainWindow!, {
+        title,
+        properties: ['openDirectory', 'createDirectory'],
+      });
+      const picked = choice.filePaths[0];
+      return choice.canceled || picked === undefined ? null : picked;
+    });
+
     handle('devpath:secrets-has', (_event, name) => {
       if (!isSecretName(name)) throw new Error('Unknown secret.');
       return secrets.has(name);
