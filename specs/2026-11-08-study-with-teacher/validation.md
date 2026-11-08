@@ -6,12 +6,12 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 10.2, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Start a pomodoro from a lesson part (goal pre-selected); finishing the session can mark the part done.
-- [ ] The part's content is shown next to the timer.
-- [ ] The goal is remembered per lesson; every session still has a goal.
-- [ ] A stopped-early session never marks the part.
-- [ ] The note is prefilled, the tags come from the lesson, and "Sonraki parça" starts the next unfinished part.
-- [ ] `tech-stack.md` is updated.
+- [x] Start a pomodoro from a lesson part (goal pre-selected); finishing the session can mark the part done.
+- [x] The part's content is shown next to the timer.
+- [x] The goal is remembered per lesson; every session still has a goal.
+- [x] A stopped-early session never marks the part.
+- [x] The note is prefilled, the tags come from the lesson, and "Sonraki parça" starts the next unfinished part.
+- [x] `tech-stack.md` is updated.
 
 ## Automated tests
 
@@ -46,13 +46,13 @@ Run the dev app with a goal and a lesson of 3 parts, focus length 1 minute (Ayar
 | M3 | Reload the window (`Ctrl+R`) | Timer and part still there |
 | M4 | Narrow the window below 900 px | One column, timer first |
 | M5 | Wait for the end | Save form: note "<lesson> — <part>", box ticked; "Kaydet" |
-| M6 | Lesson page | Part 1 "✓ Tamamlandı"; calendar day shows the session with the note |
-| M7 | Back on Pomodoro after saving: "Molaya başla", finish the break, "Sonraki parça: …" | The offer survives the break; part 2 runs with the same goal |
-| M8 | Stop part 2 early (after 1 minute of a longer timer) | Saved as stopped; part 2 not done; open part 2 again: goal preselected; keyboard reaches the select, the button and the box with a visible focus ring |
+| M6 | Still on Pomodoro after saving: "Molaya başla", "Molayı bitir", "Sonraki parça: …" (the offer lives in page state, so this comes before leaving the page), then "Durdur" under a minute | The offer survives the break; part 2 runs with the same goal; nothing is saved for under a minute |
+| M7 | Lesson page and the day's calendar page | Part 1 "✓ Tamamlandı", "1 / 3 parça"; the day shows the session with the note |
+| M8 | Focus length 3, open part 3, "Bu parçayı çalış", "Durdur" after a minute | Goal preselected; saved as stopped; part 3 not done, no next part. Keyboard reaches the select, the button and the box with a visible focus ring |
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M8 done with the expected results
-- [ ] `roadmap.md` phase 10.2 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M8 done with the expected results
+- [x] `roadmap.md` phase 10.2 ticked and set to `done`

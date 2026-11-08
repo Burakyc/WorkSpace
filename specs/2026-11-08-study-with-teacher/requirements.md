@@ -30,6 +30,8 @@ A lesson part has "Bu parçayı çalış". It starts a focus timer with the goal
 | Note | Prefilled with "<lesson> — <part>", editable. |
 | Tags | The session starts with the lesson's tags (at most 10). |
 | Addition: unreadable lesson | `StudyPartPanel` shows "Parça yüklenemedi." when the lesson read fails, apart from "Parça bulunamadı." for a gone lesson or part. |
+| Fix found in manual testing | In two columns the timer's fields overflowed onto the part, and the save form ran off the screen while sticky. The panel now takes the column's width and scrolls inside (`fix(pomodoro): fit the timer panel in its column`). |
+| Fix found while testing | An existing Pomodoro shortcut test read `localStorage` before the provider's save effect and failed under load; it now waits (`test(pomodoro): wait for the stored timer in the shortcut test`). |
 | Deviation: test fake | `learning/testing/studyApi.ts` puts the two existing fakes behind one `fetch`, instead of adding goals and settings to `fakeContentApi`. Less change in a shared file. |
 
 ## User stories
