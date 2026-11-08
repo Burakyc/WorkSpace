@@ -755,3 +755,17 @@ Implement the spec in specs/2026-11-07-mvp-release/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 7.4 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** version 0.1.0 (desktop, API, user agents); `tokens.test.ts` contrast check and the muted text / field border fix; `DevPath Setup 0.1.0.exe` built, installed silently and checked: first run, empty states, three starts at ~1.6 s, the study session, interview import and look-back scenarios, 25 minutes minimized, simulated offline start, keyboard, light and dark, reminders, backups; test data removed; phase 7.4 done, tag `v0.1.0` on the user's yes.
+
+## 2026-11-08 – Plan phase 9.1 mode setting and copy-paste mode
+**Phase:** 9.1 Mode setting and copy-paste mode
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 9.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-08-ai-mode-setting/` (`requirements.md`, `plan.md`, `validation.md`).
