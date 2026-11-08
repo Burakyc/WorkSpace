@@ -23,6 +23,9 @@ public sealed record ContentType(
         Load(Post, "posts", "title", []),
     ];
 
+    /// <summary>The source of a link's draft prompt: validated like an import, but never imported or stored, so it is not in <see cref="All"/>.</summary>
+    public static readonly ContentType LinkAnalysis = Load("link-analysis", "posts", "url", []);
+
     public static ContentType? Find(string? name) => All.FirstOrDefault(type => type.Name == name);
 
     /// <summary>The type with this name; an unknown name is a validation error on <c>type</c>.</summary>
