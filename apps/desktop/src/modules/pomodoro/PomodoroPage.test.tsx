@@ -472,13 +472,16 @@ describe('PomodoroPage shortcut', () => {
     pressShortcut();
 
     expect(await screen.findByRole('button', { name: 'Duraklat' })).toBeInTheDocument();
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
-      status: 'running',
-      kind: 'focus',
-      goalId: 'a',
-      projectId: 'p1',
-      tags: ['di'],
-    });
+    // The state is stored in an effect, which may run after the button appears.
+    await waitFor(() =>
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toMatchObject({
+        status: 'running',
+        kind: 'focus',
+        goalId: 'a',
+        projectId: 'p1',
+        tags: ['di'],
+      }),
+    );
     expect(goalSelect()).toHaveValue('a');
   });
 
