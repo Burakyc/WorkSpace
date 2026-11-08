@@ -32,6 +32,14 @@ The user pastes a YouTube link or any URL on Gönderiler. The API reads the titl
 | Prompt | `prompts/link-analysis.md` shows the analysis shape and asks for a `post` answer, so `AiContentPanel` with `type="post"` works unchanged in all three modes. |
 | No fetch without a click | Reading happens only on "Oku". Nothing reads a link on its own, and reading costs nothing. |
 
+### Deviations found while implementing
+
+| Topic | What happened |
+|---|---|
+| Check per task | Tasks 1–4 touch only the API. They were checked with `npm run check:api` (build and tests), and the full `npm run check` ran before task 5's commit, instead of a full run per task. Tasks 1 and 2 were written and checked together, then committed apart; so were tasks 3 and 4. |
+| Static class | `LinkAnalysisService` is static: it needs no storage or clock. The name follows the plan. |
+| Manual reads | M1, M2 and M4 made real GET requests to YouTube, `learn.microsoft.com` and `localtest.me`, as the steps say. No AI provider was called: API mode used the local stub and a made-up key, removed afterwards. |
+
 ## User stories
 
 1. **As the user**, I paste a YouTube link, press "Oku", see the title, channel and description, write why I liked it, and get a draft I copy to LinkedIn.

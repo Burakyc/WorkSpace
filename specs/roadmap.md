@@ -257,9 +257,9 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Draft fields: title, body, hashtags, source link, image suggestion; saved in `posts.json`.
 - [x] "Kopyala" copies the text. There is no post button and no LinkedIn API call.
 
-#### 11.3 Drafts from a YouTube video or link — `todo`
-- [ ] Paste a YouTube link or any URL; the app fills the link-analysis fields (`schemas/link-analysis.schema.json`) and drafts a post.
-- [ ] The "Preparing a post" scenario works end to end.
+#### 11.3 Drafts from a YouTube video or link — `done`
+- [x] Paste a YouTube link or any URL; the app fills the link-analysis fields (`schemas/link-analysis.schema.json`) and drafts a post.
+- [x] The "Preparing a post" scenario works end to end.
 
 ### Later (order to be decided)
 

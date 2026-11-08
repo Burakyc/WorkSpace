@@ -904,4 +904,4 @@ Implement the spec in specs/2026-11-09-link-drafts/.
 - After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 11.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
-**Result:**
+**Result:** `schemas/link-analysis.schema.json`, `prompts/link-analysis.md` (`ContentType.LinkAnalysis`, validated but never imported or stored); `LinkAddress` (public https only, DNS and redirects checked), `LinkReader` with the named client `link`, `HtmlMeta`, `YouTubeLink`, `POST /api/posts/link/read` and `/context`; "Bağlantıdan taslak" on Gönderiler with a required note; validated with real reads of public pages and a local AI stub, no paid call; tech-stack and specs updated; phase 11.3 done.

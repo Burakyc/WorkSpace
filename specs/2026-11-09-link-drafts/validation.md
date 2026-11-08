@@ -6,11 +6,11 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 11.3, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Pasting a YouTube link or any URL fills the link-analysis fields (`schemas/link-analysis.schema.json`), and they can be corrected.
-- [ ] A draft comes from those fields, the required note and the style prompt, in any AI mode.
-- [ ] Non-https, local and private addresses are refused, also through redirects and DNS.
-- [ ] A failed read never stops the flow: the fields can be filled by hand.
-- [ ] The "Preparing a post" scenario works end to end.
+- [x] Pasting a YouTube link or any URL fills the link-analysis fields (`schemas/link-analysis.schema.json`), and they can be corrected.
+- [x] A draft comes from those fields, the required note and the style prompt, in any AI mode.
+- [x] Non-https, local and private addresses are refused, also through redirects and DNS.
+- [x] A failed read never stops the flow: the fields can be filled by hand.
+- [x] The "Preparing a post" scenario works end to end.
 
 ## Automated tests
 
@@ -56,7 +56,7 @@ In the dev app (`%APPDATA%\DevPath\dev-data`). Reading a public page is free. Ne
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M11 done with the expected results
-- [ ] `roadmap.md` phase 11.3 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M11 done with the expected results
+- [x] `roadmap.md` phase 11.3 ticked and set to `done`
