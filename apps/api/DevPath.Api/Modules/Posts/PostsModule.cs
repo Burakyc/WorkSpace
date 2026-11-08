@@ -16,6 +16,9 @@ public static class PostsModule
     public static IServiceCollection AddPosts(this IServiceCollection services)
     {
         services.AddSingleton<StyleService>();
+        services.AddSingleton<IRepository<PostDraft>>(provider =>
+            new JsonRepository<PostDraft>(provider.GetRequiredService<JsonFileStore>(), DraftsFileName, DraftsSchema));
+        services.AddSingleton<PostDraftService>();
         return services;
     }
 }
