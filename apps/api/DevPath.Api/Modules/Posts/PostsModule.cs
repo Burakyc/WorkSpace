@@ -1,4 +1,6 @@
+using System.Net;
 using DevPath.Api.Infrastructure.Storage;
+using DevPath.Api.Modules.System;
 
 namespace DevPath.Api.Modules.Posts;
 
@@ -20,6 +22,19 @@ public static class PostsModule
             new JsonRepository<PostDraft>(provider.GetRequiredService<JsonFileStore>(), DraftsFileName, DraftsSchema));
         services.AddSingleton<PostDraftService>();
         services.AddSingleton<PostContextService>();
+        services.AddSingleton<LinkReader>();
+        services.AddHttpClient(LinkReader.ClientName, client =>
+        {
+            client.Timeout = LinkReader.Timeout;
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"DevPath/{AppInfo.Version}");
+        }).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            AllowAutoRedirect = false,
+            UseCookies = false,
+            UseProxy = false,
+            AutomaticDecompression = DecompressionMethods.All,
+            ConnectCallback = LinkReader.ConnectPublicAsync,
+        });
         return services;
     }
 }

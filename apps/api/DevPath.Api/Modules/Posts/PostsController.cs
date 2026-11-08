@@ -4,8 +4,12 @@ namespace DevPath.Api.Modules.Posts;
 
 [ApiController]
 [Route("api/posts")]
-public sealed class PostsController(StyleService style, PostDraftService drafts, PostContextService contexts) : ControllerBase
+public sealed class PostsController(StyleService style, PostDraftService drafts, PostContextService contexts, LinkReader links) : ControllerBase
 {
+    [HttpPost("link/read")]
+    public Task<LinkRead> ReadLink(LinkReadInput input, CancellationToken cancellationToken) =>
+        links.ReadAsync(input, cancellationToken);
+
     [HttpPost("project-context")]
     public Task<DraftContext> ProjectContext(ProjectContextInput input, CancellationToken cancellationToken) =>
         contexts.BuildAsync(input, cancellationToken);
