@@ -19,6 +19,10 @@
   background: var(--color-surface);
 }
 
+.modeField {
+  max-width: 20rem;
+}
+
 .panelTitle {
   margin: 0;
   font-size: var(--font-size-lg);

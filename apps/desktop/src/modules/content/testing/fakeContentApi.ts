@@ -1,5 +1,8 @@
 import { vi } from 'vitest';
 import type {
+  AiMode,
+  AiModes,
+  AiModule,
   ContentItemBase,
   ContentTopic,
   ImportError,
@@ -33,10 +36,22 @@ export function installFakeContentApi(
     topics?: FakeTopic[];
     failTopics?: boolean;
     failMark?: boolean;
+    /** Saved modes in GET /api/settings (default: copy-paste everywhere). */
+    aiModes?: Partial<AiModes>;
+    /** GET and PUT /api/settings fail. */
+    failSettings?: boolean;
+    /** Only PUT /api/settings/ai-modes fails. */
+    failAiModeSave?: boolean;
   } = {},
 ) {
   const requests: { method: string; path: string; body: unknown }[] = [];
   const topics: FakeTopic[] = structuredClone(options.topics ?? []);
+  const aiModes: AiModes = {
+    english: 'copyPaste',
+    learning: 'copyPaste',
+    interview: 'copyPaste',
+    ...options.aiModes,
+  };
 
   function summary(topic: FakeTopic): TopicSummary {
     const marks: Record<string, number> = {};
@@ -99,6 +114,14 @@ export function installFakeContentApi(
     const body: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
     requests.push({ method, path: pathname, body });
 
+    if (pathname.startsWith('/api/settings')) {
+      if (options.failSettings) return Promise.resolve(json({ title: 'Error' }, 500));
+      if (method === 'GET') return Promise.resolve(json({ aiModes }));
+      if (options.failAiModeSave) return Promise.resolve(json({ title: 'Error' }, 500));
+      const module = pathname.split('/').pop() as AiModule;
+      aiModes[module] = (body as { mode: AiMode }).mode;
+      return Promise.resolve(json(aiModes));
+    }
     if (options.failImport && pathname.startsWith('/api/import')) {
       return Promise.resolve(json({ title: 'Error' }, 500));
     }

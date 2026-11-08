@@ -1,0 +1,21 @@
+import type { AiMode, AiModule, ContentType } from '../../shared/api/types';
+
+/** The rows of Ayarlar → "Yapay zekâ modları". */
+export const AI_MODULES: readonly { id: AiModule; label: string }[] = [
+  { id: 'english', label: 'İngilizce' },
+  { id: 'learning', label: 'Öğrenme' },
+  { id: 'interview', label: 'Mülakat' },
+];
+
+export const AI_MODES: readonly { id: AiMode; label: string; disabled?: boolean }[] = [
+  { id: 'copyPaste', label: 'Kopyala-yapıştır' },
+  { id: 'file', label: 'Dosyadan içe aktar (yakında)', disabled: true },
+  { id: 'api', label: 'API (yakında)', disabled: true },
+];
+
+/** The module whose mode applies to a content type's topic list. */
+export const AI_MODULE_OF_TYPE: Readonly<Record<ContentType, AiModule>> = {
+  vocab: 'english',
+  lesson: 'learning',
+  interview: 'interview',
+};
