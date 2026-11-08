@@ -155,6 +155,18 @@ export interface AiRunResult {
   output: string | null;
 }
 
+export interface StyleVersion {
+  text: string;
+  savedAt: string;
+}
+
+/** GET /api/posts/style. An empty text means no style yet; history is newest first. */
+export interface StylePrompt {
+  text: string;
+  updatedAt: string | null;
+  history: StyleVersion[];
+}
+
 /** POST /api/inbox/{module}/scan. No errors means the file can be imported. */
 export interface InboxFile {
   name: string;

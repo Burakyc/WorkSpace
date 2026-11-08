@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using DevPath.Api.Modules.Posts;
 
 namespace DevPath.Api.Tests.Modules.Posts;
 
@@ -24,6 +25,23 @@ public class StyleEndpointTests
         Assert.Equal("two", after.GetProperty("text").GetString());
         Assert.Equal("one", after.GetProperty("history")[0].GetProperty("text").GetString());
         Assert.NotEqual(JsonValueKind.Null, after.GetProperty("history")[0].GetProperty("savedAt").ValueKind);
+    }
+
+    [Theory]
+    [InlineData("style-example-en.md")]
+    [InlineData("style-example-tr.md")]
+    public void Each_example_fits_the_limit(string name)
+    {
+        var folder = new DirectoryInfo(AppContext.BaseDirectory);
+        while (folder is not null && !Directory.Exists(Path.Combine(folder.FullName, "prompts")))
+        {
+            folder = folder.Parent;
+        }
+
+        var text = File.ReadAllText(Path.Combine(folder!.FullName, "prompts", name));
+
+        Assert.False(string.IsNullOrWhiteSpace(text));
+        Assert.True(text.TrimEnd().Length <= StyleService.MaxLength);
     }
 
     [Fact]

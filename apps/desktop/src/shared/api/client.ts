@@ -36,6 +36,7 @@ import type {
   ProjectUpdateInput,
   Session,
   SessionInput,
+  StylePrompt,
   TopicSummary,
   VisitChanges,
   YouTubeChannel,
@@ -87,6 +88,9 @@ export interface ApiClient {
     type: ContentType,
     names: string[],
   ): Promise<{ results: InboxImportResult[] }>;
+  getStylePrompt(): Promise<StylePrompt>;
+  /** Saves the text; a changed text moves the old one to the history. */
+  saveStylePrompt(text: string): Promise<StylePrompt>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
   getDay(date: string, timeZone: string): Promise<DayDetail>;
@@ -219,6 +223,8 @@ export function createApiClient(
         type,
         names,
       }),
+    getStylePrompt: () => request<StylePrompt>('GET', '/api/posts/style'),
+    saveStylePrompt: (text) => request<StylePrompt>('PUT', '/api/posts/style', { text }),
     getCalendar: (month, timeZone) =>
       request<CalendarMonth>(
         'GET',
