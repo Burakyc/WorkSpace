@@ -975,3 +975,17 @@ Add a new section "### Opportunity tracker" with phase "12.1 Opportunity sites" 
 - Links only: the app does not fetch, scrape or store any listings from these sites.
 - Tests: adding, removing and validating a site (https only).
 **Result:** added "### Opportunity tracker" with phase 12.1 Opportunity sites (four unchecked items) before "Later" in `specs/roadmap.md`; no code.
+
+## 2026-11-09 – Plan phase 12.1 opportunity sites
+**Phase:** 12.1 Opportunity sites
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 12.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-09-opportunity-sites/` (`requirements.md`, `plan.md`, `validation.md`).
