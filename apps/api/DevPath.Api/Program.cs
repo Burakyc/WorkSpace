@@ -9,6 +9,7 @@ using DevPath.Api.Modules.Content;
 using DevPath.Api.Modules.Goals;
 using DevPath.Api.Modules.Home;
 using DevPath.Api.Modules.Notes;
+using DevPath.Api.Modules.Opportunities;
 using DevPath.Api.Modules.Pomodoro;
 using DevPath.Api.Modules.Posts;
 using DevPath.Api.Modules.Projects;
@@ -45,6 +46,7 @@ builder.Services.AddSingleton<DayService>();
 builder.Services.AddSingleton<FeedService>();
 builder.Services.AddYouTube();
 builder.Services.AddGitHub();
+builder.Services.AddOpportunities();
 
 var app = builder.Build();
 
