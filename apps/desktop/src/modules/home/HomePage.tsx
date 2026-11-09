@@ -4,6 +4,7 @@ import { GitHubCard } from './GitHubCard';
 import styles from './HomePage.module.css';
 import { RemindersCard } from './RemindersCard';
 import { TodayCard } from './TodayCard';
+import { OpportunitiesCard } from './OpportunitiesCard';
 import { VideosCard } from './VideosCard';
 
 /** Ana Sayfa: independent cards; each loads its own data, so one failing never hides another. */
@@ -17,6 +18,7 @@ export function HomePage() {
         <RemindersCard />
         <GitHubCard />
         <VideosCard />
+        <OpportunitiesCard />
         <FeedCard />
       </div>
     </>
