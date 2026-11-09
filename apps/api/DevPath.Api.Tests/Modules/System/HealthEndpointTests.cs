@@ -21,7 +21,7 @@ public class HealthEndpointTests(ApiFactory factory) : IClassFixture<ApiFactory>
         var root = JsonDocument.Parse(json).RootElement;
 
         Assert.Equal("ok", root.GetProperty("status").GetString());
-        Assert.Equal("0.2.0", root.GetProperty("version").GetString());
+        Assert.Equal("0.3.0", root.GetProperty("version").GetString());
     }
 
     [Fact]
