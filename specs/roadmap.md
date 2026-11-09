@@ -249,17 +249,17 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Post assistant
 
-#### 11.1 Style prompt — `todo`
-- [ ] Editor for the user's style prompt (`style.json`) with an example and version history (last 10).
+#### 11.1 Style prompt — `done`
+- [x] Editor for the user's style prompt (`style.json`) with an example and version history (last 10).
 
-#### 11.2 Drafts from a project — `todo`
-- [ ] Pick a project; the assistant builds a prompt from the project, its sessions and notes plus the style prompt.
-- [ ] Draft fields: title, body, hashtags, source link, image suggestion; saved in `posts.json`.
-- [ ] "Kopyala" copies the text. There is no post button and no LinkedIn API call.
+#### 11.2 Drafts from a project — `done`
+- [x] Pick a project; the assistant builds a prompt from the project, its sessions and notes plus the style prompt.
+- [x] Draft fields: title, body, hashtags, source link, image suggestion; saved in `posts.json`.
+- [x] "Kopyala" copies the text. There is no post button and no LinkedIn API call.
 
-#### 11.3 Drafts from a YouTube video or link — `todo`
-- [ ] Paste a YouTube link or any URL; the app fills the link-analysis fields (`schemas/link-analysis.schema.json`) and drafts a post.
-- [ ] The "Preparing a post" scenario works end to end.
+#### 11.3 Drafts from a YouTube video or link — `done`
+- [x] Paste a YouTube link or any URL; the app fills the link-analysis fields (`schemas/link-analysis.schema.json`) and drafts a post.
+- [x] The "Preparing a post" scenario works end to end.
 
 ### Later (order to be decided)
 

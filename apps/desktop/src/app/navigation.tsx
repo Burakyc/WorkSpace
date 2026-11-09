@@ -4,6 +4,7 @@ import {
   GraduationCap,
   House,
   Languages,
+  Megaphone,
   MessagesSquare,
   NotebookPen,
   Settings,
@@ -19,6 +20,7 @@ import { GoalsPage } from '../modules/goals/GoalsPage';
 import { HomePage } from '../modules/home/HomePage';
 import { NotesPage } from '../modules/notes/NotesPage';
 import { PomodoroPage } from '../modules/pomodoro/PomodoroPage';
+import { PostsPage } from '../modules/posts/PostsPage';
 import { SettingsPage } from '../modules/settings/SettingsPage';
 import { EmptyState } from '../shared/ui/EmptyState';
 
@@ -60,6 +62,7 @@ export const navigation: readonly NavEntry[] = [
     icon: MessagesSquare,
     element: <InterviewPage />,
   },
+  { path: '/posts', label: 'Gönderiler', icon: Megaphone, element: <PostsPage /> },
   { path: '/settings', label: 'Ayarlar', icon: Settings, element: <SettingsPage /> },
 ];
 

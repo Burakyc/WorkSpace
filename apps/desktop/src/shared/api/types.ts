@@ -126,7 +126,7 @@ export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
 export type AiMode = 'copyPaste' | 'file' | 'api';
 
 /** The modules with an AI mode setting; a later module adds its name (also in the API's `AiModes`). */
-export type AiModule = 'english' | 'learning' | 'interview';
+export type AiModule = 'english' | 'learning' | 'interview' | 'posts';
 
 export type AiModes = Record<AiModule, AiMode>;
 
@@ -154,6 +154,60 @@ export interface AiRunResult {
   usage: { inputTokens: number; outputTokens: number; costUsd: number } | null;
   output: string | null;
 }
+
+export interface StyleVersion {
+  text: string;
+  savedAt: string;
+}
+
+/** GET /api/posts/style. An empty text means no style yet; history is newest first. */
+export interface StylePrompt {
+  text: string;
+  updatedAt: string | null;
+  history: StyleVersion[];
+}
+
+/** A saved LinkedIn draft; `topic` says what it was drafted from. Hashtags have no leading #. */
+export interface PostDraft {
+  id: string;
+  topic: string;
+  title: string;
+  body: string;
+  hashtags: string[];
+  sourceLink: string | null;
+  imageSuggestion: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** What a draft prompt is built from. */
+export interface DraftContext {
+  topic: string;
+  text: string;
+}
+
+/** POST /api/posts/link/read. `error` says why nothing could be read; the user then fills in the fields. */
+export interface LinkRead {
+  url: string;
+  source: 'youtube' | 'page';
+  title: string | null;
+  author: string | null;
+  description: string | null;
+  error: string | null;
+}
+
+export interface LinkContextInput {
+  url: string;
+  title: string;
+  author: string;
+  description: string;
+  note: string;
+}
+
+export type PostDraftInput = Pick<
+  PostDraft,
+  'title' | 'body' | 'hashtags' | 'sourceLink' | 'imageSuggestion'
+>;
 
 /** POST /api/inbox/{module}/scan. No errors means the file can be imported. */
 export interface InboxFile {
@@ -259,7 +313,7 @@ export interface DayDetail {
 }
 
 /** A content type of the shared import format; each module imports one. */
-export type ContentType = 'vocab' | 'lesson' | 'interview';
+export type ContentType = 'vocab' | 'lesson' | 'interview' | 'post';
 
 /** One import problem: JSON pointer of the value, its 1-based line (null when unknown) and a Turkish message. */
 export interface ImportError {

@@ -7,7 +7,7 @@ public static class AiModes
     public const string File = "file";
     public const string Api = "api";
 
-    public static readonly IReadOnlyList<string> Modules = ["english", "learning", "interview"];
+    public static readonly IReadOnlyList<string> Modules = ["english", "learning", "interview", "posts"];
 
     /// <summary>The modes that work; anything else is refused on save and reads as <see cref="CopyPaste"/>.</summary>
     public static readonly IReadOnlyList<string> Available = [CopyPaste, File, Api];

@@ -31,7 +31,7 @@ public sealed class SettingsServiceTests : IDisposable
 
         var settings = await _settings.GetAsync(CancellationToken.None);
 
-        Assert.Equal(["english", "interview", "learning"], settings.AiModes.Keys.Order());
+        Assert.Equal(["english", "interview", "learning", "posts"], settings.AiModes.Keys.Order());
         Assert.All(settings.AiModes.Values, mode => Assert.Equal(AiModes.CopyPaste, mode));
     }
 
@@ -42,7 +42,7 @@ public sealed class SettingsServiceTests : IDisposable
 
         var modes = await _settings.SaveAiModeAsync("english", AiModes.CopyPaste, CancellationToken.None);
 
-        Assert.Equal(3, modes.Count);
+        Assert.Equal(AiModes.Modules.Count, modes.Count);
         var read = await _settings.GetAsync(CancellationToken.None);
         Assert.Equal(50, read.Pomodoro.FocusMinutes);
         var saved = JsonNode.Parse(await File.ReadAllTextAsync(SettingsFile))!;
@@ -59,7 +59,7 @@ public sealed class SettingsServiceTests : IDisposable
 
         var settings = await _settings.GetAsync(CancellationToken.None);
 
-        Assert.Equal(3, settings.AiInbox.Count);
+        Assert.Equal(AiModes.Modules.Count, settings.AiInbox.Count);
         Assert.All(settings.AiInbox.Values, Assert.Null);
     }
 

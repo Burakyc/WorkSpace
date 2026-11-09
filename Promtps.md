@@ -881,3 +881,79 @@ Implement the spec in specs/2026-11-08-study-with-teacher/.
 - If a task turns out bigger or different than planned, stop and ask before changing the plan.
 - When every item in validation.md passes, mark Phase 10.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `lessonPart` on the timer state; `StudyPartForm` on the part page (goal remembered per lesson, lesson tags, opens Pomodoro); `StudyPartPanel` and shared `PartContent` next to the timer in two columns; prefilled note, ticked "Bu parçayı tamamlandı işaretle", marking after the save and "Sonraki parça"; a layout fix and a racy test fix; no API change; tech-stack and specs updated; phase 10.2 done.
+
+
+## 2026-11-09 – Plan phase 11.1 style prompt
+**Phase:** 11.1 Style prompt
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 11.1 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-09-style-prompt/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-09 – Implement phase 11.1 style prompt
+**Phase:** 11.1 Style prompt
+**Prompt:**
+Implement the spec in specs/2026-11-09-style-prompt/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 11.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `Modules/Posts/` (`StyleService`, `GET`/`PUT /api/posts/style`, `style.json` with the last 10 versions); sidebar item Gönderiler (`/posts`) with the style box, the English and Turkish examples (`prompts/style-example-*.md`) and the version history; one flaky Pomodoro test fixed; tech-stack and specs updated; phase 11.1 done.
+
+## 2026-11-09 – Plan phase 11.2 drafts from a project
+**Phase:** 11.2 Drafts from a project
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 11.2 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-09-project-drafts/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-09 – Implement phase 11.2 drafts from a project
+**Phase:** 11.2 Drafts from a project
+**Prompt:**
+Implement the spec in specs/2026-11-09-project-drafts/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 11.2 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `schemas/post.schema.json`, `prompts/post.md`, content type `post` saved in `posts.json` (`PostDraftImport`, titles never overwritten); `PostDraftService` with `GET`, `PUT`, `DELETE /api/posts/drafts`; `POST /api/posts/project-context`; `posts` AI module; "Projeden taslak" (project, note pages, prompt preview, `AiContentPanel`) and "Taslaklar" (Kopyala, edit, delete) on Gönderiler; no post button, no LinkedIn call; validated in all three AI modes against a local stub, no paid call; one fix; tech-stack and specs updated; phase 11.2 done.
+
+## 2026-11-09 – Plan phase 11.3 drafts from a YouTube video or link
+**Phase:** 11.3 Drafts from a YouTube video or link
+**Prompt:**
+Read README.md, CLAUDE.md, specs/mission.md, specs/tech-stack.md and specs/roadmap.md.
+Plan Phase 11.3 in roadmap.md. Only plan; do not write any code yet.
+
+Create specs/YYYY-MM-DD-<feature-name>/ with:
+- requirements.md (scope, user stories, business rules, out of scope)
+- plan.md (small, numbered tasks in order, one Conventional Commit per task)
+- validation.md (acceptance criteria, automated tests and manual test steps)
+
+Important: You *must* use AskUserQuestion before writing to disk.
+**Result:** created `specs/2026-11-09-link-drafts/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-09 – Implement phase 11.3 drafts from a YouTube video or link
+**Phase:** 11.3 Drafts from a YouTube video or link
+**Prompt:**
+Implement the spec in specs/2026-11-09-link-drafts/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 11.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `schemas/link-analysis.schema.json`, `prompts/link-analysis.md` (`ContentType.LinkAnalysis`, validated but never imported or stored); `LinkAddress` (public https only, DNS and redirects checked), `LinkReader` with the named client `link`, `HtmlMeta`, `YouTubeLink`, `POST /api/posts/link/read` and `/context`; "Bağlantıdan taslak" on Gönderiler with a required note; validated with real reads of public pages and a local AI stub, no paid call; tech-stack and specs updated; phase 11.3 done.

@@ -40,6 +40,7 @@ describe('AppLayout', () => {
       'İngilizce',
       'Öğrenme',
       'Mülakat',
+      'Gönderiler',
       'Ayarlar',
     ]);
   });

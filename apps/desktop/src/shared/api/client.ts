@@ -17,6 +17,7 @@ import type {
   ContentTopic,
   ContentType,
   DayDetail,
+  DraftContext,
   FeedResponse,
   GitHubSettings,
   GitHubStatus,
@@ -26,16 +27,21 @@ import type {
   HealthResponse,
   ImportResult,
   ImportValidation,
+  LinkContextInput,
+  LinkRead,
   NoteKind,
   NoteNode,
   NoteSearchResult,
   PomodoroSettings,
+  PostDraft,
+  PostDraftInput,
   ReminderSettings,
   Project,
   ProjectCreateInput,
   ProjectUpdateInput,
   Session,
   SessionInput,
+  StylePrompt,
   TopicSummary,
   VisitChanges,
   YouTubeChannel,
@@ -87,6 +93,19 @@ export interface ApiClient {
     type: ContentType,
     names: string[],
   ): Promise<{ results: InboxImportResult[] }>;
+  getStylePrompt(): Promise<StylePrompt>;
+  /** Saves the text; a changed text moves the old one to the history. */
+  saveStylePrompt(text: string): Promise<StylePrompt>;
+  /** Newest first. New drafts arrive through the import with type `post`. */
+  listDrafts(): Promise<PostDraft[]>;
+  saveDraft(id: string, input: PostDraftInput): Promise<PostDraft>;
+  deleteDraft(id: string): Promise<void>;
+  /** The source text of a draft: the project, its sessions and the chosen pages. */
+  getProjectContext(projectId: string, noteIds: readonly string[]): Promise<DraftContext>;
+  /** Reads a public https link once. A bad address is a 400; a failed read answers `error`. */
+  readLink(url: string): Promise<LinkRead>;
+  /** The source text of a link's draft, checked against the link-analysis schema. */
+  getLinkContext(input: LinkContextInput): Promise<DraftContext>;
   /** `timeZone` is an IANA id; sessions are grouped by their local start date in it. */
   getCalendar(month: string, timeZone: string): Promise<CalendarMonth>;
   getDay(date: string, timeZone: string): Promise<DayDetail>;
@@ -219,6 +238,16 @@ export function createApiClient(
         type,
         names,
       }),
+    getStylePrompt: () => request<StylePrompt>('GET', '/api/posts/style'),
+    saveStylePrompt: (text) => request<StylePrompt>('PUT', '/api/posts/style', { text }),
+    listDrafts: () => request<PostDraft[]>('GET', '/api/posts/drafts'),
+    saveDraft: (id, input) =>
+      request<PostDraft>('PUT', `/api/posts/drafts/${encodeURIComponent(id)}`, input),
+    deleteDraft: (id) => request<void>('DELETE', `/api/posts/drafts/${encodeURIComponent(id)}`),
+    getProjectContext: (projectId, noteIds) =>
+      request<DraftContext>('POST', '/api/posts/project-context', { projectId, noteIds }),
+    readLink: (url) => request<LinkRead>('POST', '/api/posts/link/read', { url }),
+    getLinkContext: (input) => request<DraftContext>('POST', '/api/posts/link/context', input),
     getCalendar: (month, timeZone) =>
       request<CalendarMonth>(
         'GET',

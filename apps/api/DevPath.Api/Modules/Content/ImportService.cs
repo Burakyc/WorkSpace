@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using DevPath.Api.Infrastructure.Storage;
 using DevPath.Api.Modules.Pomodoro;
+using DevPath.Api.Modules.Posts;
 
 namespace DevPath.Api.Modules.Content;
 
@@ -23,6 +24,11 @@ public sealed class ImportService(JsonFileStore store, TimeProvider time)
         if (document is null)
         {
             return new ImportResult(errors, null);
+        }
+
+        if (contentType.Name == ContentType.Post)
+        {
+            return new ImportResult([], await PostDraftImport.MergeAsync(store, time, document, cancellationToken));
         }
 
         var topic = document["topic"]!.GetValue<string>().Trim();

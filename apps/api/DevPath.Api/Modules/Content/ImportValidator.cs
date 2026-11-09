@@ -151,7 +151,7 @@ public static partial class ImportValidator
             "enum" => $"Şunlardan biri olmalı: {string.Join(", ", rule?["enum"]?.AsArray().Select(v => v?.ToString()) ?? [])}.",
             "minLength" => Limit(rule, keyword) == 1 ? "Boş olamaz." : $"En az {Limit(rule, keyword)} karakter olmalı.",
             "maxLength" => $"En fazla {Limit(rule, keyword)} karakter olabilir.",
-            "pattern" => "Yalnızca boşluktan oluşamaz.",
+            "pattern" => rule?["pattern"]?.GetValue<string>() == @"\S" ? "Yalnızca boşluktan oluşamaz." : "Biçimi geçersiz.",
             "minItems" => $"En az {Limit(rule, keyword)} öğe olmalı.",
             "maxItems" => $"En fazla {Limit(rule, keyword)} öğe olabilir.",
             _ => fallback,

@@ -10,6 +10,7 @@ using DevPath.Api.Modules.Goals;
 using DevPath.Api.Modules.Home;
 using DevPath.Api.Modules.Notes;
 using DevPath.Api.Modules.Pomodoro;
+using DevPath.Api.Modules.Posts;
 using DevPath.Api.Modules.Projects;
 using DevPath.Api.Modules.Settings;
 
@@ -37,6 +38,7 @@ builder.Services.AddProjects();
 builder.Services.AddNotes();
 builder.Services.AddContent();
 builder.Services.AddAi();
+builder.Services.AddPosts();
 builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddSingleton<CalendarService>();
 builder.Services.AddSingleton<DayService>();

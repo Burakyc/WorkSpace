@@ -149,7 +149,7 @@ public sealed class ImportServiceTests : IDisposable
     {
         var error = Assert.Throws<ValidationException>(() => _service.Validate("x", "{}"));
 
-        Assert.Equal(["Tür vocab, lesson veya interview olmalı."], error.Errors["type"]);
+        Assert.Equal(["Tür vocab, lesson, interview veya post olmalı."], error.Errors["type"]);
     }
 
     private async Task<JsonObject> ReadTopicAsync() =>

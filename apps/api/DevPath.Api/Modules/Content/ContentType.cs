@@ -12,12 +12,19 @@ namespace DevPath.Api.Modules.Content;
 public sealed record ContentType(
     string Name, string Folder, string KeyField, IReadOnlyList<string> Marks, JsonSchema Schema, JsonNode Definition)
 {
+    /// <summary>A draft, not a topic: its items go to posts.json (see <see cref="ImportService"/>), and Folder and Marks are unused.</summary>
+    public const string Post = "post";
+
     public static readonly IReadOnlyList<ContentType> All =
     [
         Load("vocab", "english", "term", ["known", "repeat"]),
         Load("lesson", "learning", "title", ["done"]),
         Load("interview", "interview", "question", ["practised"]),
+        Load(Post, "posts", "title", []),
     ];
+
+    /// <summary>The source of a link's draft prompt: validated like an import, but never imported or stored, so it is not in <see cref="All"/>.</summary>
+    public static readonly ContentType LinkAnalysis = Load("link-analysis", "posts", "url", []);
 
     public static ContentType? Find(string? name) => All.FirstOrDefault(type => type.Name == name);
 
@@ -25,7 +32,7 @@ public sealed record ContentType(
     public static ContentType Require(string? name) =>
         Find(name) ?? throw new ValidationException(new Dictionary<string, string[]>
         {
-            ["type"] = ["Tür vocab, lesson veya interview olmalı."],
+            ["type"] = ["Tür vocab, lesson, interview veya post olmalı."],
         });
 
     private static ContentType Load(string name, string folder, string keyField, IReadOnlyList<string> marks)
