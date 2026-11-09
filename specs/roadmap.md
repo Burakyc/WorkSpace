@@ -261,6 +261,14 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 - [x] Paste a YouTube link or any URL; the app fills the link-analysis fields (`schemas/link-analysis.schema.json`) and drafts a post.
 - [x] The "Preparing a post" scenario works end to end.
 
+### Opportunity tracker
+
+#### 12.1 Opportunity sites
+- [ ] A list of followed opportunity sites (name and URL) in Ayarlar, starting with youthall.com, anbean.com.tr, coderspace.io and patika.dev; the user can add and remove sites.
+- [ ] An Ana Sayfa card lists the sites; clicking one opens it in the browser with `openExternal`.
+- [ ] Links only: the app does not fetch, scrape or store any listings from these sites.
+- [ ] Tests: adding, removing and validating a site (https only).
+
 ### Later (order to be decided)
 
 - **Spaced repetition** for English and Interview cards (replaces the simple "know / repeat" marks).

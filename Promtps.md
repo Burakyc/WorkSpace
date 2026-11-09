@@ -963,3 +963,15 @@ Implement the spec in specs/2026-11-09-link-drafts/.
 **Prompt:**
 çalışıyordur test etmiyecem şimdi benim release güncelle ve bilgilerim gitmesin ama kur benim bilgisayra
 **Result:** version 0.2.0 in `Directory.Build.props`, `package.json` and the lockfile; `DevPath Setup 0.2.0.exe` built and installed over 0.1.0 with the data folder intact and backed up first; tag `v0.2.0`.
+
+## 2026-11-09 – Add phase 12.1 opportunity sites
+**Phase:** 12.1 Opportunity sites
+**Prompt:**
+Add a new section "### Opportunity tracker" with phase "12.1 Opportunity sites" before "### Later (order to be decided)" in specs/roadmap.md. Do not renumber other phases or write any code.
+
+12.1 Opportunity sites:
+- A list of followed opportunity sites (name and URL) in Ayarlar, starting with youthall.com, anbean.com.tr, coderspace.io and patika.dev; the user can add and remove sites.
+- An Ana Sayfa card lists the sites; clicking one opens it in the browser with openExternal.
+- Links only: the app does not fetch, scrape or store any listings from these sites.
+- Tests: adding, removing and validating a site (https only).
+**Result:** added "### Opportunity tracker" with phase 12.1 Opportunity sites (four unchecked items) before "Later" in `specs/roadmap.md`; no code.
