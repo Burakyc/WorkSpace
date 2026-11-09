@@ -4,7 +4,7 @@ A personal desktop application that manages learning, English practice, intervie
 
 ## Input from stakeholders
 
-- **Engineer ([Name])** : Technology stack, system reliability, scalability, security standards and internal tools for the team/agent.
+- **Engineer ** : Technology stack, system reliability, scalability, security standards and internal tools for the team/agent.
 
   **Technology stack**
   - Desktop shell: Electron
@@ -39,7 +39,7 @@ A personal desktop application that manages learning, English practice, intervie
   - Agent interface: Claude's morning task writes X List summaries to `feed.json` and weekly stats to `stats.json`. The app only reads these files.
   - Prompt library: ready-made prompt templates with format instructions for each content type.
 
-- **Marketing ([Name])** : UI quality, responsive design, performance expectations, featured content/showcase management and user experience standards.
+- **Marketing** : UI quality, responsive design, performance expectations, featured content/showcase management and user experience standards.
 
   **UI quality**
   - Consistent design system: colors, fonts, spacing and components come from a single token file.
@@ -69,7 +69,7 @@ A personal desktop application that manages learning, English practice, intervie
   - Notifications are calm and configurable; the user sets the time of the daily English and tech reminders.
   - Accessibility: sufficient color contrast, full keyboard navigation.
 
-- **Product ([Name])** : Core MVP features (modules, workflows), user scenarios and business rules.
+- **Product ** : Core MVP features (modules, workflows), user scenarios and business rules.
 
   **MVP scope**
   1. Goals and projects: create a goal, link projects to it, progress percentage.
