@@ -303,6 +303,9 @@ describe('createApiClient', () => {
     await client.removeYouTubeChannel('UC 1');
     await client.getYouTubeVideos();
     await client.refreshYouTube();
+    await client.listOpportunitySites();
+    await client.addOpportunitySite('', 'patika.dev');
+    await client.removeOpportunitySite('patika.dev');
     await client.getGitHubSettings();
     await client.saveGitHubSettings('octo');
     await client.getGitHubStats();
@@ -319,6 +322,9 @@ describe('createApiClient', () => {
       [`DELETE ${base}/youtube/channels/UC%201`, undefined],
       [`GET ${base}/youtube/videos`, undefined],
       [`POST ${base}/youtube/refresh`, undefined],
+      [`GET ${base}/opportunities/sites`, undefined],
+      [`POST ${base}/opportunities/sites`, JSON.stringify({ name: '', url: 'patika.dev' })],
+      [`DELETE ${base}/opportunities/sites/patika.dev`, undefined],
       [`GET ${base}/github/settings`, undefined],
       [`PUT ${base}/github/settings`, JSON.stringify({ username: 'octo' })],
       [`GET ${base}/github/stats`, undefined],

@@ -19,6 +19,7 @@ import type {
   Session,
   SessionInput,
   VisitChanges,
+  OpportunitySite,
   YouTubeChannel,
   YouTubeVideos,
 } from '../../../shared/api/types';
@@ -82,6 +83,10 @@ export function installFakeGoalsApi(
     refreshedVideos?: YouTubeVideos;
     failYouTube?: boolean;
     failRefresh?: boolean;
+    /** Opportunity sites; mutated by add/remove. A bare domain is added as `https://<domain>/`. */
+    opportunitySites?: OpportunitySite[];
+    failOpportunities?: boolean;
+    failOpportunityRemove?: boolean;
     /** The saved GitHub username and the stats GET/refresh answer (refresh: `refreshedGitHub`, default the same). */
     gitHubUsername?: string | null;
     gitHub?: Omit<GitHubStatus, 'username'>;
@@ -447,6 +452,31 @@ export function installFakeGoalsApi(
     return json(channel, 201);
   }
 
+  const opportunitySites = (options.opportunitySites ?? []).map((site) => ({ ...site }));
+
+  function opportunitiesRoute(method: string, action: string | undefined, body: unknown) {
+    if (options.failOpportunities) return json({ title: 'Server error' }, 500);
+    if (method === 'GET') return json(opportunitySites);
+    if (method === 'DELETE') {
+      if (options.failOpportunityRemove) return json({ title: 'Server error' }, 500);
+      const index = opportunitySites.findIndex((site) => site.id === action);
+      if (index < 0) return notFound();
+      opportunitySites.splice(index, 1);
+      return new Response(null, { status: 204 });
+    }
+    const { name, url } = body as { name: string; url: string };
+    const host = url.trim();
+    if (host.includes('://')) {
+      return json({ errors: { url: ['Sadece https adresleri eklenebilir.'] } }, 400);
+    }
+    if (opportunitySites.some((site) => site.id === host)) {
+      return json({ errors: { url: ['Bu site zaten ekli.'] } }, 400);
+    }
+    const site = { id: host, name: name.trim(), url: `https://${host}/` };
+    opportunitySites.push(site);
+    return json(site, 201);
+  }
+
   let gitHubUsername = options.gitHubUsername ?? null;
   const noGitHub = { stats: null, fetchedAt: null, lastRefreshAt: null, error: null };
 
@@ -501,6 +531,9 @@ export function installFakeGoalsApi(
           },
         ),
       );
+    }
+    if (resource === 'opportunities') {
+      return Promise.resolve(opportunitiesRoute(method, action, body));
     }
     if (resource === 'youtube') {
       return Promise.resolve(youTubeRoute(method, id, action, body));
@@ -557,6 +590,7 @@ export function installFakeGoalsApi(
     notes,
     contents,
     youTubeChannels,
+    opportunitySites,
     secrets,
     gitHubUsername: () => gitHubUsername,
     closeApp,

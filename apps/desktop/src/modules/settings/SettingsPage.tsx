@@ -7,6 +7,7 @@ import { GitHubSettingsForm } from './GitHubSettingsForm';
 import { PomodoroSettingsForm } from './PomodoroSettingsForm';
 import { ReminderSettingsForm } from './ReminderSettingsForm';
 import styles from './SettingsPage.module.css';
+import { OpportunitySitesForm } from './OpportunitySitesForm';
 import { YouTubeChannelsForm } from './YouTubeChannelsForm';
 
 export function SettingsPage() {
@@ -75,6 +76,7 @@ export function SettingsPage() {
       <AiModesSection />
       <AiApiSection />
       <YouTubeChannelsForm />
+      <OpportunitySitesForm />
       <GitHubSettingsForm />
     </>
   );

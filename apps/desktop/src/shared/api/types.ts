@@ -476,6 +476,13 @@ export interface YouTubeVideos {
   error: string | null;
 }
 
+/** A followed opportunity site; `id` is the host without `www.`, `name` may be empty. */
+export interface OpportunitySite {
+  id: string;
+  name: string;
+  url: string;
+}
+
 /** What main answers to a data folder change. `dataDir` is null when the user cancelled the dialog. */
 export type ChangeDataDirResult = { dataDir: string | null } | { error: string };
 

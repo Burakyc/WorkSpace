@@ -37,6 +37,7 @@ import type {
   PostDraftInput,
   ReminderSettings,
   Project,
+  OpportunitySite,
   ProjectCreateInput,
   ProjectUpdateInput,
   Session,
@@ -153,6 +154,10 @@ export interface ApiClient {
   getYouTubeVideos(): Promise<YouTubeVideos>;
   /** Fetches every channel now, then answers like `getYouTubeVideos`. */
   refreshYouTube(): Promise<YouTubeVideos>;
+  listOpportunitySites(): Promise<OpportunitySite[]>;
+  /** `url` is a bare domain or an https URL; `name` may be empty. */
+  addOpportunitySite(name: string, url: string): Promise<OpportunitySite>;
+  removeOpportunitySite(id: string): Promise<void>;
   getGitHubSettings(): Promise<GitHubSettings>;
   /** Saves the username (empty clears it); a new name is fetched at once. */
   saveGitHubSettings(username: string): Promise<GitHubStatus>;
@@ -296,6 +301,11 @@ export function createApiClient(
       request<void>('DELETE', `/api/youtube/channels/${encodeURIComponent(id)}`),
     getYouTubeVideos: () => request<YouTubeVideos>('GET', '/api/youtube/videos'),
     refreshYouTube: () => request<YouTubeVideos>('POST', '/api/youtube/refresh'),
+    listOpportunitySites: () => request<OpportunitySite[]>('GET', '/api/opportunities/sites'),
+    addOpportunitySite: (name, url) =>
+      request<OpportunitySite>('POST', '/api/opportunities/sites', { name, url }),
+    removeOpportunitySite: (id) =>
+      request<void>('DELETE', `/api/opportunities/sites/${encodeURIComponent(id)}`),
     getGitHubSettings: () => request<GitHubSettings>('GET', '/api/github/settings'),
     saveGitHubSettings: (username) =>
       request<GitHubStatus>('PUT', '/api/github/settings', { username }),
