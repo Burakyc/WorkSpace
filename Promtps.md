@@ -989,3 +989,14 @@ Create specs/YYYY-MM-DD-<feature-name>/ with:
 
 Important: You *must* use AskUserQuestion before writing to disk.
 **Result:** created `specs/2026-11-09-opportunity-sites/` (`requirements.md`, `plan.md`, `validation.md`).
+
+## 2026-11-09 – Implement phase 12.1 opportunity sites
+**Phase:** 12.1 Opportunity sites
+**Prompt:**
+Implement the spec in specs/2026-11-09-opportunity-sites/.
+
+- Follow plan.md task by task, in order.
+- After each task: run the build and tests, then make a Conventional Commit with the message from plan.md.
+- If a task turns out bigger or different than planned, stop and ask before changing the plan.
+- When every item in validation.md passes, mark Phase 12.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
+**Result:** `Modules/Opportunities/` (`OpportunitySite` with four defaults shown until the first edit, `OpportunitySiteUrl` bare domain or https only, `OpportunityService` in `settings.json` → `opportunities.sites`, `GET`/`POST`/`DELETE /api/opportunities/sites`, no HTTP client); Ayarlar → "Fırsat siteleri" (`OpportunitySitesForm`) and the Ana Sayfa card (`OpportunitiesCard`, `openExternal`); validated in the dev app (M1–M7), test section removed afterwards; tech-stack updated; phase 12.1 done.

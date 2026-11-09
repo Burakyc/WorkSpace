@@ -263,11 +263,11 @@ Optional dev container for the API only. The desktop app and `npm run check` nev
 
 ### Opportunity tracker
 
-#### 12.1 Opportunity sites
-- [ ] A list of followed opportunity sites (name and URL) in Ayarlar, starting with youthall.com, anbean.com.tr, coderspace.io and patika.dev; the user can add and remove sites.
-- [ ] An Ana Sayfa card lists the sites; clicking one opens it in the browser with `openExternal`.
-- [ ] Links only: the app does not fetch, scrape or store any listings from these sites.
-- [ ] Tests: adding, removing and validating a site (https only).
+#### 12.1 Opportunity sites — `done`
+- [x] A list of followed opportunity sites (name and URL) in Ayarlar, starting with youthall.com, anbean.com.tr, coderspace.io and patika.dev; the user can add and remove sites.
+- [x] An Ana Sayfa card lists the sites; clicking one opens it in the browser with `openExternal`.
+- [x] Links only: the app does not fetch, scrape or store any listings from these sites.
+- [x] Tests: adding, removing and validating a site (https only).
 
 ### Later (order to be decided)
 

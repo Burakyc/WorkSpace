@@ -6,10 +6,10 @@ The phase is done only when every acceptance criterion below is checked, `npm ru
 
 From `roadmap.md` phase 12.1, plus the decisions in [requirements.md](requirements.md):
 
-- [ ] Ayarlar lists the followed sites, starting with youthall.com, anbean.com.tr, coderspace.io and patika.dev; the user can add and remove sites.
-- [ ] The Ana Sayfa card lists the sites; clicking one opens it in the browser with `openExternal`.
-- [ ] Links only: the module makes no HTTP request and stores nothing but `{ id, name, url }`.
-- [ ] Only https sites can be added; a bare domain becomes `https://`.
+- [x] Ayarlar lists the followed sites, starting with youthall.com, anbean.com.tr, coderspace.io and patika.dev; the user can add and remove sites.
+- [x] The Ana Sayfa card lists the sites; clicking one opens it in the browser with `openExternal`.
+- [x] Links only: the module makes no HTTP request and stores nothing but `{ id, name, url }`.
+- [x] Only https sites can be added; a bare domain becomes `https://`.
 
 ## Automated tests
 
@@ -48,7 +48,7 @@ In the dev app (`%APPDATA%\DevPath\dev-data`). At the end, remove the `opportuni
 
 ## Sign-off
 
-- [ ] All acceptance criteria checked
-- [ ] `npm run check` passes
-- [ ] M1–M7 done with the expected results
-- [ ] `roadmap.md` phase 12.1 ticked and set to `done`
+- [x] All acceptance criteria checked
+- [x] `npm run check` passes
+- [x] M1–M7 done with the expected results
+- [x] `roadmap.md` phase 12.1 ticked and set to `done`
