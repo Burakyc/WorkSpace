@@ -958,11 +958,6 @@ Implement the spec in specs/2026-11-09-link-drafts/.
 - When every item in validation.md passes, mark Phase 11.3 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `schemas/link-analysis.schema.json`, `prompts/link-analysis.md` (`ContentType.LinkAnalysis`, validated but never imported or stored); `LinkAddress` (public https only, DNS and redirects checked), `LinkReader` with the named client `link`, `HtmlMeta`, `YouTubeLink`, `POST /api/posts/link/read` and `/context`; "Bağlantıdan taslak" on Gönderiler with a required note; validated with real reads of public pages and a local AI stub, no paid call; tech-stack and specs updated; phase 11.3 done.
 
-## 2026-11-09 – Release 0.2.0 and install it
-**Phase:** release
-**Prompt:**
-çalışıyordur test etmiyecem şimdi benim release güncelle ve bilgilerim gitmesin ama kur benim bilgisayra
-**Result:** version 0.2.0 in `Directory.Build.props`, `package.json` and the lockfile; `DevPath Setup 0.2.0.exe` built and installed over 0.1.0 with the data folder intact and backed up first; tag `v0.2.0`.
 
 ## 2026-11-09 – Add phase 12.1 opportunity sites
 **Phase:** 12.1 Opportunity sites
@@ -1001,8 +996,4 @@ Implement the spec in specs/2026-11-09-opportunity-sites/.
 - When every item in validation.md passes, mark Phase 12.1 as done in roadmap.md, show me the manual test steps, and stop. Do not start the next phase.
 **Result:** `Modules/Opportunities/` (`OpportunitySite` with four defaults shown until the first edit, `OpportunitySiteUrl` bare domain or https only, `OpportunityService` in `settings.json` → `opportunities.sites`, `GET`/`POST`/`DELETE /api/opportunities/sites`, no HTTP client); Ayarlar → "Fırsat siteleri" (`OpportunitySitesForm`) and the Ana Sayfa card (`OpportunitiesCard`, `openExternal`); validated in the dev app (M1–M7), test section removed afterwards; tech-stack updated; phase 12.1 done.
 
-## 2026-11-09 – Release 0.3.0 and install it
-**Phase:** release
-**Prompt:**
-şimdi benim masaüstüdekinide güncellesene fırsat sitelrine görmek istiyorunm
-**Result:** version 0.3.0 in `Directory.Build.props`, `package.json` and the lockfile; `DevPath Setup 0.3.0.exe` built and installed over 0.2.0 with the data folder intact and backed up first; tag `v0.3.0`.
+
